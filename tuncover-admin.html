@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TunCover — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<!-- MOBILE TOP BAR -->
+<div class="mobile-topbar">
+  <button class="mob-menu-btn" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+  <span style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:#fff;font-weight:600;">TunCover Admin</span>
+  <span style="font-size:0.75rem;color:var(--clay);">●  Live</span>
+</div>
+
+<div class="admin-wrap">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <a href="tuncover-home.html" class="brand-logo">TunCover</a>
+      <div class="brand-tag">Admin Panel</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">Overview</div>
+      <button class="nav-item active" onclick="showPanel('dashboard',this)">
+        <span class="ic">📊</span> Dashboard
+      </button>
+
+      <div class="nav-group-label">Users</div>
+      <button class="nav-item" onclick="showPanel('users',this)">
+        <span class="ic">👥</span> All Users
+      </button>
+      <button class="nav-item" onclick="showPanel('artisans',this)">
+        <span class="ic">🏺</span> Artisans
+        <span class="nav-badge" id="pendingBadge">3</span>
+      </button>
+
+      <div class="nav-group-label">Content</div>
+      <button class="nav-item" onclick="showPanel('activities',this)">
+        <span class="ic">🗺</span> Activities
+      </button>
+      <button class="nav-item" onclick="showPanel('reservations',this)">
+        <span class="ic">📅</span> Reservations
+      </button>
+      <button class="nav-item" onclick="showPanel('reviews',this)">
+        <span class="ic">⭐</span> Reviews
+      </button>
+
+      <div class="nav-group-label">Reports</div>
+      <button class="nav-item" onclick="showPanel('stats',this)">
+        <span class="ic">📈</span> Statistics
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="s-avatar">AD</div>
+        <div>
+          <div class="s-name">Admin</div>
+          <div class="s-role">Super Admin</div>
+        </div>
+ <button class="s-logout" onclick="handleLogout()" title="Sign out">↩</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <main class="admin-main">
+    <div class="topbar">
+      <h1 id="panelTitle">Dashboard</h1>
+      <div class="topbar-right">
+        <div class="search-box">
+          <span style="color:var(--text-m);font-size:0.85rem;">🔍</span>
+          <input type="text" placeholder="Search users, activities..."/>
+        </div>
+        <button class="topbar-btn">🔔</button>
+        <button class="topbar-btn" onclick="window.location='tuncover-home.html'">← View Site</button>
+      </div>
+    </div>
+
+    <!-- ══ PANEL: DASHBOARD ══ -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon">👥</div>
+          <div class="stat-label">Total Users</div>
+          <div class="stat-num" id="totalUsers">—</div>
+          <div class="stat-sub up">↑ 12 this week</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon">🏺</div>
+          <div class="stat-label">Active Artisans</div>
+          <div class="stat-num" id="totalArtisans">—</div>
+          <div class="stat-sub warn">3 pending validation</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-icon">📅</div>
+          <div class="stat-label">Reservations</div>
+          <div class="stat-num" id="totalReservations">—</div>
+          <div class="stat-sub up">↑ 24 this month</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon">🗺</div>
+          <div class="stat-label">Activities</div>
+          <div class="stat-num" id="totalActivities">—</div>
+          <div class="stat-sub warn">8 pending review</div>
+        </div>
+      </div>
+
+      <!-- RECENT ACTIVITY + CHART -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">Bookings by Region</div></div>
+          </div>
+          <div style="padding:1.2rem 1.5rem;" id="regionChart">
+            <div class="chart-row"><span class="chart-label">Tunis</span><div class="chart-bar-bg"><div class="chart-bar-fill" style="width:78%;background:var(--clay);"></div></div><span class="chart-value">78%</span></div>
+            <div class="chart-row"><span class="chart-label">Nabeul</span><div class="chart-bar-bg"><div class="chart-bar-fill" style="width:62%;background:var(--blue);"></div></div><span class="chart-value">62%</span></div>
+            <div class="chart-row"><span class="chart-label">Kairouan</span><div class="chart-bar-bg"><div class="chart-bar-fill" style="width:45%;background:var(--green);"></div></div><span class="chart-value">45%</span></div>
+            <div class="chart-row"><span class="chart-label">Tozeur</span><div class="chart-bar-bg"><div class="chart-bar-fill" style="width:34%;background:var(--amber);"></div></div><span class="chart-value">34%</span></div>
+            <div class="chart-row"><span class="chart-label">Djerba</span><div class="chart-bar-bg"><div class="chart-bar-fill" style="width:28%;background:var(--gold);"></div></div><span class="chart-value">28%</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">Artisans Pending Validation</div></div>
+            <button class="btn-primary-sm" onclick="showPanel('artisans',document.querySelectorAll('.nav-item')[3])">View All</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Craft</th><th>City</th><th>Actions</th></tr></thead>
+              <tbody id="pendingArtisansMini"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECENT REGISTRATIONS -->
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Recent Registrations</div><div class="card-subtitle">Latest users who joined TunCover</div></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>User</th><th>Role</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="recentUsers"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PANEL: ALL USERS ══ -->
+    <div class="panel" id="panel-users">
+      <div class="filters-row">
+        <input class="filter-input" type="text" placeholder="🔍  Search by name or email..." id="userSearch" oninput="renderUsers()"/>
+        <select class="filter-select" id="userRoleFilter" onchange="renderUsers()">
+          <option value="">All Roles</option>
+          <option value="touriste">Tourists</option>
+          <option value="artisan">Artisans</option>
+          <option value="admin">Admins</option>
+        </select>
+        <select class="filter-select" id="userStatusFilter" onchange="renderUsers()">
+          <option value="">All Status</option>
+          <option value="actif">Active</option>
+          <option value="banni">Banned</option>
+        </select>
+        <span class="filter-count" id="userCount"></span>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>User</th><th>Role</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="usersTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PANEL: ARTISANS ══ -->
+    <div class="panel" id="panel-artisans">
+      <div class="filters-row">
+        <input class="filter-input" type="text" placeholder="🔍  Search artisans..." id="artisanSearch" oninput="renderArtisans()"/>
+        <select class="filter-select" id="artisanStatusFilter" onchange="renderArtisans()">
+          <option value="">All Status</option>
+          <option value="en_attente">Pending</option>
+          <option value="valide">Validated</option>
+          <option value="rejete">Rejected</option>
+        </select>
+        <span class="filter-count" id="artisanCount"></span>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Artisan</th><th>Craft</th><th>City</th><th>Rating</th><th>Workshops</th><th>Validation</th><th>Actions</th></tr></thead>
+            <tbody id="artisansTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PANEL: ACTIVITIES ══ -->
+    <div class="panel" id="panel-activities">
+      <div class="filters-row">
+        <input class="filter-input" type="text" placeholder="🔍  Search activities..." id="actSearch" oninput="renderActivities()"/>
+        <select class="filter-select" id="actStatusFilter" onchange="renderActivities()">
+          <option value="">All Status</option>
+          <option value="publie">Published</option>
+          <option value="brouillon">Draft</option>
+          <option value="pause">Paused</option>
+        </select>
+        <span class="filter-count" id="actCount"></span>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Activity</th><th>Artisan</th><th>City</th><th>Price</th><th>Bookings</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="activitiesTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PANEL: RESERVATIONS ══ -->
+    <div class="panel" id="panel-reservations">
+      <div class="filters-row">
+        <select class="filter-select" id="resStatusFilter" onchange="renderReservations()">
+          <option value="">All Status</option>
+          <option value="confirmee">Confirmed</option>
+          <option value="en_attente">Pending</option>
+          <option value="annulee">Cancelled</option>
+          <option value="terminee">Completed</option>
+        </select>
+        <span class="filter-count" id="resCount"></span>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tourist</th><th>Activity</th><th>Date</th><th>Guests</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="reservationsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PANEL: REVIEWS ══ -->
+    <div class="panel" id="panel-reviews">
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tourist</th><th>Activity</th><th>Rating</th><th>Comment</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="reviewsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PANEL: STATISTICS ══ -->
+    <div class="panel" id="panel-stats">
+      <div class="stats-grid">
+        <div class="stat-card blue"><div class="stat-icon">💰</div><div class="stat-label">Revenue This Month</div><div class="stat-num" id="statsMonthRevenue">—</div><div class="stat-sub up">TND collected</div></div>
+        <div class="stat-card green"><div class="stat-icon">📈</div><div class="stat-label">Avg Booking Value</div><div class="stat-num" id="statsAvgBooking">—</div><div class="stat-sub" id="statsAvgSub">TND / booking</div></div>
+        <div class="stat-card amber"><div class="stat-icon">⭐</div><div class="stat-label">Platform Rating</div><div class="stat-num" id="statsAvgRating">—</div><div class="stat-sub up" id="statsRatingSub">— reviews</div></div>
+        <div class="stat-card red"><div class="stat-icon">🔄</div><div class="stat-label">Cancellation Rate</div><div class="stat-num" id="statsCancRate">—%</div><div class="stat-sub warn" id="statsCancSub">of all bookings</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Bookings by Category</div></div>
+          <div style="padding:1.2rem 1.5rem;">
+            <div class="chart-row"><span class="chart-label">Workshops</span><div class="chart-bar-bg"><div class="chart-bar-fill" style="width:82%;background:var(--clay);"></div></div><span class="chart-value">82</span></div>
+            <div class="chart-row"><span class="chart-label">Heritage</span><div class="chart-bar-bg"><div class="chart-bar-fill" style="width:65%;background:var(--blue);"></div></div><span class="chart-value">65</span></div>
+            <div class="chart-row"><span class="chart-label">Tours</span><div class="chart-bar-bg"><div class="chart-bar-fill" style="width:48%;background:var(--green);"></div></div><span class="chart-value">48</span></div>
+            <div class="chart-row"><span class="chart-label">Events</span><div class="chart-bar-bg"><div class="chart-bar-fill" style="width:31%;background:var(--amber);"></div></div><span class="chart-value">31</span></div>
+            <div class="chart-row"><span class="chart-label">Festivals</span><div class="chart-bar-bg"><div class="chart-bar-fill" style="width:22%;background:var(--gold);"></div></div><span class="chart-value">22</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Top Artisans by Revenue</div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Artisan</th><th>Bookings</th><th>Revenue</th></tr></thead>
+              <tbody id="statsTopArtisans">
+                <tr><td class="td-name">Mohamed Trabelsi</td><td>47</td><td style="color:var(--green);">2,840 TND</td></tr>
+                <tr><td class="td-name">Fatma Ben Ali</td><td>31</td><td style="color:var(--green);">1,860 TND</td></tr>
+                <tr><td class="td-name">Leila Mansour</td><td>28</td><td style="color:var(--green);">2,240 TND</td></tr>
+                <tr><td class="td-name">Khaled Mabrouk</td><td>22</td><td style="color:var(--green);">1,100 TND</td></tr>
+                <tr><td class="td-name">Youssef Hamdi</td><td>18</td><td style="color:var(--green);">990 TND</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══ MODALS ══ -->
+<!-- User detail modal -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="userModalTitle">User Details</span>
+      <button class="modal-close" onclick="closeModal('userModal')">✕</button>
+    </div>
+    <div class="modal-body" id="userModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('userModal')">Close</button>
+      <button class="btn-confirm danger" id="banBtn" onclick="banUser()">Ban User</button>
+    </div>
+  </div>
+</div>
+
+<!-- Artisan validation modal -->
+<div class="modal-overlay" id="artisanModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="artisanModalTitle">Artisan Profile</span>
+      <button class="modal-close" onclick="closeModal('artisanModal')">✕</button>
+    </div>
+    <div class="modal-body" id="artisanModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('artisanModal')">Close</button>
+      <button class="btn-confirm danger" onclick="rejectArtisan()">Reject</button>
+      <button class="btn-confirm" onclick="approveArtisan()">Approve</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete confirm modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal" style="width:380px;">
+    <div class="modal-header">
+      <span class="modal-title">Confirm Delete</span>
+      <button class="modal-close" onclick="closeModal('deleteModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.88rem;color:var(--text-l);line-height:1.65;" id="deleteModalMsg">Are you sure you want to delete this item? This action cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('deleteModal')">Cancel</button>
+      <button class="btn-confirm danger" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══ API ENDPOINTS ══════════════════════════════════ */
+const API = {
+  me:           'php/auth/me.php',
+  logout:       'php/auth/logout.php',
+  stats:        'php/admin/stats.php',
+  users:        'php/admin/users.php',
+  artisans:     'php/admin/artisans.php',
+  activities:   'php/admin/activities.php',
+  reservations: 'php/admin/reservations.php',
+  reviews:      'php/admin/reviews.php',
+};
+
+/* ══ STATE ══════════════════════════════════════════ */
+let currentUser    = null;
+let currentArtisan = null;
+let deleteTarget   = null;
+let usersData      = [];
+let artisansData   = [];
+let activitiesData = [];
+
+/* ══ PANEL NAVIGATION ═══════════════════════════════ */
+const panelTitles = {
+  dashboard:'Dashboard', users:'All Users', artisans:'Artisans',
+  activities:'Activities', reservations:'Reservations',
+  reviews:'Reviews', stats:'Statistics'
+};
+
+function showPanel(id, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  const titleEl = document.getElementById('panelTitle');
+  if (titleEl) titleEl.textContent = panelTitles[id] || 'Admin';
+  if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
+
+  if (id === 'dashboard')    loadDashboard();
+  if (id === 'users')        loadUsers();
+  if (id === 'artisans')     loadArtisans();
+  if (id === 'activities')   loadActivities();
+  if (id === 'reservations') loadReservations();
+  if (id === 'reviews')      loadReviews();
+  if (id === 'stats')        loadStats();
+}
+
+/* ══ HELPERS ════════════════════════════════════════ */
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function setStat(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val !== null && val !== undefined ? val : '0';
+}
+function setTxt(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val || '';
+}
+
+function roleBadge(role) {
+  const map = {touriste:['badge-blue','Tourist'],artisan:['badge-amber','Artisan'],admin:['badge-red','Admin']};
+  const [cls, label] = map[role] || ['badge-gray', role];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+function statusBadge(s) {
+  return s === 'actif'
+    ? `<span class="badge badge-green">Active</span>`
+    : `<span class="badge badge-red">Banned</span>`;
+}
+function validationBadge(s) {
+  const map = {en_attente:['badge-amber','Pending'],valide:['badge-green','Validated'],rejete:['badge-red','Rejected']};
+  const [cls, label] = map[s] || ['badge-gray', s];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+function activityBadge(s) {
+  const map = {publie:['badge-green','Published'],brouillon:['badge-gray','Draft'],pause:['badge-amber','Paused']};
+  const [cls, label] = map[s] || ['badge-gray', s];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+function reservationBadge(s) {
+  const map = {confirmee:['badge-green','Confirmed'],en_attente:['badge-amber','Pending'],annulee:['badge-red','Cancelled'],terminee:['badge-blue','Completed']};
+  const [cls, label] = map[s] || ['badge-gray', s];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+/* ══ TOAST ══════════════════════════════════════════ */
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  const icons = { success:'✓', error:'✗', info:'ℹ' };
+  t.innerHTML = `<span>${icons[type]||'✓'}</span> ${msg}`;
+  t.className = 'toast show ' + type;
+  setTimeout(() => { t.className = 'toast'; }, 3000);
+}
+
+/* ══ CHECK ADMIN AUTH ═══════════════════════════════ */
+async function checkAuth() {
+  try {
+    const res  = await fetch(API.me);
+    const data = await res.json();
+    if (!data.success || data.user.role !== 'admin') {
+      window.location.href = 'tuncover-login.html';
+      return false;
+    }
+    const u = data.user;
+    const initials = ((u.prenom||'A')[0] + (u.nom||'D')[0]).toUpperCase();
+    const av = document.querySelector('.s-avatar');
+    if (av) av.textContent = initials;
+    const nm = document.querySelector('.s-name');
+    if (nm) nm.textContent = u.prenom + ' ' + u.nom;
+    return true;
+  } catch(e) {
+    console.error('Auth check failed:', e);
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;flex-direction:column;gap:1rem;background:#0f1117;color:#c4cad6;"><p style="color:#e05252;">⚠ Could not verify session. Is XAMPP running?</p><a href="tuncover-login.html" style="color:#C9703A;">Go to Login</a></div>';
+    return false;
+  }
+}
+
+/* ══ DASHBOARD ══════════════════════════════════════ */
+async function loadDashboard() {
+  try {
+    const res  = await fetch(API.stats);
+    const data = await res.json();
+    if (!data.success) return;
+
+    // Main stat cards — REAL data from DB
+    setStat('totalUsers',        data.users        || 0);
+    setStat('totalArtisans',     data.artisans      || 0);
+    setStat('totalReservations', data.reservations  || 0);
+    setStat('totalActivities',   data.activities    || 0);
+
+    // Stat subtexts
+    setTxt('subUsers',        (data.users||0) + ' total registered');
+    setTxt('subArtisans',     (data.artisans||0) + ' artisans · ' + (data.pending_artisans||0) + ' pending');
+    setTxt('subReservations', (data.month_reservations||0) + ' this month');
+    setTxt('subActivities',   (data.activities||0) + ' published · ' + (data.pending_activities||0) + ' drafts');
+
+    // Pending badge
+    const pb = document.getElementById('pendingBadge');
+    if (pb) {
+      pb.textContent  = data.pending_artisans || '0';
+      pb.style.display = (data.pending_artisans > 0) ? '' : 'none';
+    }
+
+    // Pending artisans mini table
+    const mini = document.getElementById('pendingArtisansMini');
+    if (mini) {
+      if (!data.pending_list || !data.pending_list.length) {
+        mini.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-m);padding:1.5rem;">No pending artisans — all validated ✓</td></tr>';
+      } else {
+        mini.innerHTML = data.pending_list.map(a => `
+          <tr>
+            <td class="td-name">${esc(a.nom||'')}</td>
+            <td>${esc(a.specialite||'—')}</td>
+            <td>${esc(a.ville||'—')}</td>
+            <td><div class="action-group">
+              <button class="btn-action btn-approve" onclick="quickApprove(${a.id_artisan})">Approve</button>
+              <button class="btn-action btn-reject"  onclick="quickReject(${a.id_artisan})">Reject</button>
+            </div></td>
+          </tr>`).join('');
+      }
+    }
+
+    // Recent users table
+    const ru = document.getElementById('recentUsers');
+    if (ru) {
+      if (!data.recent_users || !data.recent_users.length) {
+        ru.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-m);padding:1.5rem;">No users yet</td></tr>';
+      } else {
+        ru.innerHTML = data.recent_users.map(u => {
+          const ban = u.statut === 'banni' ? 'actif' : 'banni';
+          const d   = (u.date_inscription||'').substring(0,10);
+          return `<tr>
+            <td><div class="td-name">${esc((u.prenom||'')+' '+(u.nom||''))}</div><div class="td-email">${esc(u.email||'')}</div></td>
+            <td>${roleBadge(u.role)}</td>
+            <td style="color:var(--text-m);font-size:0.78rem;">${d}</td>
+            <td>${statusBadge(u.statut)}</td>
+            <td><div class="action-group">
+              <button class="btn-action btn-view" onclick="viewUser(${u.id_utilisateur})">View</button>
+              <button class="btn-action btn-ban" onclick="banUser(${u.id_utilisateur},'${ban}')">${u.statut==='banni'?'Unban':'Ban'}</button>
+            </div></td>
+          </tr>`;
+        }).join('');
+      }
+    }
+
+    // Region chart — REAL data, falls back gracefully if empty
+    const rc = document.getElementById('regionChart');
+    if (rc) {
+      if (data.regions && data.regions.length) {
+        const maxR   = Math.max(...data.regions.map(r => parseInt(r.cnt)||0), 1);
+        const colors = ['var(--clay)','var(--blue)','var(--green)','var(--amber)','var(--gold)','#9b59b6'];
+        rc.innerHTML = data.regions.map((r, i) => `
+          <div class="chart-row">
+            <span class="chart-label">${esc(r.ville||'?')}</span>
+            <div class="chart-bar-bg"><div class="chart-bar-fill" style="width:${Math.round((parseInt(r.cnt)||0)/maxR*100)}%;background:${colors[i%colors.length]};"></div></div>
+            <span class="chart-value">${r.cnt}</span>
+          </div>`).join('');
+      } else {
+        rc.innerHTML = '<div style="text-align:center;color:var(--text-m);padding:1.5rem;font-style:italic;font-size:0.82rem;">No bookings yet — chart will appear after first reservations.</div>';
+      }
+    }
+
+  } catch(e) { console.error('loadDashboard error:', e); }
+}
+
+/* ══ USERS ══════════════════════════════════════════ */
+async function loadUsers() {
+  try {
+    const q      = document.getElementById('userSearch')?.value || '';
+    const role   = document.getElementById('userRoleFilter')?.value || '';
+    const statut = document.getElementById('userStatusFilter')?.value || '';
+    const res    = await fetch(`${API.users}?q=${encodeURIComponent(q)}&role=${role}&statut=${statut}`);
+    const data   = await res.json();
+    if (!data.success) return;
+    usersData = data.users;
+    renderUsersTable(usersData);
+  } catch(e) { console.error('loadUsers:', e); }
+}
+
+// Called from oninput/onchange in HTML
+function renderUsers() { loadUsers(); }
+
+function renderUsersTable(list) {
+  setTxt('userCount', list.length + ' users');
+  const tbody = document.getElementById('usersTable');
+  if (!tbody) return;
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-m);padding:1.5rem;">No users found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(u => `
+    <tr>
+      <td><div class="td-name">${esc((u.prenom||'')+' '+(u.nom||''))}</div><div class="td-email">${esc(u.email||'')}</div></td>
+      <td>${roleBadge(u.role)}</td>
+      <td style="color:var(--text-m);font-size:0.78rem;">${(u.date_inscription||'').substring(0,10)}</td>
+      <td>${statusBadge(u.statut)}</td>
+      <td><div class="action-group">
+        <button class="btn-action btn-view" onclick="viewUser(${u.id_utilisateur})">View</button>
+        <button class="btn-action btn-ban" onclick="banUser(${u.id_utilisateur},'${u.statut==='banni'?'actif':'banni'}')">${u.statut==='banni'?'Unban':'Ban'}</button>
+        <button class="btn-action btn-delete" onclick="openDelete('user',${u.id_utilisateur})">Delete</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function viewUser(id) {
+  const u = usersData.find(x => x.id_utilisateur == id);
+  if (!u) return;
+  currentUser = u;
+  document.getElementById('userModalTitle').textContent = (u.prenom||'') + ' ' + (u.nom||'');
+  document.getElementById('userModalBody').innerHTML = `
+    <div class="detail-row"><span class="detail-label">Full Name</span><span class="detail-value">${esc((u.prenom||'')+' '+(u.nom||''))}</span></div>
+    <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">${esc(u.email||'')}</span></div>
+    <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-value">${esc(u.telephone||'—')}</span></div>
+    <div class="detail-row"><span class="detail-label">Role</span>${roleBadge(u.role)}</div>
+    <div class="detail-row"><span class="detail-label">Status</span>${statusBadge(u.statut)}</div>
+    <div class="detail-row"><span class="detail-label">Joined</span><span class="detail-value">${(u.date_inscription||'').substring(0,10)}</span></div>`;
+  const banBtn = document.getElementById('banBtn');
+  if (banBtn) {
+    banBtn.textContent = u.statut==='banni' ? 'Unban User' : 'Ban User';
+    banBtn.onclick = () => { banUser(u.id_utilisateur, u.statut==='banni'?'actif':'banni'); closeModal('userModal'); };
+  }
+  openModal('userModal');
+}
+
+async function banUser(id, newStatut) {
+  try {
+    const res  = await fetch(API.users, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({id, statut: newStatut})
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(`User ${newStatut==='banni'?'banned':'unbanned'} ✓`, newStatut==='banni'?'error':'success');
+      loadUsers();
+      loadDashboard();
+    } else showToast(data.error||'Error','error');
+  } catch(e) { showToast('Network error','error'); }
+}
+
+/* ══ ARTISANS ═══════════════════════════════════════ */
+async function loadArtisans() {
+  try {
+    const q      = document.getElementById('artisanSearch')?.value || '';
+    const statut = document.getElementById('artisanStatusFilter')?.value || '';
+    const res    = await fetch(`${API.artisans}?q=${encodeURIComponent(q)}&statut=${statut}`);
+    const data   = await res.json();
+    if (!data.success) return;
+    artisansData = data.artisans;
+    renderArtisansTable(artisansData);
+  } catch(e) { console.error('loadArtisans:', e); }
+}
+
+function renderArtisans() { loadArtisans(); }
+
+function renderArtisansTable(list) {
+  setTxt('artisanCount', list.length + ' artisans');
+  const tbody = document.getElementById('artisansTable');
+  if (!tbody) return;
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-m);padding:1.5rem;">No artisans found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(a => `
+    <tr>
+      <td><div class="td-name">${esc((a.prenom||'')+' '+(a.nom||''))}</div><div class="td-email">${esc(a.email||'')}</div></td>
+      <td>${esc(a.specialite||'—')}</td>
+      <td>${esc(a.ville||'—')}</td>
+      <td>${a.note_moyenne > 0 ? `<span style="color:var(--gold)">★</span> ${a.note_moyenne}` : '<span style="color:var(--text-m)">—</span>'}</td>
+      <td>${a.nb_activites||0}</td>
+      <td>${validationBadge(a.statut_validation)}</td>
+      <td><div class="action-group">
+        <button class="btn-action btn-view" onclick="viewArtisan(${a.id_artisan})">View</button>
+        ${a.statut_validation==='en_attente' ? `
+          <button class="btn-action btn-approve" onclick="quickApprove(${a.id_artisan})">Approve</button>
+          <button class="btn-action btn-reject"  onclick="quickReject(${a.id_artisan})">Reject</button>` : ''}
+        <button class="btn-action btn-delete" onclick="openDelete('user',${a.id_utilisateur})">Delete</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function viewArtisan(id) {
+  const a = artisansData.find(x => x.id_artisan == id);
+  if (!a) return;
+  currentArtisan = a;
+  document.getElementById('artisanModalTitle').textContent = (a.prenom||'') + ' ' + (a.nom||'');
+  document.getElementById('artisanModalBody').innerHTML = `
+    <div class="detail-row"><span class="detail-label">Name</span><span class="detail-value">${esc((a.prenom||'')+' '+(a.nom||''))}</span></div>
+    <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">${esc(a.email||'')}</span></div>
+    <div class="detail-row"><span class="detail-label">Craft</span><span class="detail-value">${esc(a.specialite||'—')}</span></div>
+    <div class="detail-row"><span class="detail-label">City</span><span class="detail-value">${esc(a.ville||'—')}</span></div>
+    <div class="detail-row"><span class="detail-label">Rating</span><span class="detail-value">${a.note_moyenne > 0 ? '★ '+a.note_moyenne : 'Not rated yet'}</span></div>
+    <div class="detail-row"><span class="detail-label">Listings</span><span class="detail-value">${a.nb_activites||0} published</span></div>
+    <div class="detail-row"><span class="detail-label">Bookings</span><span class="detail-value">${a.nb_reservations||0} total</span></div>
+    <div class="detail-row"><span class="detail-label">Validation</span>${validationBadge(a.statut_validation)}</div>`;
+  openModal('artisanModal');
+}
+
+async function quickApprove(id) {
+  try {
+    const res  = await fetch(API.artisans, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({id, statut:'valide'})
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Artisan approved ✓','success');
+      closeModal('artisanModal');
+      loadArtisans(); loadDashboard();
+    } else showToast(data.error||'Error','error');
+  } catch(e) { showToast('Network error','error'); }
+}
+
+async function quickReject(id) {
+  try {
+    const res  = await fetch(API.artisans, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({id, statut:'rejete'})
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Artisan rejected','error');
+      closeModal('artisanModal');
+      loadArtisans(); loadDashboard();
+    } else showToast(data.error||'Error','error');
+  } catch(e) { showToast('Network error','error'); }
+}
+
+function approveArtisan() { if (currentArtisan) quickApprove(currentArtisan.id_artisan); }
+function rejectArtisan()  { if (currentArtisan) quickReject(currentArtisan.id_artisan);  }
+
+/* ══ ACTIVITIES ══════════════════════════════════════ */
+async function loadActivities() {
+  try {
+    const q      = document.getElementById('actSearch')?.value || '';
+    const statut = document.getElementById('actStatusFilter')?.value || '';
+    const res    = await fetch(`${API.activities}?q=${encodeURIComponent(q)}&statut=${statut}`);
+    const data   = await res.json();
+    if (!data.success) return;
+    activitiesData = data.activities;
+    renderActivitiesTable(activitiesData);
+  } catch(e) { console.error('loadActivities:', e); }
+}
+
+function renderActivities() { loadActivities(); }
+
+function renderActivitiesTable(list) {
+  setTxt('actCount', list.length + ' activities');
+  const tbody = document.getElementById('activitiesTable');
+  if (!tbody) return;
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-m);padding:1.5rem;">No activities found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(a => `
+    <tr>
+      <td class="td-name">${esc(a.titre||'')}</td>
+      <td style="color:var(--text-m);">${esc(a.artisan_nom||'')}</td>
+      <td>${esc(a.ville||'—')}</td>
+      <td style="color:var(--green);">${a.prix||0} TND</td>
+      <td>${a.nb_reservations||0}</td>
+      <td>${activityBadge(a.statut)}</td>
+      <td><div class="action-group">
+        ${a.statut==='publie'
+          ? `<button class="btn-action btn-ban"     onclick="toggleActivity(${a.id_activite},'pause')">Pause</button>`
+          : `<button class="btn-action btn-approve" onclick="toggleActivity(${a.id_activite},'publie')">Publish</button>`}
+        <button class="btn-action btn-delete" onclick="openDelete('activity',${a.id_activite})">Delete</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+async function toggleActivity(id, newStatus) {
+  try {
+    const res  = await fetch(API.activities, {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({id, statut: newStatus})
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(`Activity ${newStatus==='publie'?'published ✓':'paused'}`, newStatus==='publie'?'success':'info');
+      loadActivities();
+    } else showToast(data.error||'Error','error');
+  } catch(e) { showToast('Network error','error'); }
+}
+
+/* ══ RESERVATIONS ════════════════════════════════════ */
+async function loadReservations() {
+  try {
+    const statut = document.getElementById('resStatusFilter')?.value || '';
+    const res    = await fetch(`${API.reservations}?statut=${statut}`);
+    const data   = await res.json();
+    if (!data.success) return;
+    setTxt('resCount', data.reservations.length + ' reservations');
+    const tbody = document.getElementById('reservationsTable');
+    if (!tbody) return;
+    if (!data.reservations.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-m);padding:1.5rem;">No reservations found</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.reservations.map(r => `
+      <tr>
+        <td><div class="td-name">${esc(r.tourist_nom||'')}</div><div class="td-email">${esc(r.tourist_email||'')}</div></td>
+        <td style="color:var(--text-m);">${esc(r.activite_titre||'')}</td>
+        <td style="font-size:0.78rem;color:var(--text-m);">${r.date_activite||''}</td>
+        <td>${r.nb_participants||1}</td>
+        <td style="color:var(--green);">${r.montant_total||0} TND</td>
+        <td>${reservationBadge(r.statut)}</td>
+        <td style="font-size:0.75rem;color:var(--text-m);">${esc(r.artisan_nom||'')}</td>
+      </tr>`).join('');
+  } catch(e) { console.error('loadReservations:', e); }
+}
+
+function renderReservations() { loadReservations(); }
+
+/* ══ REVIEWS ══════════════════════════════════════════ */
+async function loadReviews() {
+  try {
+    const res  = await fetch(API.reviews);
+    const data = await res.json();
+    if (!data.success) return;
+    const tbody = document.getElementById('reviewsTable');
+    if (!tbody) return;
+    if (!data.reviews.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-m);padding:1.5rem;">No reviews yet</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.reviews.map(r => `
+      <tr>
+        <td class="td-name">${esc(r.tourist_nom||'')}</td>
+        <td style="color:var(--text-m);">${esc(r.activite_titre||'')}</td>
+        <td><span style="color:var(--gold);">${'★'.repeat(r.note||0)}${'☆'.repeat(5-(r.note||0))}</span></td>
+        <td style="font-size:0.78rem;color:var(--text-m);max-width:200px;">${esc(r.commentaire||'')}</td>
+        <td style="font-size:0.78rem;color:var(--text-m);">${(r.date_avis||'').substring(0,10)}</td>
+        <td><button class="btn-action btn-delete" onclick="openDelete('review',${r.id_avis})">Remove</button></td>
+      </tr>`).join('');
+  } catch(e) { console.error('loadReviews:', e); }
+}
+
+/* ══ STATISTICS ══════════════════════════════════════ */
+async function loadStats() {
+  try {
+    const res  = await fetch(API.stats);
+    const data = await res.json();
+    if (!data.success) return;
+
+    setStat('statsMonthRevenue', parseFloat(data.month_revenue||0).toFixed(0));
+    setStat('statsAvgBooking',   data.avg_booking || 0);
+    setStat('statsAvgRating',    data.avg_rating > 0 ? data.avg_rating : '—');
+    setTxt('statsRatingSub',    data.total_reviews > 0 ? 'From '+data.total_reviews+' reviews' : 'No reviews yet');
+    setStat('statsCancRate',    (data.cancellation_rate||0) + '%');
+    setTxt('statsCancSub',      'of ' + (data.reservations||0) + ' total bookings');
+
+    // Category chart
+    const catData = (data.categories && data.categories.length)
+      ? data.categories
+      : (data.activities_by_category || []);
+    const catChart = document.getElementById('categoryChart');
+    if (catChart) {
+      if (catData.length) {
+        const maxC   = Math.max(...catData.map(c => parseInt(c.cnt)||0), 1);
+        const colors = ['var(--clay)','var(--blue)','var(--green)','var(--amber)','var(--gold)','#9b59b6'];
+        catChart.innerHTML = catData.map((c, i) => `
+          <div class="chart-row">
+            <span class="chart-label">${esc(c.nom||'Other')}</span>
+            <div class="chart-bar-bg"><div class="chart-bar-fill" style="width:${Math.round((parseInt(c.cnt)||0)/maxC*100)}%;background:${colors[i%colors.length]};"></div></div>
+            <span class="chart-value">${c.cnt}</span>
+          </div>`).join('');
+      } else {
+        catChart.innerHTML = '<div style="text-align:center;color:var(--text-m);padding:1.5rem;font-style:italic;">No data yet</div>';
+      }
+    }
+
+    // Top artisans table
+    const tbody = document.getElementById('statsTopArtisans');
+    if (tbody) {
+      if (data.top_artisans && data.top_artisans.length) {
+        tbody.innerHTML = data.top_artisans.map(a => `
+          <tr>
+            <td class="td-name">${esc(a.nom||'')}</td>
+            <td>${a.bookings||0}</td>
+            <td style="color:var(--green);">${parseFloat(a.revenue||0).toFixed(0)} TND</td>
+          </tr>`).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text-m);padding:1.5rem;font-style:italic;">No data yet</td></tr>';
+      }
+    }
+  } catch(e) { console.error('loadStats:', e); }
+}
+
+/* ══ DELETE ═══════════════════════════════════════════ */
+function openDelete(type, id) {
+  deleteTarget = { type, id };
+  const msgs = {
+    user:     'this user account',
+    activity: 'this activity listing',
+    review:   'this review'
+  };
+  const msg = document.getElementById('deleteModalMsg');
+  if (msg) msg.textContent = `Are you sure you want to delete ${msgs[type]||'this item'}? This action cannot be undone.`;
+  openModal('deleteModal');
+}
+
+async function confirmDelete() {
+  if (!deleteTarget) return;
+  const { type, id } = deleteTarget;
+  const endpoints = { user: API.users, activity: API.activities, review: API.reviews };
+  const endpoint  = endpoints[type];
+  if (!endpoint) { closeModal('deleteModal'); return; }
+
+  try {
+    const res  = await fetch(endpoint, {
+      method: 'DELETE',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({id})
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Deleted successfully ✓','success');
+      closeModal('deleteModal');
+      if (type === 'user')     { loadUsers(); loadDashboard(); }
+      if (type === 'activity') loadActivities();
+      if (type === 'review')   loadReviews();
+    } else showToast(data.error||'Delete failed','error');
+  } catch(e) { showToast('Network error','error'); }
+  deleteTarget = null;
+}
+
+/* ══ MODALS ═══════════════════════════════════════════ */
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+/* ══ SIDEBAR MOBILE ═══════════════════════════════════ */
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+/* ══ LOGOUT ═══════════════════════════════════════════ */
+async function handleLogout() {
+  try { await fetch(API.logout, { method:'POST' }); } catch(e) {}
+  localStorage.removeItem('tc_user');
+  window.location.href = 'tuncover-login.html';
+}
+
+/* ══ INIT ═════════════════════════════════════════════ */
+// Fast redirect if clearly not admin (before server check)
+(function() {
+  try {
+    const u = JSON.parse(localStorage.getItem('tc_user') || 'null');
+    if (!u || !u.id || u.role !== 'admin') {
+      window.location.href = 'tuncover-login.html';
+    }
+  } catch(e) {
+    window.location.href = 'tuncover-login.html';
+  }
+})();
+
+// Then verify with server and load data
+checkAuth().then(ok => { if (ok) loadDashboard(); });
+</script>
+</body>
+</html>

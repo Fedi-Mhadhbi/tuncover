@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="apple-touch-icon" href="https://via.placeholder.com/192x192/C9703A/FFFFFF?text=TC"/>
+  <meta name="theme-color" content="#1A1410"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TunCover — Discover Authentic Tunisia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/home.css">
+</head>
+<body>
+<nav id="nav">
+  <a href="tuncover-home.html" class="nav-logo">TunCover</a>
+  <div class="nav-links" id="navLinks">
+    <a href="tuncover-explore.html">Discover</a>
+    <a href="tuncover-artisans.html">Artisans</a>
+    <a href="tuncover-explore.html">Events</a>
+    <a href="tuncover-login.html" class="nav-cta">Start Exploring</a>
+  </div>
+  <button class="hamburger" id="hamburgerBtn" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-close" onclick="closeMenu()">✕</button>
+    <a href="tuncover-explore.html" onclick="closeMenu()">Discover</a>
+    <a href="tuncover-artisans.html" onclick="closeMenu()">Artisans</a>
+    <a href="tuncover-explore.html" onclick="closeMenu()">Events</a>
+    <a href="tuncover-login.html" class="menu-cta" onclick="closeMenu()">Start Exploring</a>
+  </div>
+  <script>
+  function toggleMenu(){
+    const m=document.getElementById('mobileMenu');
+    const open=m.classList.contains('open');
+    m.classList.toggle('open',!open);
+    document.body.style.overflow=!open?'hidden':'';
+  }
+  function closeMenu(){
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.body.style.overflow='';
+  }
+</script>
+</nav>
+
+<!-- NAV -->
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-tag">Cultural Tourism Platform</div>
+  <h1>Discover<br/><em>Hidden Tunisia</em></h1>
+  <p>Beyond the beaches, a world of ancient craft, living tradition, and authentic human connection awaits.</p>
+  <div class="hero-actions">
+    <a href="tuncover-explore.html" class="btn-primary">Explore Experiences</a>
+    <a href="#how" class="btn-ghost">
+      <span class="play-ic">
+        <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M1 1L9 6L1 11V1Z" fill="white"/></svg>
+      </span>
+      How it works
+    </a>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat-item reveal">
+    <div class="stat-num">240+</div>
+    <div class="stat-label">Cultural Sites</div>
+  </div>
+  <div class="stat-item reveal reveal-delay-1">
+    <div class="stat-num">180+</div>
+    <div class="stat-label">Local Artisans</div>
+  </div>
+  <div class="stat-item reveal reveal-delay-2">
+    <div class="stat-num">24</div>
+    <div class="stat-label">Governorates Covered</div>
+  </div>
+  <div class="stat-item reveal reveal-delay-3">
+    <div class="stat-num">4k+</div>
+    <div class="stat-label">Travellers Connected</div>
+  </div>
+</div>
+
+<!-- EXPERIENCES -->
+<section class="section experiences" id="experiences">
+  <div class="exp-header">
+    <div>
+      <div class="section-tag reveal">Curated Experiences</div>
+      <h2 class="section-title reveal">Where every journey<br/><em>tells a story</em></h2>
+    </div>
+    <p class="exp-desc reveal">Hand-picked cultural experiences spanning ancient ruins, artisan workshops, and living traditions across all of Tunisia.</p>
+  </div>
+  <div class="exp-grid">
+    <div class="exp-card reveal" onclick="window.location='tuncover-experience.html'" style="cursor:pointer">
+      <div class="exp-card-img">
+        <img src="https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&q=80" alt="Medina Tunis"/>
+        <span class="exp-badge">Heritage</span>
+      </div>
+      <div class="exp-card-body">
+        <div class="exp-region">Tunis</div>
+        <h3>Medina of Tunis Walking Tour</h3>
+        <p>Navigate centuries-old souks and discover hidden courtyards with an expert local guide.</p>
+        <div class="exp-meta">
+          <div class="exp-price">From 45 TND <span>/ person</span></div>
+          <div class="exp-arrow">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="#1A1410" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="exp-card reveal reveal-delay-1" onclick="window.location='tuncover-experience.html'" style="cursor:pointer">
+      <div class="exp-card-img">
+        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&q=80" alt="Pottery"/>
+        <span class="exp-badge">Craft</span>
+      </div>
+      <div class="exp-card-body">
+        <div class="exp-region">Nabeul</div>
+        <h3>Traditional Pottery Workshop</h3>
+        <p>Shape clay alongside a master potter using techniques unchanged for five generations.</p>
+        <div class="exp-meta">
+          <div class="exp-price">From 60 TND <span>/ person</span></div>
+          <div class="exp-arrow">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="#1A1410" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="exp-card reveal reveal-delay-2" onclick="window.location='tuncover-experience.html'" style="cursor:pointer">
+      <div class="exp-card-img">
+        <img src="https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=600&q=80" alt="Desert"/>
+        <span class="exp-badge">Adventure</span>
+      </div>
+      <div class="exp-card-body">
+        <div class="exp-region">Tozeur</div>
+        <h3>Sahara Sunset & Berber Camp</h3>
+        <p>Experience an authentic Berber evening under a sky thick with stars at the Sahara's edge.</p>
+        <div class="exp-meta">
+          <div class="exp-price">From 120 TND <span>/ person</span></div>
+          <div class="exp-arrow">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="#1A1410" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAP -->
+<section class="section map-section">
+  <div class="map-layout">
+    <div>
+      <div class="section-tag reveal">Interactive Map</div>
+      <h2 class="section-title reveal">Tunisia at<br/><em>your fingertips</em></h2>
+      <p class="reveal" style="font-size:0.9rem;color:var(--text-m);line-height:1.7;margin-top:1rem;max-width:380px;">
+        Explore a live, interactive map of cultural experiences, artisan workshops, heritage sites, and local events across all 24 governorates.
+      </p>
+      <ul class="map-feature-list reveal">
+        <li><span class="feat-ic">📍</span>Filter by type, region, or date</li>
+        <li><span class="feat-ic">🗺️</span>Get directions & opening hours</li>
+        <li><span class="feat-ic">⭐</span>Save favourites for your trip</li>
+        <li><span class="feat-ic">🔔</span>Be notified of nearby events</li>
+      </ul>
+    </div>
+    <div class="map-placeholder reveal">
+      <div class="map-dots"></div>
+      <!-- Fake pins on a stylised Tunisia outline -->
+      <div class="map-pin" style="top:28%;left:38%">
+        <div class="map-pin-dot"></div>
+        <div class="map-pin-label">Tunis</div>
+      </div>
+      <div class="map-pin" style="top:45%;left:26%">
+        <div class="map-pin-dot"></div>
+        <div class="map-pin-label">Nabeul</div>
+      </div>
+      <div class="map-pin" style="top:62%;left:44%">
+        <div class="map-pin-dot"></div>
+        <div class="map-pin-label">Sfax</div>
+      </div>
+      <div class="map-pin" style="top:78%;left:30%">
+        <div class="map-pin-dot"></div>
+        <div class="map-pin-label">Tozeur</div>
+      </div>
+      <div class="map-pin" style="top:70%;left:60%">
+        <div class="map-pin-dot"></div>
+        <div class="map-pin-label">Djerba</div>
+      </div>
+      <div class="map-overlay-text">
+        Google Maps integration<br/>
+        <span style="font-size:0.75rem;opacity:0.6;font-family:'DM Sans',sans-serif;font-style:normal;">240+ locations mapped</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARTISANS -->
+<section class="section artisans-section">
+  <div class="section-tag">Meet the Makers</div>
+  <h2 class="section-title reveal">Hands that keep<br/><em>tradition alive</em></h2>
+  <div class="artisans-grid">
+    <div class="artisan-card reveal" onclick="window.location='tuncover-artisans.html'" style="cursor:pointer">
+      <img src="https://images.unsplash.com/photo-1607799279861-4dd421887fb3?w=400&q=80" alt="Artisan"/>
+      <div class="artisan-info">
+        <div class="artisan-craft">Weaving</div>
+        <div class="artisan-name">Fatma Ben Ali</div>
+        <div class="artisan-city">Gafsa</div>
+      </div>
+    </div>
+    <div class="artisan-card reveal reveal-delay-1" onclick="window.location='tuncover-artisans.html'" style="cursor:pointer">
+      <img src="https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400&q=80" alt="Artisan"/>
+      <div class="artisan-info">
+        <div class="artisan-craft">Pottery</div>
+        <div class="artisan-name">Mohamed Trabelsi</div>
+        <div class="artisan-city">Nabeul</div>
+      </div>
+    </div>
+    <div class="artisan-card reveal reveal-delay-2" onclick="window.location='tuncover-artisans.html'" style="cursor:pointer">
+      <img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=400&q=80" alt="Artisan"/>
+      <div class="artisan-info">
+        <div class="artisan-craft">Calligraphy</div>
+        <div class="artisan-name">Khaled Mabrouk</div>
+        <div class="artisan-city">Kairouan</div>
+      </div>
+    </div>
+    <div class="artisan-card reveal reveal-delay-3" onclick="window.location='tuncover-artisans.html'" style="cursor:pointer">
+      <img src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=400&q=80" alt="Artisan"/>
+      <div class="artisan-info">
+        <div class="artisan-craft">Jewellery</div>
+        <div class="artisan-name">Leila Mansour</div>
+        <div class="artisan-city">Djerba</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section how-section" id="how">
+  <div class="section-tag reveal">Simple Process</div>
+  <h2 class="section-title reveal">Three steps to your<br/><em>perfect experience</em></h2>
+  <div class="steps">
+    <div class="step reveal">
+      <div class="step-num">01</div>
+      <div class="step-ic">🔍</div>
+      <h3>Discover</h3>
+      <p>Browse the interactive map or search by region, type of experience, or date. Filter by culture, craft, or adventure.</p>
+    </div>
+    <div class="step reveal reveal-delay-1">
+      <div class="step-num">02</div>
+      <div class="step-ic">📅</div>
+      <h3>Book</h3>
+      <p>Reserve your experience directly with the local artisan or guide. Instant confirmation, no middlemen.</p>
+    </div>
+    <div class="step reveal reveal-delay-2">
+      <div class="step-num">03</div>
+      <div class="step-ic">✨</div>
+      <h3>Experience</h3>
+      <p>Arrive, connect with your host, and immerse yourself in an authentic slice of Tunisian heritage and life.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-banner">
+  <h2>Ready to uncover<br/>the <em style="font-style:italic">real</em> Tunisia?</h2>
+  <p>Join thousands of curious travellers who explore beyond the ordinary.</p>
+  <div class="cta-actions">
+    <a href="tuncover-explore.html" class="btn-white">Browse Experiences</a>
+    <a href="tuncover-login.html" class="btn-outline-white">List Your Workshop</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="logo">TunCover</span>
+      <p>Connecting curious travellers with the authentic cultural soul of Tunisia — one experience at a time.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <a href="tuncover-explore.html">Cultural Sites</a>
+      <a href="tuncover-explore.html">Artisan Workshops</a>
+      <a href="tuncover-explore.html">Local Events</a>
+      <a href="tuncover-explore.html">Guided Tours</a>
+    </div>
+    <div class="footer-col">
+      <h4>For Artisans</h4>
+      <a href="tuncover-login.html">Create Profile</a>
+      <a href="tuncover-artisan-dashboard.html">List a Workshop</a>
+      <a href="tuncover-artisan-dashboard.html">Manage Bookings</a>
+      <a href="tuncover-artisans.html">Resources</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="#">About TunCover</a>
+      <a href="#">Our Mission</a>
+      <a href="#">Contact</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 TunCover. All rights reserved.</span>
+    <span>Made with care in Tunisia 🇹🇳</span>
+  </div>
+</footer>
+
+<script>
+  // Nav scroll effect
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+
+
+
+
+<script>
+(function(){
+  try {
+    const u = JSON.parse(localStorage.getItem('tc_user') || 'null');
+    if (!u || !u.id) return;
+    const dest = u.role === 'artisan' ? 'tuncover-artisan-dashboard.html'
+               : u.role === 'admin'   ? 'tuncover-admin.html'
+               : 'tuncover-tourist.html';
+    const label = '\u{1F464} ' + (u.prenom || 'Dashboard');
+    document.querySelectorAll('.nav-cta, .menu-cta').forEach(el => {
+      el.textContent = label;
+      el.href = dest;
+      el.style.background = '#C9703A';
+      el.style.color = '#fff';
+    });
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>

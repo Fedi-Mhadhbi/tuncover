@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="apple-touch-icon" href="https://via.placeholder.com/192x192/C9703A/FFFFFF?text=TC"/>
+  <meta name="theme-color" content="#1A1410"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TunCover — Explore</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/explore.css">
+</head>
+<body>
+<nav id="nav">
+  <a href="tuncover-home.html" class="nav-logo">TunCover</a>
+  <div class="nav-links" id="navLinks">
+    <a href="tuncover-explore.html" class="active">Discover</a>
+    <a href="tuncover-artisans.html">Artisans</a>
+    <a href="tuncover-login.html" class="nav-cta" id="navAuthBtn">Sign In</a>
+  </div>
+  <button class="hamburger" id="hamburgerBtn" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-close" onclick="closeMenu()">✕</button>
+    <a href="tuncover-explore.html" onclick="closeMenu()">Discover</a>
+    <a href="tuncover-artisans.html" onclick="closeMenu()">Artisans</a>
+    <a href="tuncover-login.html" class="menu-cta" id="mobileAuthBtn" onclick="closeMenu()">Sign In</a>
+  </div>
+  <script>
+  function toggleMenu(){
+    const m=document.getElementById('mobileMenu');
+    const open=m.classList.contains('open');
+    m.classList.toggle('open',!open);
+    document.body.style.overflow=!open?'hidden':'';
+  }
+  function closeMenu(){
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.body.style.overflow='';
+  }
+</script>
+</nav>
+<div class="explore-hero">
+  <h1>Explore <em>Tunisia</em></h1>
+  <p>240+ cultural experiences, workshops, sites & events across all 24 governorates</p>
+</div>
+
+<div class="search-bar-wrap">
+  <div class="search-bar">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/><path d="M11 11l3 3" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <input type="text" placeholder="Search experiences, artisans, sites..." id="searchInput"/>
+    <select id="regionSelect">
+      <option value="">All Regions</option>
+      <option>Tunis</option><option>Nabeul</option><option>Sousse</option>
+      <option>Sfax</option><option>Kairouan</option><option>Tozeur</option>
+      <option>Djerba</option><option>Gafsa</option><option>Bizerte</option>
+    </select>
+    <select id="typeSelect">
+      <option value="">All Types</option>
+      <option>Heritage Site</option><option>Workshop</option>
+      <option>Event</option><option>Guided Tour</option><option>Festival</option>
+    </select>
+    <button class="search-btn" onclick="filterCards()">Search</button>
+  </div>
+</div>
+
+<div class="explore-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="filter-group">
+      <h4>Experience Type</h4>
+      <button class="filter-btn active" onclick="setType(this,'all')">All Experiences</button>
+      <button class="filter-btn" onclick="setType(this,'heritage')">🏛 Heritage Sites</button>
+      <button class="filter-btn" onclick="setType(this,'workshop')">🏺 Workshops</button>
+      <button class="filter-btn" onclick="setType(this,'event')">🎭 Events</button>
+      <button class="filter-btn" onclick="setType(this,'tour')">🗺 Guided Tours</button>
+      <button class="filter-btn" onclick="setType(this,'festival')">🎶 Festivals</button>
+    </div>
+    <div class="filter-group">
+      <h4>Region</h4>
+      <label class="filter-check"><input type="checkbox" checked/> Tunis</label>
+      <label class="filter-check"><input type="checkbox" checked/> Nabeul</label>
+      <label class="filter-check"><input type="checkbox"/> Sousse</label>
+      <label class="filter-check"><input type="checkbox"/> Kairouan</label>
+      <label class="filter-check"><input type="checkbox"/> Sfax</label>
+      <label class="filter-check"><input type="checkbox"/> Tozeur</label>
+      <label class="filter-check"><input type="checkbox"/> Djerba</label>
+    </div>
+    <div class="filter-group">
+      <h4>Price Range (TND)</h4>
+      <input type="range" class="price-range" min="0" max="300" value="200" oninput="document.getElementById('priceVal').textContent=this.value"/>
+      <div class="price-labels"><span>0</span><span id="priceVal">200</span></div>
+    </div>
+    <div class="filter-group">
+      <h4>Rating</h4>
+      <label class="filter-check"><input type="checkbox" checked/> ⭐⭐⭐⭐⭐ (5)</label>
+      <label class="filter-check"><input type="checkbox" checked/> ⭐⭐⭐⭐ (4+)</label>
+      <label class="filter-check"><input type="checkbox"/> ⭐⭐⭐ (3+)</label>
+    </div>
+    <div class="filter-group">
+      <h4>Duration</h4>
+      <label class="filter-check"><input type="checkbox"/> Half day (1–4h)</label>
+      <label class="filter-check"><input type="checkbox" checked/> Full day (4–8h)</label>
+      <label class="filter-check"><input type="checkbox"/> Multi-day</label>
+    </div>
+    <button class="sidebar-apply">Apply Filters</button>
+  </aside>
+
+  <!-- RESULTS -->
+  <main class="results-area">
+    <div class="results-header">
+      <span class="results-count"><strong id="resultCount">12</strong> experiences found</span>
+      <div style="display:flex;gap:1rem;align-items:center;">
+        <div class="view-toggle">
+          <button class="view-btn active" title="Grid view">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" stroke="#fff" stroke-width="1.3"/><rect x="8" y="1" width="5" height="5" rx="1" stroke="#fff" stroke-width="1.3"/><rect x="1" y="8" width="5" height="5" rx="1" stroke="#fff" stroke-width="1.3"/><rect x="8" y="8" width="5" height="5" rx="1" stroke="#fff" stroke-width="1.3"/></svg>
+          </button>
+          <button class="view-btn" title="List view">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 3h12M1 7h12M1 11h12" stroke="#6B5C4E" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <select class="sort-select">
+          <option>Sort: Recommended</option>
+          <option>Price: Low to High</option>
+          <option>Price: High to Low</option>
+          <option>Rating: Highest</option>
+          <option>Most Popular</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="type-tabs">
+      <button class="type-tab active" onclick="setTab(this)">All</button>
+      <button class="type-tab" onclick="setTab(this)">🏛 Heritage</button>
+      <button class="type-tab" onclick="setTab(this)">🏺 Craft</button>
+      <button class="type-tab" onclick="setTab(this)">🗺 Tours</button>
+      <button class="type-tab" onclick="setTab(this)">🎭 Events</button>
+      <button class="type-tab" onclick="setTab(this)">🎶 Festivals</button>
+    </div>
+
+    <div class="cards-grid" id="cardsGrid">
+      <!-- Cards generated by JS -->
+    </div>
+
+    <div class="pagination">
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <button class="page-btn">›</button>
+    </div>
+  </main>
+</div>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand"><span class="logo">TunCover</span><p>Connecting curious travellers with the authentic cultural soul of Tunisia.</p></div>
+    <div class="footer-col"><h4>Explore</h4><a href="#">Cultural Sites</a><a href="#">Workshops</a><a href="#">Events</a><a href="#">Tours</a></div>
+    <div class="footer-col"><h4>Artisans</h4><a href="#">Join Us</a><a href="#">List Workshop</a><a href="#">Manage Bookings</a></div>
+    <div class="footer-col"><h4>Company</h4><a href="#">About</a><a href="#">Contact</a><a href="#">Privacy</a></div>
+  </div>
+  <div class="footer-bottom"><span>© 2025 TunCover</span><span>Made in Tunisia 🇹🇳</span></div>
+</footer>
+
+<script>
+/* ── Smart nav ── */
+(function(){
+  try {
+    const u = JSON.parse(localStorage.getItem('tc_user') || 'null');
+    if (!u || !u.id) return;
+    const dest = u.role === 'artisan' ? 'tuncover-artisan-dashboard.html'
+               : u.role === 'admin'   ? 'tuncover-admin.html'
+               : 'tuncover-tourist.html';
+    const label = '\u{1F464} ' + (u.prenom || 'Dashboard');
+    document.querySelectorAll('.nav-cta,.menu-cta').forEach(el => {
+      el.textContent = label; el.href = dest;
+      el.style.background = '#C9703A'; el.style.color = '#fff';
+    });
+  } catch(e) {}
+})();
+
+/* ── Category → fallback image (used when DB has no image_url) ── */
+const CAT_IMG = {
+  'workshop':    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&q=80',
+  'pottery':     'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=600&q=80',
+  'ceramics':    'https://images.unsplash.com/photo-1474649107449-ea4f014b7e9f?w=600&q=80',
+  'weaving':     'https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=600&q=80',
+  'carpet':      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
+  'jewellery':   'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&q=80',
+  'jewelry':     'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&q=80',
+  'calligraphy': 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&q=80',
+  'leather':     'https://images.unsplash.com/photo-1473496169904-658ba7574b0d?w=600&q=80',
+  'cooking':     'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80',
+  'cuisine':     'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80',
+  'pastry':      'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=600&q=80',
+  'heritage':    'https://images.unsplash.com/photo-1548013146-72479768bada?w=600&q=80',
+  'tour':        'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&q=80',
+  'medina':      'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&q=80',
+  'event':       'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=600&q=80',
+  'festival':    'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600&q=80',
+  'adventure':   'https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=600&q=80',
+  'default':     'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&q=80'
+};
+
+function getImg(a) {
+  if (a.image_url) return a.image_url;
+  const keys = [
+    (a.categorie||'').toLowerCase(),
+    (a.artisan_specialite||'').toLowerCase(),
+    (a.titre||'').toLowerCase()
+  ].join(' ');
+  for (const k of Object.keys(CAT_IMG)) {
+    if (keys.includes(k)) return CAT_IMG[k];
+  }
+  return CAT_IMG['default'];
+}
+
+function getBadge(a) {
+  const s = (a.categorie || a.artisan_specialite || 'Experience');
+  return s.charAt(0).toUpperCase() + s.slice(1).split(' ')[0];
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let allActivities = [];
+let currentType   = 'all';
+let searchTimer   = null;
+
+async function loadActivities() {
+  const grid = document.getElementById('cardsGrid');
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-m);font-style:italic;">Loading experiences…</div>';
+  try {
+    const res  = await fetch('php/public/activities.php');
+    const data = await res.json();
+    if (!data.success || !data.activities.length) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-m);">No experiences available yet.</div>';
+      return;
+    }
+    allActivities = data.activities;
+    filterCards();
+  } catch(e) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:#a33;">Could not load. Is XAMPP running?</div>';
+  }
+}
+
+function renderCards(data) {
+  const grid = document.getElementById('cardsGrid');
+  const countEl = document.getElementById('resultCount');
+  if (countEl) countEl.textContent = data.length;
+
+  if (!data.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-m);font-style:italic;">No experiences match your search.</div>';
+    return;
+  }
+
+  grid.innerHTML = data.map(a => {
+    const img     = getImg(a);
+    const badge   = getBadge(a);
+    const rating  = parseFloat(a.avg_rating) > 0 ? parseFloat(a.avg_rating).toFixed(1) : null;
+    const reviews = parseInt(a.nb_reviews)   || 0;
+    const rStr    = rating ? `${rating} (${reviews})` : 'New';
+    const artisan = esc((a.artisan_prenom||'')+' '+(a.artisan_nom||''));
+    const desc    = (a.description||'').substring(0, 90) + ((a.description||'').length > 90 ? '…' : '');
+
+    return `<div class="card" onclick="window.location='tuncover-experience.html?id=${a.id_activite}'" style="cursor:pointer;">
+      <div class="card-img">
+        <img src="${img}" alt="${esc(a.titre)}" loading="lazy" onerror="this.src='${CAT_IMG['default']}'"/>
+        <span class="card-badge">${esc(badge)}</span>
+        <button class="card-fav" onclick="event.stopPropagation()">♡</button>
+      </div>
+      <div class="card-body">
+        <div class="card-region">${esc(a.ville)}</div>
+        <h3>${esc(a.titre)}</h3>
+        <p>${esc(desc)}</p>
+        <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.4rem;">
+          <img src="${a.avatar_url || 'https://images.unsplash.com/photo-1607799279861-4dd421887fb3?w=80&q=70'}" alt="${artisan}" style="width:20px;height:20px;border-radius:50%;object-fit:cover;border:1.5px solid #e0d5c8;" onerror="this.style.display='none'"/>
+          <span style="font-size:0.72rem;color:var(--text-m);">by ${artisan}</span>
+        </div>
+        <div class="card-meta">
+          <div class="card-price">From ${parseFloat(a.prix).toFixed(0)} TND</div>
+          <div class="card-rating"><span class="star">★</span>${rStr}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Filters ── */
+const TYPE_KEYWORDS = {
+  'all':      null,
+  'heritage': ['heritage','tour','guided tour','medina','souk'],
+  'workshop': ['workshop','pottery','ceramics','cooking','cuisine','pastry','leather','craft'],
+  'event':    ['event','festival','cultural'],
+  'tour':     ['tour','guided','medina','souk','heritage'],
+  'festival': ['festival']
+};
+
+function setType(btn, type) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentType = type;
+  filterCards();
+}
+function setTab(btn) {
+  document.querySelectorAll('.type-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function filterCards() {
+  const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+  const allowed = TYPE_KEYWORDS[currentType] || null;
+
+  const filtered = allActivities.filter(a => {
+    const cat   = (a.categorie || '').toLowerCase();
+    const title = (a.titre || '').toLowerCase();
+    const ville = (a.ville || '').toLowerCase();
+    const spec  = (a.artisan_specialite || '').toLowerCase();
+    const desc  = (a.description || '').toLowerCase();
+    const art   = ((a.artisan_prenom||'')+' '+(a.artisan_nom||'')).toLowerCase();
+
+    const matchType = !allowed || allowed.some(k => cat.includes(k) || title.includes(k) || spec.includes(k));
+    const matchQ    = !q || title.includes(q) || ville.includes(q) || desc.includes(q) || art.includes(q) || cat.includes(q) || spec.includes(q);
+    return matchType && matchQ;
+  });
+  renderCards(filtered);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('searchInput');
+  if (inp) inp.addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(filterCards, 250); });
+  loadActivities();
+});
+</script>
+
+
+
+
+<!-- Mobile filter button & drawer -->
+
+<div id="filterFab" style="display:none;position:fixed;bottom:1.5rem;right:1.2rem;z-index:140;">
+  <button onclick="toggleFilters()" style="background:var(--clay);color:#fff;border:none;border-radius:3rem;padding:0.75rem 1.4rem;font-family:'DM Sans',sans-serif;font-size:0.84rem;font-weight:500;cursor:pointer;box-shadow:0 4px 20px rgba(201,112,58,0.45);display:flex;align-items:center;gap:0.4rem;">
+    ⚙ Filters
+  </button>
+</div>
+<div id="filterDrawer" style="position:fixed;inset:0;z-index:180;display:none;">
+  <div onclick="toggleFilters()" style="position:absolute;inset:0;background:rgba(0,0,0,0.5);"></div>
+  <div id="drawerInner" style="position:absolute;bottom:0;left:0;right:0;background:var(--cream);border-radius:1.5rem 1.5rem 0 0;padding:1.5rem 1.5rem 3rem;max-height:80vh;overflow-y:auto;transform:translateY(100%);transition:transform 0.35s ease;">
+    <div style="width:40px;height:4px;background:var(--sand2);border-radius:2px;margin:0 auto 1.5rem;"></div>
+    <p style="font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--clay);font-weight:500;margin-bottom:0.9rem;">Experience Type</p>
+    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.5rem;">
+      <button class="filter-btn active" onclick="setType(this,'all')" style="padding:0.45rem 1rem;border-radius:2rem;">All</button>
+      <button class="filter-btn" onclick="setType(this,'heritage')" style="padding:0.45rem 1rem;border-radius:2rem;">🏛 Heritage</button>
+      <button class="filter-btn" onclick="setType(this,'workshop')" style="padding:0.45rem 1rem;border-radius:2rem;">🏺 Workshop</button>
+      <button class="filter-btn" onclick="setType(this,'event')" style="padding:0.45rem 1rem;border-radius:2rem;">🎭 Events</button>
+      <button class="filter-btn" onclick="setType(this,'tour')" style="padding:0.45rem 1rem;border-radius:2rem;">🗺 Tours</button>
+      <button class="filter-btn" onclick="setType(this,'festival')" style="padding:0.45rem 1rem;border-radius:2rem;">🎶 Festival</button>
+    </div>
+    <p style="font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--clay);font-weight:500;margin-bottom:0.6rem;">Max Price (TND)</p>
+    <input type="range" style="width:100%;accent-color:var(--clay);margin-bottom:1.5rem;" min="0" max="300" value="200" oninput="this.nextElementSibling.textContent='Up to '+this.value+' TND'"/>
+    <p style="font-size:0.78rem;color:var(--text-m);margin-bottom:1.5rem;">Up to 200 TND</p>
+    <button onclick="toggleFilters()" style="width:100%;background:var(--clay);color:#fff;border:none;padding:0.9rem;border-radius:3rem;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;cursor:pointer;">Apply Filters</button>
+  </div>
+</div>
+<style>
+@media(max-width:768px){ #filterFab{display:block!important;} }
+</style>
+<script>
+function toggleFilters(){
+  const d=document.getElementById('filterDrawer');
+  const inner=document.getElementById('drawerInner');
+  const isOpen=d.style.display==='block' && inner.style.transform==='translateY(0%)';
+  if(!isOpen){
+    d.style.display='block';
+    requestAnimationFrame(()=>{ inner.style.transform='translateY(0%)'; });
+  } else {
+    inner.style.transform='translateY(100%)';
+    setTimeout(()=>{ d.style.display='none'; },350);
+  }
+}
+</script>
+
+
+
+</body>
+</html>

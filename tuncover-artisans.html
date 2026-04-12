@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="apple-touch-icon" href="https://via.placeholder.com/192x192/C9703A/FFFFFF?text=TC"/>
+  <meta name="theme-color" content="#1A1410"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TunCover — Artisans</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/artisans.css">
+
+
+</head>
+<body>
+<nav id="nav">
+  <a href="tuncover-home.html" class="nav-logo">TunCover</a>
+  <div class="nav-links" id="navLinks">
+    <a href="tuncover-explore.html">Discover</a>
+    <a href="tuncover-artisans.html" class="active">Artisans</a>
+    <a href="tuncover-login.html" class="nav-cta">Sign In</a>
+  </div>
+  <button class="hamburger" id="hamburgerBtn" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-close" onclick="closeMenu()">✕</button>
+    <a href="tuncover-explore.html" onclick="closeMenu()">Discover</a>
+    <a href="tuncover-artisans.html" onclick="closeMenu()">Artisans</a>
+    <a href="tuncover-login.html" class="menu-cta" onclick="closeMenu()">Sign In</a>
+  </div>
+  <script>
+  function toggleMenu(){
+    const m=document.getElementById('mobileMenu');
+    const open=m.classList.contains('open');
+    m.classList.toggle('open',!open);
+    document.body.style.overflow=!open?'hidden':'';
+  }
+  function closeMenu(){
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.body.style.overflow='';
+  }
+</script>
+</nav>
+<div class="hero-strip">
+  <div>
+    <h1>Meet the <em>Makers</em><br/>of Tunisia</h1>
+    <p>180+ local artisans preserving centuries of Tunisian craft tradition — each one a living connection to the country's cultural heritage.</p>
+    <div class="craft-pills">
+      <span class="craft-pill active" onclick="filterArtisans('all',this)">All Crafts</span>
+      <span class="craft-pill" onclick="filterArtisans('pottery',this)">🏺 Pottery</span>
+      <span class="craft-pill" onclick="filterArtisans('weaving',this)">🧶 Weaving</span>
+      <span class="craft-pill" onclick="filterArtisans('jewellery',this)">💎 Jewellery</span>
+      <span class="craft-pill" onclick="filterArtisans('calligraphy',this)">✍️ Calligraphy</span>
+      <span class="craft-pill" onclick="filterArtisans('leather',this)">👜 Leather</span>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="h-stat"><div class="h-stat-num">180+</div><div class="h-stat-label">Artisans</div></div>
+    <div class="h-stat"><div class="h-stat-num">24</div><div class="h-stat-label">Governorates</div></div>
+    <div class="h-stat"><div class="h-stat-num">40+</div><div class="h-stat-label">Craft types</div></div>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <input type="text" placeholder="🔍  Search artisans by name, craft or city..." id="artisanSearch" oninput="renderArtisans()"/>
+  <select onchange="renderArtisans()" id="regionFilter">
+    <option value="">All Regions</option>
+    <option>Tunis</option><option>Nabeul</option><option>Kairouan</option>
+    <option>Djerba</option><option>Gafsa</option><option>Tozeur</option>
+  </select>
+  <select id="sortFilter">
+    <option>Sort: Featured</option>
+    <option>Most Reviews</option>
+    <option>Highest Rated</option>
+  </select>
+</div>
+
+<div class="artisans-page">
+  <div class="page-header">
+    <h2>All Artisans <span style="font-family:'DM Sans',sans-serif;font-size:0.85rem;color:var(--text-m);font-weight:400;" id="aCount">(8 shown)</span></h2>
+  </div>
+
+  <div class="artisans-grid" id="artisansGrid"></div>
+
+  <div class="join-cta">
+    <div>
+      <h3>Are you an artisan or cultural guide?</h3>
+      <p>Join TunCover and connect directly with thousands of culturally curious travellers from around the world.</p>
+    </div>
+    <a href="tuncover-artisan-dashboard.html" class="btn-white">Join as an Artisan</a>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand"><span class="logo">TunCover</span><p>Connecting curious travellers with the authentic cultural soul of Tunisia.</p></div>
+    <div class="footer-col"><h4>Explore</h4><a href="#">Cultural Sites</a><a href="#">Workshops</a><a href="#">Events</a></div>
+    <div class="footer-col"><h4>Artisans</h4><a href="#">Join Us</a><a href="#">List Workshop</a></div>
+    <div class="footer-col"><h4>Company</h4><a href="#">About</a><a href="#">Contact</a></div>
+  </div>
+  <div class="footer-bottom"><span>© 2025 TunCover</span><span>Made in Tunisia 🇹🇳</span></div>
+</footer>
+
+<script>
+const artisans=[
+  {craft:'pottery',name:'Mohamed Trabelsi',region:'Nabeul',bio:'Third-generation master potter with 30 years of experience in traditional Nabeul ceramics and glazing.',rating:'4.9',reviews:'94',workshops:'3',img:'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400&q=70',avatar:'https://images.unsplash.com/photo-1607799279861-4dd421887fb3?w=100&q=70'},
+  {craft:'weaving',name:'Fatma Ben Ali',region:'Gafsa',bio:'Master weaver specialising in the ancient Gafsa carpet tradition. Her work is exhibited in national museums.',rating:'4.8',reviews:'61',workshops:'2',img:'https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=400&q=70',avatar:'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&q=70'},
+  {craft:'jewellery',name:'Leila Mansour',region:'Djerba',bio:'Specialises in traditional Djerban gold and silver jewellery using ancient Berber techniques and motifs.',rating:'4.7',reviews:'52',workshops:'4',img:'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&q=70',avatar:'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100&q=70'},
+  {craft:'calligraphy',name:'Khaled Mabrouk',region:'Kairouan',bio:'Islamic calligraphy artist trained in the tradition of Kairouan. Offers immersive morning workshops.',rating:'4.9',reviews:'77',workshops:'2',img:'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&q=70',avatar:'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&q=70'},
+  {craft:'leather',name:'Youssef Hamdi',region:'Tunis',bio:'Produces hand-stitched leather goods using traditional Tunisian tanning methods in the Medina souks.',rating:'4.6',reviews:'38',workshops:'1',img:'https://images.unsplash.com/photo-1473496169904-658ba7574b0d?w=400&q=70',avatar:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=70'},
+  {craft:'pottery',name:'Amira Khelifi',region:'Nabeul',bio:'Young potter bringing contemporary designs to traditional Nabeul forms, blending heritage with modern art.',rating:'4.8',reviews:'44',workshops:'3',img:'https://images.unsplash.com/photo-1474649107449-ea4f014b7e9f?w=400&q=70',avatar:'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=100&q=70'},
+  {craft:'weaving',name:'Tahar Salhi',region:'Kairouan',bio:'Specialises in the famous Kairouan mergoum rugs — geometric tapestries with centuries of symbolism.',rating:'4.9',reviews:'83',workshops:'2',img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=70',avatar:'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=70'},
+  {craft:'jewellery',name:'Nadia Belhadj',region:'Tunis',bio:'Creates wearable art inspired by Carthaginian and Roman archaeological motifs found across Tunisia.',rating:'4.7',reviews:'29',workshops:'1',img:'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&q=70',avatar:'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=70'},
+];
+
+let currentCraft='all';
+function filterArtisans(craft,el){
+  currentCraft=craft;
+  document.querySelectorAll('.craft-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  renderArtisans();
+}
+function renderArtisans(){
+  const q=document.getElementById('artisanSearch').value.toLowerCase();
+  const region=document.getElementById('regionFilter').value;
+  const filtered=artisans.filter(a=>{
+    const mc=currentCraft==='all'||a.craft===currentCraft;
+    const mq=!q||a.name.toLowerCase().includes(q)||a.craft.toLowerCase().includes(q)||a.region.toLowerCase().includes(q);
+    const mr=!region||a.region===region;
+    return mc&&mq&&mr;
+  });
+  document.getElementById('aCount').textContent=`(${filtered.length} shown)`;
+  document.getElementById('artisansGrid').innerHTML=filtered.map(a=>`
+    <div class="artisan-card" onclick="window.location='tuncover-artisans.html'">
+      <div class="artisan-card-cover">
+        <img src="${a.img}" alt="${a.name}" loading="lazy"/>
+        <span class="craft-tag">${a.craft}</span>
+      </div>
+      <div class="artisan-card-body">
+        <div class="artisan-avatar-row">
+          <img src="${a.avatar}" class="artisan-avatar" alt="${a.name}"/>
+          <span class="artisan-verified" title="Verified Artisan">✓</span>
+        </div>
+        <div class="artisan-name">${a.name}</div>
+        <div class="artisan-craft">${a.craft}</div>
+        <div class="artisan-location">📍 ${a.region}</div>
+        <p class="artisan-bio">${a.bio}</p>
+        <div class="artisan-footer">
+          <div>
+            <div class="artisan-rating"><span class="star">★</span>${a.rating} (${a.reviews})</div>
+            <div class="artisan-workshops">${a.workshops} workshop${a.workshops>1?'s':''} available</div>
+          </div>
+          <a href="tuncover-experience.html" class="btn-visit">View Profile</a>
+        </div>
+      </div>
+    </div>`).join('');
+}
+renderArtisans();
+</script>
+
+
+
+
+<script>
+(function(){
+  try {
+    const u = JSON.parse(localStorage.getItem('tc_user') || 'null');
+    if (!u || !u.id) return;
+    const dest = u.role === 'artisan' ? 'tuncover-artisan-dashboard.html'
+               : u.role === 'admin'   ? 'tuncover-admin.html'
+               : 'tuncover-tourist.html';
+    const label = '\u{1F464} ' + (u.prenom || 'Dashboard');
+    document.querySelectorAll('.nav-cta, .menu-cta').forEach(el => {
+      el.textContent = label;
+      el.href = dest;
+      el.style.background = '#C9703A';
+      el.style.color = '#fff';
+    });
+  } catch(e) {}
+})();
+</script>
+</body>
+</html>

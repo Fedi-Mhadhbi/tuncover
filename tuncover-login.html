@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#1A1410"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>TunCover — Sign In</title>
+<link rel="manifest" href="manifest.json"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+
+<!-- FIXED NAV — direct child of body, NOT inside auth-wrap -->
+<nav class="top-nav">
+  <a href="tuncover-home.html" class="nav-logo">TunCover</a>
+  <div class="nav-right">
+    <a href="tuncover-explore.html">Discover</a>
+    <a href="tuncover-artisans.html">Artisans</a>
+    <a href="tuncover-home.html" class="back-link">← Home</a>
+  </div>
+  <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" onclick="closeMenu()">✕</button>
+  <a href="tuncover-home.html" onclick="closeMenu()">Home</a>
+  <a href="tuncover-explore.html" onclick="closeMenu()">Discover</a>
+  <a href="tuncover-artisans.html" onclick="closeMenu()">Artisans</a>
+  <a href="tuncover-login.html" class="menu-cta" onclick="closeMenu()">Sign In</a>
+</div>
+
+<!-- TWO-COL: form LEFT, visual RIGHT -->
+<div class="auth-wrap">
+
+  <!-- FORM PANEL -->
+  <div class="auth-form-panel">
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="showPanel('login',this)">Sign In</button>
+      <button class="auth-tab" onclick="showPanel('register',this)">Create Account</button>
+    </div>
+
+    <!-- SIGN IN -->
+    <div id="panel-login">
+      <div class="form-header">
+        <h1>Welcome back</h1>
+        <p>No account? <a href="#" onclick="showPanel('register',document.querySelectorAll('.auth-tab')[1]);return false;">Create one free</a></p>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" placeholder="you@email.com" id="loginEmail"/><span id="loginEmailErr" style="font-size:0.72rem;color:#e05252;display:block;margin-top:0.2rem;"></span>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="password-wrap">
+          <input type="password" placeholder="Your password" id="loginPwd"/><span id="loginPwdErr" style="font-size:0.72rem;color:#e05252;display:block;margin-top:0.2rem;"></span>
+          <button class="pwd-toggle" onclick="togglePwd('loginPwd',this)">Show</button>
+        </div>
+        <a href="#" class="forgot-link">Forgot password?</a>
+      </div>
+      <button class="submit-btn" id="loginBtn" onclick="handleLogin()">Sign In</button>
+      <div class="form-divider">or continue with</div>
+      <button class="social-btn">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.706A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="panel-register" style="display:none;">
+      <div class="form-header">
+        <h1>Create account</h1>
+        <p>Already have one? <a href="#" onclick="showPanel('login',document.querySelectorAll('.auth-tab')[0]);return false;">Sign in</a></p>
+      </div>
+      <p style="font-size:0.72rem;color:var(--text-m);margin-bottom:0.7rem;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;">I am a:</p>
+      <div class="role-selector">
+        <div class="role-btn active" onclick="setRole(this,'touriste')">
+          <div class="role-icon">🧳</div>
+          <div class="role-label">Tourist</div>
+          <div class="role-sub">Discover experiences</div>
+        </div>
+        <div class="role-btn" onclick="setRole(this,'artisan')">
+          <div class="role-icon">🏺</div>
+          <div class="role-label">Artisan / Guide</div>
+          <div class="role-sub">Share my craft</div>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="form-group"><label>First Name</label><input type="text" id="regPrenom" placeholder="Sami"/></div>
+        <div class="form-group"><label>Last Name</label><input type="text" id="regNom" placeholder="Ben Salah"/></div>
+      </div>
+      <div class="form-group"><label>Email Address</label><input type="email" id="regEmail" placeholder="you@email.com"/></div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="password-wrap">
+          <input type="password" placeholder="Min. 8 characters" oninput="checkStrength(this.value)" id="regPwd"/>
+          <button class="pwd-toggle" onclick="togglePwd('regPwd',this)">Show</button>
+        </div>
+        <div class="strength-bars">
+          <div class="sbar" id="s1"></div><div class="sbar" id="s2"></div>
+          <div class="sbar" id="s3"></div><div class="sbar" id="s4"></div>
+        </div>
+      </div>
+      <div id="artisanExtra">
+        <div class="form-group"><label>Craft / Speciality</label><input type="text" id="regSpecialite" placeholder="e.g. Traditional Pottery, Weaving..."/></div>
+        <div class="form-group"><label>City / Region</label><input type="text" id="regVille" placeholder="e.g. Nabeul"/></div>
+      </div>
+      <button class="submit-btn" id="registerBtn" onclick="handleRegister()">Create My Account</button>
+      <p class="terms-note">By creating an account you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
+    </div>
+  </div>
+
+  <!-- VISUAL PANEL -->
+  <div class="auth-visual">
+    <div class="auth-visual-content">
+      <h2>Your gateway to<br/><em>authentic Tunisia</em></h2>
+      <p>Join thousands of travellers and artisans connecting over the rich cultural heritage of Tunisia.</p>
+      <div class="testimonial">
+        <p>"TunCover helped me discover the real Tunisia — not just tourist spots, but living culture and extraordinary people."</p>
+        <div class="testimonial-author">
+          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&q=70" alt=""/>
+          <div><strong>Marie-Claire D.</strong><span>Paris, France · Tourist</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══ PANEL / UI HELPERS ═══════════════════════════════ */
+function showPanel(id,btn){
+  document.getElementById('panel-login').style.display='none';
+  document.getElementById('panel-register').style.display='none';
+  document.getElementById('panel-'+id).style.display='block';
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  clearErrors();
+}
+function setRole(el,role){
+  selectedRole=role;
+  document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('artisanExtra').style.display=role==='artisan'?'block':'none';
+}
+function togglePwd(id,btn){
+  const inp=document.getElementById(id);
+  inp.type=inp.type==='password'?'text':'password';
+  btn.textContent=inp.type==='password'?'Show':'Hide';
+}
+function checkStrength(v){
+  ['s1','s2','s3','s4'].forEach(id=>document.getElementById(id).style.background='var(--sand2)');
+  if(v.length>0) document.getElementById('s1').style.background='#e05252';
+  if(v.length>=6) document.getElementById('s2').style.background='#e8a03a';
+  if(v.length>=8) document.getElementById('s3').style.background='#d4a843';
+  if(v.length>=10&&/[A-Z]/.test(v)&&/[0-9]/.test(v)) document.getElementById('s4').style.background='#6b9e4a';
+}
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=(type==='success'?'✓ ':'✗ ')+msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+function setLoading(btnId,loading){
+  const btn=document.getElementById(btnId);
+  if(!btn)return;
+  btn.disabled=loading;
+  btn.style.opacity=loading?'0.7':'1';
+}
+function clearErrors(){
+  document.querySelectorAll('.field-error').forEach(e=>{e.textContent='';});
+  document.querySelectorAll('input').forEach(i=>i.style.borderColor='');
+}
+function showError(fieldId,msg){
+  const e=document.getElementById(fieldId+'Err');
+  if(e){e.textContent=msg;}
+  const f=document.getElementById(fieldId);
+  if(f)f.style.borderColor='#e05252';
+}
+
+/* ══ ROLE STATE ═══════════════════════════════════════ */
+let selectedRole='touriste';
+
+/* ══ REDIRECT BY ROLE ═════════════════════════════════ */
+function redirectByRole(role){
+  if(role==='admin')   window.location.href='tuncover-admin.html';
+  else if(role==='artisan') window.location.href='tuncover-artisan-dashboard.html';
+  else                 window.location.href='tuncover-tourist.html';
+}
+
+/* ══ AUTO-REDIRECT IF ALREADY LOGGED IN ══════════════ */
+(async function(){
+  try{
+    const u=JSON.parse(localStorage.getItem('tc_user')||'null');
+    if(!u||!u.id||!u.role) return; // not logged in, stay on login page
+
+    // Verify session is still valid with server before redirecting
+    const res = await fetch('php/auth/me.php',{credentials:'include'});
+    const data = await res.json();
+    if(data.success && data.user.role){
+      // Session valid — update localStorage with fresh data and redirect
+      localStorage.setItem('tc_user', JSON.stringify({
+        id: data.user.id, nom: data.user.nom, prenom: data.user.prenom,
+        email: data.user.email, role: data.user.role
+      }));
+      redirectByRole(data.user.role);
+    } else {
+      // Session expired — clear localStorage, stay on login page
+      localStorage.removeItem('tc_user');
+    }
+  }catch(e){
+    // Network error or XAMPP not running — clear and stay
+    localStorage.removeItem('tc_user');
+  }
+})();
+
+/* ══ LOGIN ════════════════════════════════════════════ */
+async function handleLogin(){
+  clearErrors();
+  const email=document.getElementById('loginEmail')?.value.trim()||'';
+  const pwd=document.getElementById('loginPwd')?.value||'';
+
+  if(!email){ showError('loginEmail','Email is required'); return; }
+  if(!pwd)  { showError('loginPwd','Password is required'); return; }
+
+  setLoading('loginBtn',true);
+  try{
+    const res=await fetch('php/auth/login.php',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body:JSON.stringify({email,password:pwd})
+    });
+    const data=await res.json();
+    if(data.success){
+      // Save to localStorage
+      localStorage.setItem('tc_user',JSON.stringify({
+        id:data.user.id, nom:data.user.nom, prenom:data.user.prenom,
+        email:data.user.email, role:data.user.role
+      }));
+      showToast('Welcome back, '+data.user.prenom+'!');
+      setTimeout(()=>redirectByRole(data.user.role),900);
+    }else{
+      if(data.field==='email')    showError('loginEmail',data.error);
+      else if(data.field==='password') showError('loginPwd',data.error);
+      else showToast(data.error||'Login failed','error');
+    }
+  }catch(e){
+    showToast('Connection error — is XAMPP running?','error');
+  }finally{
+    setLoading('loginBtn',false);
+  }
+}
+
+/* ══ REGISTER ═════════════════════════════════════════ */
+async function handleRegister(){
+  clearErrors();
+  const prenom=document.getElementById('regPrenom')?.value.trim()||'';
+  const nom=document.getElementById('regNom')?.value.trim()||'';
+  const email=document.getElementById('regEmail')?.value.trim()||'';
+  const pwd=document.getElementById('regPwd')?.value||'';
+  const specialite=document.getElementById('regSpecialite')?.value.trim()||'';
+  const ville=document.getElementById('regVille')?.value.trim()||'';
+
+  let ok=true;
+  if(!prenom){showError('regPrenom','First name required');ok=false;}
+  if(!nom)   {showError('regNom','Last name required');ok=false;}
+  if(!email) {showError('regEmail','Email required');ok=false;}
+  if(!pwd||pwd.length<8){showError('regPwd','Min 8 characters');ok=false;}
+  if(!ok)return;
+
+  setLoading('registerBtn',true);
+  try{
+    const payload={nom,prenom,email,password:pwd,role:selectedRole};
+    if(selectedRole==='artisan'){payload.specialite=specialite;payload.ville=ville;}
+
+    const res=await fetch('php/auth/register.php',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body:JSON.stringify(payload)
+    });
+    const data=await res.json();
+    if(data.success){
+      localStorage.setItem('tc_user',JSON.stringify({
+        id:data.user.id||data.user_id, nom, prenom, email, role:selectedRole
+      }));
+      showToast('Account created! Welcome 🎉');
+      setTimeout(()=>redirectByRole(selectedRole),1000);
+    }else{
+      if(data.field==='email') showError('regEmail',data.error);
+      else showToast(data.error||'Registration failed','error');
+    }
+  }catch(e){
+    showToast('Connection error — is XAMPP running?','error');
+  }finally{
+    setLoading('registerBtn',false);
+  }
+}
+
+/* ══ KEYBOARD SUPPORT ════════════════════════════════ */
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Enter')return;
+  const loginVisible=document.getElementById('panel-login').style.display!=='none';
+  if(loginVisible) handleLogin();
+  else handleRegister();
+});
+
+/* ══ MOBILE MENU ══════════════════════════════════════ */
+function toggleMenu(){
+  const m=document.getElementById('mobileMenu');
+  m.classList.toggle('open');
+  document.body.style.overflow=m.classList.contains('open')?'hidden':'';
+}
+function closeMenu(){
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.body.style.overflow='';
+}
+</script>
+</body>
+</html>

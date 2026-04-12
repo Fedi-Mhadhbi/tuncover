@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="apple-touch-icon" href="https://via.placeholder.com/192x192/C9703A/FFFFFF?text=TC"/>
+  <meta name="theme-color" content="#1A1410"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TunCover — Pottery Workshop</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/experience.css">
+</head>
+<body>
+<nav id="nav">
+  <a href="tuncover-home.html" class="nav-logo">TunCover</a>
+  <div class="nav-links" id="navLinks">
+    <a href="tuncover-explore.html">Discover</a>
+    <a href="tuncover-artisans.html">Artisans</a>
+    <a href="tuncover-login.html" class="nav-cta">Sign In</a>
+  </div>
+  <button class="hamburger" id="hamburgerBtn" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-close" onclick="closeMenu()">✕</button>
+    <a href="tuncover-explore.html" onclick="closeMenu()">Discover</a>
+    <a href="tuncover-artisans.html" onclick="closeMenu()">Artisans</a>
+    <a href="tuncover-login.html" class="menu-cta" onclick="closeMenu()">Sign In</a>
+  </div>
+  <script>
+  function toggleMenu(){
+    const m=document.getElementById('mobileMenu');
+    const open=m.classList.contains('open');
+    m.classList.toggle('open',!open);
+    document.body.style.overflow=!open?'hidden':'';
+  }
+  function closeMenu(){
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.body.style.overflow='';
+  }
+</script>
+</nav>
+<div class="gallery">
+  <div class="gallery-main">
+    <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=900&q=80" alt="Pottery Workshop"/>
+    <button class="gallery-btn">📷 View All Photos</button>
+  </div>
+  <div class="gallery-thumb"><img src="https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=500&q=70" alt=""/></div>
+  <div class="gallery-thumb"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&q=70" alt=""/></div>
+</div>
+
+<div class="detail-layout">
+  <!-- LEFT COLUMN -->
+  <div>
+    <div class="breadcrumb">
+      <a href="tuncover-home.html">Home</a><span>/</span>
+      <a href="tuncover-explore.html">Explore</a><span>/</span>
+      <a href="#">Nabeul</a><span>/</span>
+      <span style="color:var(--ink)">Pottery Workshop</span>
+    </div>
+
+    <div class="exp-header-row">
+      <span class="exp-type-badge">🏺 Craft Workshop</span>
+      <button style="background:none;border:none;font-size:1.3rem;cursor:pointer;" title="Save">♡</button>
+    </div>
+    <h1 class="exp-title">Traditional Pottery<br/>Workshop — Nabeul</h1>
+    <div class="exp-meta-row">
+      <div class="meta-item"><span class="rating-stars">★★★★★</span>&nbsp;<strong>4.8</strong>&nbsp;(94 reviews)</div>
+      <div class="meta-item">📍 <strong>Nabeul</strong>, Tunisia</div>
+      <div class="meta-item">⏱ <strong>3 hours</strong></div>
+      <div class="meta-item">👥 <strong>Max 8</strong> guests</div>
+      <div class="meta-item">🗣 Arabic, French, English</div>
+    </div>
+
+    <div class="artisan-mini">
+      <img src="https://images.unsplash.com/photo-1607799279861-4dd421887fb3?w=100&q=70" alt="Mohamed"/>
+      <div class="artisan-mini-info">
+        <h4>Mohamed Trabelsi</h4>
+        <p>Master Potter · 30 years experience · Nabeul</p>
+      </div>
+      <a href="tuncover-artisans.html" class="artisan-mini-link">View profile →</a>
+    </div>
+
+    <!-- TABS -->
+    <div class="detail-tabs">
+      <button class="d-tab active" onclick="showTab('about',this)">About</button>
+      <button class="d-tab" onclick="showTab('includes',this)">What's Included</button>
+      <button class="d-tab" onclick="showTab('reviews',this)">Reviews (94)</button>
+      <button class="d-tab" onclick="showTab('location',this)">Location</button>
+    </div>
+
+    <div id="about" class="tab-content active">
+      <p class="desc-text">Step into the ancient world of Nabeul pottery and learn directly from Mohamed Trabelsi, a third-generation master potter whose family has practised this art for over a century. You'll begin by understanding the history of Nabeul's celebrated ceramic tradition before rolling up your sleeves to shape, glaze, and decorate your own piece.</p>
+      <p class="desc-text">The session takes place in Mohamed's authentic workshop in the medina, surrounded by completed works that showcase the range of what you'll soon be able to create. Every piece you make is yours to take home, wrapped and ready to travel.</p>
+      <p class="desc-text" style="font-weight:500;color:var(--ink);">Highlights of this experience:</p>
+      <ul class="highlight-list">
+        <li>Hands-on clay shaping on a traditional wheel</li>
+        <li>Learn traditional Nabeul glazing techniques</li>
+        <li>Decorate your piece with authentic motifs</li>
+        <li>Take your creation home with you</li>
+        <li>Small group — max 8 participants</li>
+        <li>Tea & refreshments included</li>
+      </ul>
+    </div>
+
+    <div id="includes" class="tab-content">
+      <p class="desc-text"><strong style="color:var(--ink)">Included:</strong></p>
+      <ul class="highlight-list">
+        <li>All materials & tools provided</li>
+        <li>Professional instruction throughout</li>
+        <li>Traditional mint tea & pastries</li>
+        <li>Your finished pottery piece to take home</li>
+        <li>Certificate of participation</li>
+        <li>Workshop apron provided</li>
+      </ul>
+      <p class="desc-text" style="margin-top:1rem;"><strong style="color:var(--ink)">Not included:</strong></p>
+      <ul class="highlight-list">
+        <li>Transportation to/from workshop</li>
+        <li>Additional pieces (available to purchase)</li>
+      </ul>
+    </div>
+
+    <div id="reviews" class="tab-content">
+      <div style="display:flex;align-items:center;gap:2rem;margin-bottom:2rem;padding:1.5rem;background:var(--sand);border-radius:0.9rem;">
+        <div style="text-align:center;">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:3.5rem;font-weight:300;color:var(--ink);line-height:1;">4.8</div>
+          <div style="color:var(--gold);font-size:1.1rem;">★★★★★</div>
+          <div style="font-size:0.75rem;color:var(--text-m);">94 reviews</div>
+        </div>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.4rem;"><span style="font-size:0.75rem;color:var(--text-m);width:60px;">Guide</span><div style="flex:1;height:6px;background:var(--sand2);border-radius:3px;"><div style="width:98%;height:100%;background:var(--clay);border-radius:3px;"></div></div><span style="font-size:0.75rem;color:var(--ink);width:24px;">4.9</span></div>
+          <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.4rem;"><span style="font-size:0.75rem;color:var(--text-m);width:60px;">Value</span><div style="flex:1;height:6px;background:var(--sand2);border-radius:3px;"><div style="width:94%;height:100%;background:var(--clay);border-radius:3px;"></div></div><span style="font-size:0.75rem;color:var(--ink);width:24px;">4.7</span></div>
+          <div style="display:flex;align-items:center;gap:0.6rem;"><span style="font-size:0.75rem;color:var(--text-m);width:60px;">Location</span><div style="flex:1;height:6px;background:var(--sand2);border-radius:3px;"><div style="width:96%;height:100%;background:var(--clay);border-radius:3px;"></div></div><span style="font-size:0.75rem;color:var(--ink);width:24px;">4.8</span></div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-header"><div class="reviewer"><div class="reviewer-avatar">SM</div><div><div class="reviewer-name">Sarah M.</div><div class="reviewer-date">March 2025</div></div></div><span style="color:var(--gold);">★★★★★</span></div>
+        <p class="review-text">Absolutely magical experience. Mohamed is a true master and incredibly patient with beginners. My pottery piece made it home safely and now sits proudly on my shelf as the best souvenir I've ever bought.</p>
+      </div>
+      <div class="review-card">
+        <div class="review-header"><div class="reviewer"><div class="reviewer-avatar" style="background:var(--olive);">JL</div><div><div class="reviewer-name">Jean-Luc D.</div><div class="reviewer-date">February 2025</div></div></div><span style="color:var(--gold);">★★★★★</span></div>
+        <p class="review-text">We did this as a couple and it was the highlight of our Tunisia trip. The workshop is authentic, the host is wonderful, and the tea was delicious. Book it.</p>
+      </div>
+    </div>
+
+    <div id="location" class="tab-content">
+      <p class="desc-text">📍 Rue de l'Artisanat, Médina de Nabeul, 8000 Nabeul, Tunisia</p>
+      <div class="map-mini">🗺 Google Maps will load here</div>
+    </div>
+  </div>
+
+  <!-- BOOKING CARD -->
+  <aside>
+    <div class="booking-card">
+      <div class="booking-price">60 TND <span>/ person</span></div>
+      <div class="booking-rating"><span style="color:var(--gold);">★</span> 4.8 · 94 reviews</div>
+
+      <div class="form-group">
+        <label>Select Date</label>
+        <div class="date-row">
+          <input type="date" id="bookDate" oninput="updatePrice()"/>
+          <select onchange="updatePrice()">
+            <option>10:00 AM</option><option>02:00 PM</option><option>04:00 PM</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Guests</label>
+        <div class="guests-row">
+          <span style="font-size:0.85rem;color:var(--text-m);">Number of guests</span>
+          <div class="guests-ctrl">
+            <button class="guest-btn" onclick="changeGuests(-1)">−</button>
+            <span id="guestCount">2</span>
+            <button class="guest-btn" onclick="changeGuests(1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="price-breakdown">
+        <div class="price-row"><span id="priceLabel">60 TND × 2 guests</span><span id="subtotal">120 TND</span></div>
+        <div class="price-row"><span>Service fee</span><span>12 TND</span></div>
+        <div class="price-row total"><span>Total</span><span id="total">132 TND</span></div>
+      </div>
+
+      <button class="book-btn" onclick="window.location='tuncover-tourist.html'">Reserve Now</button>
+      <p class="book-note">Free cancellation up to 48h before</p>
+
+      <div style="display:flex;justify-content:center;gap:1.5rem;margin-top:1.5rem;">
+        <button style="background:none;border:none;font-size:0.78rem;color:var(--text-m);cursor:pointer;">♡ Save</button>
+        <button style="background:none;border:none;font-size:0.78rem;color:var(--text-m);cursor:pointer;">↗ Share</button>
+        <button style="background:none;border:none;font-size:0.78rem;color:var(--text-m);cursor:pointer;">🚩 Report</button>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand"><span class="logo">TunCover</span><p>Connecting curious travellers with the authentic cultural soul of Tunisia.</p></div>
+    <div class="footer-col"><h4>Explore</h4><a href="#">Cultural Sites</a><a href="#">Workshops</a><a href="#">Events</a></div>
+    <div class="footer-col"><h4>Artisans</h4><a href="#">Join Us</a><a href="#">List Workshop</a></div>
+    <div class="footer-col"><h4>Company</h4><a href="#">About</a><a href="#">Contact</a></div>
+  </div>
+  <div class="footer-bottom"><span>© 2025 TunCover</span><span>Made in Tunisia 🇹🇳</span></div>
+</footer>
+
+<script>
+let guests=2;
+function changeGuests(d){
+  guests=Math.max(1,Math.min(8,guests+d));
+  document.getElementById('guestCount').textContent=guests;
+  updatePrice();
+}
+function updatePrice(){
+  const sub=60*guests;
+  document.getElementById('priceLabel').textContent=`60 TND × ${guests} guest${guests>1?'s':''}`;
+  document.getElementById('subtotal').textContent=sub+' TND';
+  document.getElementById('total').textContent=(sub+12)+' TND';
+}
+function showTab(id,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.d-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+
+
+
+<script>
+/* Smart nav — shows user name if logged in, Sign In if not */
+(function(){
+  const nav = document.getElementById('nav');
+  if(!nav) return;
+  // Always add scrolled class since these pages have solid cream nav
+  nav.classList.add('scrolled');
+  window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',window.scrollY>30));
+
+  // Check if logged in
+  try{
+    const u = JSON.parse(localStorage.getItem('tc_user')||'null');
+    if(!u||!u.id) return; // not logged in — keep "Sign In" button
+    
+    // Replace "Sign In" with user name + dashboard link + logout
+    const links = document.getElementById('navLinks');
+    if(!links) return;
+    const cta = links.querySelector('.nav-cta');
+    if(cta){
+      const ini = ((u.prenom||'?')[0]+(u.nom||'?')[0]).toUpperCase();
+      // Replace Sign In button with user chip + logout
+      cta.outerHTML = 
+        '<a href="'+getDashboard(u.role)+'" style="font-size:0.82rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:var(--text-m);display:flex;align-items:center;gap:0.5rem;">'+
+          '<span style="width:28px;height:28px;border-radius:50%;background:var(--clay,#C9703A);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;">'+ini+'</span>'+
+          (u.prenom||'My Account')+
+        '</a>'+
+        '<a href="#" onclick="doLogout()" style="font-size:0.78rem;color:var(--text-m,#6B5C4E);text-decoration:none;letter-spacing:0.05em;text-transform:uppercase;">Sign Out</a>';
+    }
+    // Also fix mobile menu
+    const mobileMenu = document.getElementById('mobileMenu');
+    if(mobileMenu){
+      const mobileCta = mobileMenu.querySelector('.menu-cta');
+      if(mobileCta) mobileCta.href = getDashboard(u.role);
+    }
+  }catch(e){}
+})();
+
+function getDashboard(role){
+  if(role==='admin')   return 'tuncover-admin.html';
+  if(role==='artisan') return 'tuncover-artisan-dashboard.html';
+  return 'tuncover-tourist.html';
+}
+async function doLogout(){
+  try{await fetch('php/auth/logout.php',{method:'POST'});}catch(e){}
+  localStorage.removeItem('tc_user');
+  window.location.href='tuncover-login.html';
+}
+</script>
+</body>
+</html>

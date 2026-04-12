@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="apple-touch-icon" href="https://via.placeholder.com/192x192/C9703A/FFFFFF?text=TC"/>
+  <meta name="theme-color" content="#1A1410"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="css/dashboard.css">
+<title>TunCover — Artisan Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+<style>
+.nav-item { color: rgba(255,255,255,0.65); text-decoration: none; }
+.nav-item:hover { background: rgba(255,255,255,0.08) !important; color: #fff; }
+.nav-item.active { background: rgba(201,112,58,0.25) !important; color: var(--clay,#C9703A) !important; font-weight: 500; }
+.sidebar-nav { display: flex; flex-direction: column; }
+.field-error { display:block; font-size:0.72rem; color:#e05252; margin-top:0.25rem; }
+</style>
+</head>
+<body>
+
+<div class="dash-layout">
+  <aside class="sidebar">
+    <a href="tuncover-home.html" class="sidebar-logo">TunCover</a>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebarAvatar" style="display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:600;color:#fff;background:var(--clay,#C9703A);border-radius:50%;width:48px;height:48px;">?</div>
+      <div class="sidebar-user-info">
+        <div class="name" id="sidebarName">Loading...</div>
+        <div class="role" id="sidebarRole">Artisan</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav" style="flex:1;margin-top:1.5rem;">
+      <a class="nav-item active" onclick="showPanel('overview',this)" style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1.2rem;border-radius:0.7rem;cursor:pointer;margin-bottom:0.2rem;font-size:0.83rem;transition:background 0.2s;"><span>🏠</span> Overview</a>
+      <a class="nav-item" onclick="showPanel('bookings',this)" style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1.2rem;border-radius:0.7rem;cursor:pointer;margin-bottom:0.2rem;font-size:0.83rem;transition:background 0.2s;"><span>📅</span> Bookings</a>
+      <a class="nav-item" onclick="showPanel('listings',this)" style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1.2rem;border-radius:0.7rem;cursor:pointer;margin-bottom:0.2rem;font-size:0.83rem;transition:background 0.2s;"><span>🏺</span> My Listings</a>
+      <a class="nav-item" onclick="showPanel('addlisting',this)" style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1.2rem;border-radius:0.7rem;cursor:pointer;margin-bottom:0.2rem;font-size:0.83rem;transition:background 0.2s;"><span>➕</span> Add Listing</a>
+      <a class="nav-item" onclick="showPanel('earnings',this)" style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1.2rem;border-radius:0.7rem;cursor:pointer;margin-bottom:0.2rem;font-size:0.83rem;transition:background 0.2s;"><span>💰</span> Earnings</a>
+      <a class="nav-item" onclick="showPanel('profile',this)" style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1.2rem;border-radius:0.7rem;cursor:pointer;margin-bottom:0.2rem;font-size:0.83rem;transition:background 0.2s;"><span>👤</span> Profile</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <button onclick="handleLogout()" style="display:flex;align-items:center;gap:0.7rem;width:100%;background:none;border:none;cursor:pointer;padding:0.75rem 1.2rem;border-radius:0.7rem;font-family:inherit;font-size:0.83rem;color:rgba(255,255,255,0.45);transition:all 0.2s;text-align:left;" onmouseover="this.style.background='rgba(224,82,82,0.12)';this.style.color='#e05252';" onmouseout="this.style.background='none';this.style.color='rgba(255,255,255,0.45)';">
+        <span style="font-size:1rem;">↩</span> Sign Out
+      </button>
+      
+    </div>
+  </aside>
+
+  <main class="dash-main">
+    <header class="dash-header">
+      <h1 id="panelTitle">Overview</h1>
+      <div class="header-right">
+        <button class="add-btn" onclick="showPanel('addlisting',document.querySelectorAll('.nav-item')[3])">+ Add New Listing</button>
+      </div>
+    </header>
+
+    <!-- OVERVIEW -->
+    <div class="dash-panel active" id="panel-overview">
+      <div id="artisanGreeting" style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--text-m);font-style:italic;margin-bottom:1.5rem;">Good day 🏺</div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-card-label">Total Bookings</div><div class="stat-card-num" id="statTotalBookings">—</div><div class="stat-card-sub" id="statTotalSub">loading…</div></div>
+        <div class="stat-card"><div class="stat-card-label">Pending</div><div class="stat-card-num" id="statPending">—</div><div class="stat-card-sub warn" id="statPendingSub">loading…</div></div>
+        <div class="stat-card"><div class="stat-card-label">Total Earned</div><div class="stat-card-num" id="statEarned">—</div><div class="stat-card-sub" id="statEarnedSub">TND this month</div></div>
+        <div class="stat-card"><div class="stat-card-label">Avg. Rating</div><div class="stat-card-num" id="statRating">—</div><div class="stat-card-sub" id="statRatingSub">no reviews yet</div></div>
+      </div>
+
+      <div class="chart-box">
+        <div class="chart-header">
+          <span class="chart-title">Bookings Over Time</span>
+          <select class="chart-select"><option>Last 6 Months</option><option>Last Year</option></select>
+        </div>
+        <div class="chart-bars">
+          <div class="chart-bar-wrap"><div class="chart-val">6</div><div class="chart-bar" style="height:40%;"></div><div class="chart-label">Oct</div></div>
+          <div class="chart-bar-wrap"><div class="chart-val">9</div><div class="chart-bar" style="height:60%;"></div><div class="chart-label">Nov</div></div>
+          <div class="chart-bar-wrap"><div class="chart-val">5</div><div class="chart-bar" style="height:33%;"></div><div class="chart-label">Dec</div></div>
+          <div class="chart-bar-wrap"><div class="chart-val">12</div><div class="chart-bar" style="height:80%;"></div><div class="chart-label">Jan</div></div>
+          <div class="chart-bar-wrap"><div class="chart-val">10</div><div class="chart-bar" style="height:67%;"></div><div class="chart-label">Feb</div></div>
+          <div class="chart-bar-wrap"><div class="chart-val">15</div><div class="chart-bar" style="height:100%;"></div><div class="chart-label">Mar</div></div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-header"><span class="table-title">Recent Bookings</span><span style="font-size:0.78rem;color:var(--clay);cursor:pointer;" onclick="showPanel('bookings',document.querySelectorAll('.nav-item')[1])">View all →</span></div>
+        <table>
+          <thead><tr><th>Tourist</th><th>Experience</th><th>Date</th><th>Guests</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+          <tbody id="overviewBookingsTbody"><tr><td colspan="7" style="text-align:center;color:var(--text-m);padding:1.5rem;font-style:italic;">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BOOKINGS -->
+    <div class="dash-panel" id="panel-bookings">
+      <div class="table-wrap">
+        <div class="table-header"><span class="table-title">All Bookings</span></div>
+        <table>
+          <thead><tr><th>Tourist</th><th>Experience</th><th>Date & Time</th><th>Guests</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="bookingsTbody"><tr><td colspan="7" style="text-align:center;color:var(--text-m);padding:1.5rem;font-style:italic;">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LISTINGS -->
+    <div class="dash-panel" id="panel-listings">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
+        <span style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-m);">Your Published & Draft Experiences</span>
+        <button class="add-btn" onclick="showPanel('addlisting',document.querySelectorAll('.nav-item')[3])" style="font-size:0.78rem;padding:0.5rem 1.2rem;">+ Add New</button>
+      </div>
+      <div class="listings-grid" id="listingsGrid">
+        <div style="text-align:center;padding:3rem;color:var(--text-m);font-style:italic;">Loading listings…</div>
+      </div>
+    </div>
+
+    <!-- ADD LISTING -->
+    <div class="dash-panel" id="panel-addlisting">
+      <div class="form-card" id="listing-form-card">
+        <div class="form-section-title" id="listing-form-title">Add New Experience</div>
+        <input type="hidden" id="editListingId" value=""/>
+
+        <div class="fg">
+          <label>Title *</label>
+          <input type="text" id="lstTitre" placeholder="e.g. Traditional Pottery Workshop — Beginner Friendly"/>
+          <span class="field-error" id="lstTitreErr"></span>
+        </div>
+        <div class="form-grid-2">
+          <div class="fg">
+            <label>Category</label>
+            <select id="lstCategorie">
+              <option value="1">Workshop</option>
+              <option value="2">Guided Tour</option>
+              <option value="3">Cultural Event</option>
+              <option value="4">Craft</option>
+              <option value="6">Jewellery</option>
+              <option value="7">Weaving</option>
+              <option value="8">Calligraphy</option>
+              <option value="9">Cooking</option>
+              <option value="10">Heritage</option>
+              <option value="11">Leather</option>
+              <option value="12">Ceramic</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>City / Region *</label>
+            <input type="text" id="lstVille" placeholder="e.g. Nabeul"/>
+          </div>
+        </div>
+        <div class="fg">
+          <label>Description *</label>
+          <textarea id="lstDescription" rows="4" placeholder="Describe your experience — what will guests see, learn and take home?"></textarea>
+          <span class="field-error" id="lstDescErr"></span>
+        </div>
+        <div class="form-section-title" style="margin-top:0.5rem;">Pricing & Availability</div>
+        <div class="form-grid-2">
+          <div class="fg">
+            <label>Price per Person (TND) *</label>
+            <input type="number" id="lstPrix" placeholder="60" min="1"/>
+            <span class="field-error" id="lstPrixErr"></span>
+          </div>
+          <div class="fg">
+            <label>Max Guests</label>
+            <input type="number" id="lstMaxP" placeholder="8" min="1" max="50"/>
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="fg">
+            <label>Duration (hours)</label>
+            <select id="lstDuree">
+              <option value="1">1 hour</option>
+              <option value="2" selected>2 hours</option>
+              <option value="3">3 hours</option>
+              <option value="4">4 hours</option>
+              <option value="6">Half day (6h)</option>
+              <option value="8">Full day (8h)</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Image URL <span style="font-weight:300;font-size:0.75rem;">(paste a photo link)</span></label>
+            <input type="url" id="lstImageUrl" placeholder="https://images.unsplash.com/photo-..."/>
+          </div>
+        </div>
+        <div style="display:flex;gap:1rem;margin-top:1.2rem;flex-wrap:wrap;">
+          <button onclick="submitListing('publie')" id="btnPublish" style="background:var(--clay,#C9703A);color:#fff;border:none;padding:0.85rem 2rem;border-radius:3rem;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:500;cursor:pointer;flex:1;min-width:140px;">
+            🚀 Publish Now
+          </button>
+          <button onclick="submitListing('brouillon')" id="btnDraft" style="background:var(--sand);color:var(--text-m);border:1px solid var(--sand2);padding:0.85rem 2rem;border-radius:3rem;font-family:'DM Sans',sans-serif;font-size:0.85rem;cursor:pointer;flex:1;min-width:140px;">
+            💾 Save as Draft
+          </button>
+          <button onclick="cancelEditListing()" id="btnCancelEdit" style="display:none;background:none;color:#a33;border:1px solid #a33;padding:0.85rem 1.5rem;border-radius:3rem;font-family:'DM Sans',sans-serif;font-size:0.85rem;cursor:pointer;">
+            ✕ Cancel Edit
+          </button>
+        </div>
+        <p id="listing-form-error" style="color:#a33;font-size:0.78rem;margin-top:0.5rem;display:none;"></p>
+      </div>
+    </div>
+
+    <!-- EARNINGS -->
+    <div class="dash-panel" id="panel-earnings">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-card-label">This Month</div><div class="stat-card-num" id="earnThisMonth">—</div><div class="stat-card-sub">TND earned</div></div>
+        <div class="stat-card"><div class="stat-card-label">Last Month</div><div class="stat-card-num" id="earnLastMonth">—</div><div class="stat-card-sub">↑ +35% growth</div></div>
+        <div class="stat-card"><div class="stat-card-label">Total Earnings</div><div class="stat-card-num" id="earnTotal">—</div><div class="stat-card-sub">TND all time</div></div>
+        <div class="stat-card"><div class="stat-card-label">Pending Payout</div><div class="stat-card-num" id="earnPending">—</div><div class="stat-card-sub warn">Processing</div></div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-header"><span class="table-title">Transaction History</span></div>
+        <table>
+          <thead><tr><th>Date</th><th>Booking</th><th>Tourist</th><th>Amount</th><th>Platform Fee</th><th>Net</th><th>Status</th></tr></thead>
+          <tbody id="earningsTbody"><tr><td colspan="7" style="text-align:center;color:var(--text-m);padding:1.5rem;font-style:italic;">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PUBLIC PROFILE -->
+    <div class="dash-panel" id="panel-profile">
+      <div class="profile-preview-banner">
+        <div class="ppb-left">
+          <div class="ppb-avatar" id="ppbAvatar" style="display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:600;color:#fff;background:var(--clay,#C9703A);border-radius:50%;width:56px;height:56px;">?</div>
+          <div><div class="ppb-name" id="ppbName">Loading...</div><div class="ppb-sub">This is how tourists see your public profile</div></div>
+        </div>
+        <a href="tuncover-artisans.html" class="ppb-link">View Public Profile</a>
+      </div>
+      <div class="form-card">
+        <div class="form-section-title">About You</div>
+        <div class="fg"><label>Display Name</label><input type="text" id="pfName" value=""/></div>
+        <div class="fg"><label>Craft Speciality</label><input type="text" id="pfSpecialite" value=""/></div>
+        <div class="fg"><label>Bio</label><textarea id="pfBio"></textarea></div>
+        <div class="form-grid-2">
+          <div class="fg"><label>City</label><input type="text" id="pfVille" value=""/></div>
+          <div class="fg"><label>Experience (years)</label><input type="number" value=""/></div>
+        </div>
+        <div class="fg"><label>Languages Spoken</label><input type="text" value="Arabic, French, English"/></div>
+        <button class="save-btn">Save Profile</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast" style="position:fixed;bottom:2rem;right:2rem;background:var(--ink);color:#fff;padding:1rem 1.5rem;border-radius:0.75rem;font-size:0.85rem;transform:translateY(100px);opacity:0;transition:all 0.4s;z-index:200;">✓ Listing published successfully!</div>
+
+<script>
+/* ══ CONFIG ══════════════════════════════════════════ */
+const BOOKINGS_API = 'php/artisan/bookings.php';
+const LISTINGS_API = 'php/artisan/listings.php';
+const EARNINGS_API = 'php/artisan/earnings.php';
+const ME_API       = 'php/artisan/me.php';
+const PROFILE_API  = 'php/artisan/profile.php';
+
+/* ══ HELPERS ═════════════════════════════════════════ */
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function setEl(id,v){ const e=document.getElementById(id); if(e) e.textContent=v; }
+function setVal(id,v){ const e=document.getElementById(id); if(e) e.value=v; }
+
+function showToast(msg, isError=false){
+  const t=document.getElementById('toast');
+  if(!t) return;
+  t.textContent = msg || '✓ Done!';
+  t.style.background = isError ? '#a32d2d' : 'var(--ink,#1A1410)';
+  t.style.borderLeft = isError ? '3px solid #e05252' : '3px solid #4a9e6a';
+  t.style.transform='translateY(0)';
+  t.style.opacity='1';
+  setTimeout(()=>{ t.style.transform='translateY(100px)'; t.style.opacity='0'; },3500);
+}
+
+function statusBadge(s){
+  const m={
+    en_attente:'<span class="status-badge status-pending">Pending</span>',
+    confirmee:'<span class="status-badge status-confirmed">Confirmed</span>',
+    terminee:'<span class="status-badge status-completed">Completed</span>',
+    annulee:'<span class="status-badge status-cancelled">Cancelled</span>',
+  };
+  return m[s]||`<span class="status-badge">${esc(s)}</span>`;
+}
+
+/* ══ PANELS ══════════════════════════════════════════ */
+const titles={overview:'Overview',bookings:'Bookings',listings:'My Listings',addlisting:'Add New Listing',earnings:'Earnings',profile:'Public Profile'};
+
+function showPanel(id,el){
+  document.querySelectorAll('.dash-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  if(el) el.classList.add('active');
+  document.getElementById('panelTitle').textContent=titles[id]||'Dashboard';
+  // Load real data when switching panels
+  if(id==='bookings')  loadBookings();
+  if(id==='listings')  loadListings();
+  if(id==='earnings')  loadEarnings();
+  if(id==='profile')   loadProfile();
+}
+
+/* ══ AUTH GUARD + LOAD USER ══════════════════════════ */
+(function(){
+  try {
+    const u = JSON.parse(localStorage.getItem('tc_user') || 'null');
+    if (!u || !u.id) { window.location.href = 'tuncover-login.html'; return; }
+    if (u.role === 'touriste') { window.location.href = 'tuncover-tourist.html'; return; }
+    if (u.role === 'admin')    { window.location.href = 'tuncover-admin.html'; return; }
+  } catch(e) { localStorage.removeItem('tc_user'); window.location.href = 'tuncover-login.html'; return; }
+  // Load real user from server
+  loadCurrentUser();
+})();
+
+async function loadCurrentUser(){
+  try {
+    const res  = await fetch(ME_API);
+    // LOOP FIX: never redirect on network/parse errors — only on explicit auth failure
+    let data;
+    try {
+      const text = await res.text();
+      data = JSON.parse(text);
+    } catch(parseErr) {
+      console.warn('me.php returned non-JSON — using cached user data');
+      const cached = JSON.parse(localStorage.getItem('tc_user')||'null');
+      if(cached) { injectCachedUser(cached); }
+      return; // Don't redirect — just stop
+    }
+    // Only redirect if server explicitly says not logged in
+    if(!data.success && (data.error==='not_logged_in' || data.error==='Not authenticated')){
+      localStorage.removeItem('tc_user');
+      window.location.href='tuncover-login.html'; return;
+    }
+    if(!data.success){ console.warn('me.php error (non-fatal):', data.error); return; }
+
+    const u = data.user;
+    const initials = ((u.prenom||'?')[0]+(u.nom||'?')[0]).toUpperCase();
+    const hour = new Date().getHours();
+    const greeting = hour<12?'Good morning':hour<18?'Good afternoon':'Good evening';
+
+    // Sidebar
+    setEl('sidebarAvatar', initials);
+    setEl('sidebarName',   (u.prenom||'')+' '+(u.nom||''));
+
+    // FIX: Use statut_validation from me.php (NOT u.validated which doesn't exist)
+    const isValidated = u.statut_validation === 'valide';
+    const roleEl = document.getElementById('sidebarRole');
+    if(roleEl){
+      roleEl.textContent = isValidated ? '✓ Verified Artisan' : '⏳ Pending Approval';
+      roleEl.style.color  = isValidated ? 'var(--green,#6b9e4a)' : 'var(--gold,#d4a843)';
+    }
+
+    // Greeting
+    setEl('artisanGreeting', greeting + ', ' + (u.prenom||'') + ' 🏺');
+
+    // Profile panel
+    setEl('ppbAvatar', initials);
+    setEl('ppbName',   (u.prenom||'')+' '+(u.nom||''));
+    setVal('pfName',       (u.prenom||'')+' '+(u.nom||''));
+    setVal('pfSpecialite', u.specialite||'');
+    setVal('pfVille',      u.ville||'');
+    setVal('pfBio',        u.bio||'');
+
+    // Update localStorage with server data
+    localStorage.setItem('tc_user', JSON.stringify({
+      id: u.id, nom: u.nom, prenom: u.prenom, email: u.email, role: u.role
+    }));
+
+    // Now load overview data
+    loadOverview();
+
+  } catch(e){
+    console.error('loadCurrentUser error:', e);
+  }
+}
+
+
+function injectCachedUser(u){
+  const initials = ((u.prenom||'?')[0]+(u.nom||'?')[0]).toUpperCase();
+  const hour = new Date().getHours();
+  const greeting = hour<12?'Good morning':hour<18?'Good afternoon':'Good evening';
+  setEl('sidebarAvatar', initials);
+  setEl('sidebarName',   (u.prenom||'')+' '+(u.nom||''));
+  setEl('artisanGreeting', greeting+', '+(u.prenom||'')+' 🎺');
+  setEl('ppbAvatar', initials);
+  setEl('ppbName',   (u.prenom||'')+' '+(u.nom||''));
+  setVal('pfName',   (u.prenom||'')+' '+(u.nom||''));
+  loadOverview();
+}
+/* ══ OVERVIEW — REAL STATS FROM DB ═══════════════════ */
+async function loadOverview(){
+  try{
+    const res  = await fetch(BOOKINGS_API, {credentials:'include'});
+    const data = await res.json();
+    if(!data.success) return;
+
+    const bk      = data.bookings || [];
+    const pending  = bk.filter(b=>b.statut==='en_attente');
+    const total    = bk.length;
+    const revenue  = bk.filter(b=>b.statut!=='annulee').reduce((s,b)=>s+parseFloat(b.montant_total||0),0);
+
+    // Update stat cards
+    setEl('statTotalBookings', total);
+    setEl('statTotalSub',      total===0 ? 'no bookings yet' : '↑ bookings total');
+    setEl('statPending',       pending.length);
+    setEl('statPendingSub',    pending.length>0 ? 'Needs attention' : 'All up to date ✓');
+
+    // Revenue from earnings API if available, otherwise estimate from bookings
+    loadEarningsStats();
+
+    // Render recent bookings in overview table (last 4)
+    const tbody = document.getElementById('overviewBookingsTbody');
+    if(tbody){
+      if(bk.length===0){
+        tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text-m);padding:1.5rem;font-style:italic;">No bookings yet — share your listing link to get started!</td></tr>';
+      } else {
+        tbody.innerHTML = bk.slice(0,4).map(b=>`
+          <tr>
+            <td class="td-name">${esc((b.tourist_prenom||'')+' '+(b.tourist_nom||''))}</td>
+            <td>${esc(b.activite_titre||'')}</td>
+            <td>${b.date_activite||'—'}</td>
+            <td>${b.nb_participants||1}</td>
+            <td>${b.montant_total||0} TND</td>
+            <td>${statusBadge(b.statut)}</td>
+            <td>${b.statut==='en_attente'
+              ? `<span class="td-action" style="color:var(--green);cursor:pointer;" onclick="acceptBooking(${b.id_reservation})">✓ Accept</span>`
+              : `<span class="td-action">View</span>`
+            }</td>
+          </tr>`).join('');
+      }
+    }
+
+  } catch(e){ console.error('loadOverview error:', e); }
+}
+
+async function loadEarningsStats(){
+  try{
+    const res  = await fetch(EARNINGS_API, {credentials:'include'});
+    const data = await res.json();
+    if(!data.success) return;
+    const s = data.stats||{};
+    setEl('statEarned',    (parseFloat(s.this_month||0)).toFixed(0));
+    setEl('statEarnedSub', 'TND this month');
+    setEl('statRating',    s.avg_rating>0 ? s.avg_rating : '—');
+    setEl('statRatingSub', s.total_reviews>0 ? '★ From '+s.total_reviews+' reviews' : 'no reviews yet');
+  } catch(e){}
+}
+
+/* ══ BOOKINGS PANEL — REAL DATA ═══════════════════════ */
+async function loadBookings(){
+  try{
+    const res  = await fetch(BOOKINGS_API, {credentials:'include'});
+    const data = await res.json();
+    if(!data.success) return;
+    const bk = data.bookings || [];
+
+    const tbody = document.getElementById('bookingsTbody');
+    if(!tbody) return;
+
+    if(bk.length===0){
+      tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text-m);padding:2rem;font-style:italic;">No bookings yet.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = bk.map(b=>`
+      <tr>
+        <td class="td-name">${esc((b.tourist_prenom||'')+' '+(b.tourist_nom||''))}</td>
+        <td>${esc(b.activite_titre||'')}</td>
+        <td>${b.date_activite||'—'} · ${b.heure_activite||'—'}</td>
+        <td>${b.nb_participants||1}</td>
+        <td>${b.montant_total||0} TND</td>
+        <td>${statusBadge(b.statut)}</td>
+        <td>
+          ${b.statut==='en_attente' ? `
+            <span class="td-action" style="color:var(--green);cursor:pointer;margin-right:0.5rem;" onclick="acceptBooking(${b.id_reservation})">✓ Accept</span>
+            <span class="td-action" style="color:var(--red,#c0392b);cursor:pointer;" onclick="declineBooking(${b.id_reservation})">✗ Decline</span>
+          ` : `<span class="td-action">View</span>`}
+        </td>
+      </tr>`).join('');
+
+  } catch(e){ console.error('loadBookings error:', e); }
+}
+
+async function acceptBooking(id){
+  try{
+    const res  = await fetch(BOOKINGS_API, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body: JSON.stringify({id, statut:'confirmee'})
+    });
+    const data = await res.json();
+    if(data.success){ showToast('✓ Booking accepted!'); loadBookings(); loadOverview(); }
+    else showToast(data.error||'Error', true);
+  } catch(e){ showToast('Network error', true); }
+}
+
+async function declineBooking(id){
+  if(!confirm('Decline this booking?')) return;
+  try{
+    const res  = await fetch(BOOKINGS_API, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body: JSON.stringify({id, statut:'annulee'})
+    });
+    const data = await res.json();
+    if(data.success){ showToast('Booking declined.', true); loadBookings(); loadOverview(); }
+    else showToast(data.error||'Error', true);
+  } catch(e){ showToast('Network error', true); }
+}
+
+/* ══ LISTINGS — REAL DATA ════════════════════════════ */
+const CAT_IMG_MAP = {
+  'pottery':'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400&q=70',
+  'glazing':'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&q=70',
+  'ceramic':'https://images.unsplash.com/photo-1474649107449-ea4f014b7e9f?w=400&q=70',
+  'jewellery':'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&q=70',
+  'silver':'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&q=70',
+  'leather':'https://images.unsplash.com/photo-1473496169904-658ba7574b0d?w=400&q=70',
+  'calligraphy':'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&q=70',
+  'weaving':'https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=400&q=70',
+  'mergoum':'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=70',
+  'cooking':'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=70',
+  'heritage':'https://images.unsplash.com/photo-1548013146-72479768bada?w=400&q=70',
+  'tour':'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=400&q=70',
+  'default':'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=400&q=70'
+};
+
+function getListingImage(l){
+  if(l.image_url) return l.image_url;
+  const t=(l.titre||'').toLowerCase(), c=(l.categorie_nom||'').toLowerCase();
+  for(const [k,v] of Object.entries(CAT_IMG_MAP)){
+    if(t.includes(k)||c.includes(k)) return v;
+  }
+  return CAT_IMG_MAP.default;
+}
+
+async function loadListings(){
+  const grid = document.getElementById('listingsGrid');
+  if(grid) grid.innerHTML='<div style="text-align:center;padding:3rem;color:var(--text-m);font-style:italic;">Loading listings…</div>';
+  try{
+    const res  = await fetch(LISTINGS_API, {credentials:'include'});
+    const data = await res.json();
+    if(!data.success){ if(grid) grid.innerHTML='<div style="text-align:center;padding:3rem;color:var(--text-m);">Could not load listings.</div>'; return; }
+
+    const listings = (data.listings||[]).filter(l=>l.statut!=='supprime');
+    if(!grid) return;
+
+    if(listings.length===0){
+      grid.innerHTML='<div style="text-align:center;padding:4rem;color:var(--text-m);font-style:italic;">No listings yet — add your first experience!</div>';
+      return;
+    }
+
+    grid.innerHTML = listings.map(l=>`
+      <div class="listing-card">
+        <div class="listing-img">
+          <img src="${esc(getListingImage(l))}" alt="${esc(l.titre)}" loading="lazy" onerror="this.src='${CAT_IMG_MAP.default}'"/>
+          <span class="listing-status" style="background:${l.statut==='publie'?'#e8f5e8':'#fef3e2'};color:${l.statut==='publie'?'#3a8a3a':'#b07b20'};">
+            ${l.statut==='publie'?'● Active':l.statut==='brouillon'?'Draft':'Paused'}
+          </span>
+        </div>
+        <div class="listing-body">
+          <div class="listing-title">${esc(l.titre)}</div>
+          <div class="listing-meta">
+            <span>${l.prix} TND/person</span>
+            <span>${l.total_bookings||0} bookings</span>
+            ${l.avg_rating>0?`<span>★ ${parseFloat(l.avg_rating).toFixed(1)}</span>`:''}
+          </div>
+          <div class="listing-actions">
+            <button class="lst-btn" onclick="editListing(${l.id_activite})">✏ Edit</button>
+            <button class="lst-btn" onclick="toggleListingStatus(${l.id_activite},'${l.statut==='publie'?'brouillon':'publie'}')">${l.statut==='publie'?'⏸ Pause':'▶ Publish'}</button>
+            <button class="lst-btn danger" onclick="deleteListing(${l.id_activite})">🗑 Delete</button>
+          </div>
+        </div>
+      </div>`).join('');
+
+  } catch(e){ console.error('loadListings error:', e); if(grid) grid.innerHTML='<div style="text-align:center;padding:3rem;color:var(--text-m);">Error loading listings.</div>'; }
+}
+
+async function toggleListingStatus(id, newStatus){
+  try{
+    const res  = await fetch(LISTINGS_API, {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body: JSON.stringify({id, statut: newStatus})
+    });
+    const data = await res.json();
+    if(data.success){ showToast(newStatus==='publie'?'✓ Listing published!':'Listing paused.'); loadListings(); }
+    else showToast(data.error||'Failed', true);
+  } catch(e){ showToast('Network error', true); }
+}
+
+async function deleteListing(id){
+  if(!confirm('Delete this listing? This cannot be undone.')) return;
+  try{
+    const res  = await fetch(LISTINGS_API, {
+      method:'DELETE', headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body: JSON.stringify({id})
+    });
+    const data = await res.json();
+    if(data.success){ showToast('Listing deleted.'); loadListings(); }
+    else showToast(data.error||'Failed', true);
+  } catch(e){ showToast('Network error', true); }
+}
+
+function editListing(id){
+  fetch(LISTINGS_API, {credentials:'include'})
+    .then(r=>r.json())
+    .then(data=>{
+      const l = (data.listings||[]).find(x=>x.id_activite==id);
+      if(!l){ showToast('Listing not found', true); return; }
+      setVal('editListingId', id);
+      setVal('lstTitre',       l.titre||'');
+      setVal('lstVille',        l.ville||'');
+      setVal('lstDescription',  l.description||'');
+      setVal('lstPrix',          l.prix||'');
+      setVal('lstMaxP',          l.max_participants||8);
+      setVal('lstDuree',         l.duree_heures||2);
+      setVal('lstImageUrl',      l.image_url||'');
+      if(l.id_categorie){
+        const catEl=document.getElementById('lstCategorie');
+        if(catEl) catEl.value=l.id_categorie;
+      }
+      setEl('listing-form-title', 'Edit: '+l.titre);
+      const cancelBtn=document.getElementById('btnCancelEdit');
+      if(cancelBtn) cancelBtn.style.display='';
+      const publishBtn=document.getElementById('btnPublish');
+      if(publishBtn) publishBtn.textContent='💾 Save Changes';
+      showPanel('addlisting', document.querySelectorAll('.nav-item')[3]);
+    })
+    .catch(()=>showToast('Could not load listing', true));
+}
+
+function cancelEditListing(){
+  setVal('editListingId','');
+  setVal('lstTitre','');
+  setVal('lstVille','');
+  setVal('lstDescription','');
+  setVal('lstPrix','');
+  setVal('lstMaxP','');
+  setVal('lstImageUrl','');
+  setEl('listing-form-title','Add New Experience');
+  const cancelBtn=document.getElementById('btnCancelEdit');
+  if(cancelBtn) cancelBtn.style.display='none';
+  const publishBtn=document.getElementById('btnPublish');
+  if(publishBtn) publishBtn.textContent='🚀 Publish Now';
+  showPanel('listings', document.querySelectorAll('.nav-item')[2]);
+}
+
+async function submitListing(statut){
+  const errEl = document.getElementById('listing-form-error');
+  if(errEl) errEl.style.display='none';
+
+  const titre  = document.getElementById('lstTitre')?.value.trim()||'';
+  const ville  = document.getElementById('lstVille')?.value.trim()||'';
+  const desc   = document.getElementById('lstDescription')?.value.trim()||'';
+  const prix   = parseFloat(document.getElementById('lstPrix')?.value)||0;
+  const maxP   = parseInt(document.getElementById('lstMaxP')?.value)||8;
+  const duree  = parseInt(document.getElementById('lstDuree')?.value)||2;
+  const catId  = parseInt(document.getElementById('lstCategorie')?.value)||null;
+  const imgUrl = document.getElementById('lstImageUrl')?.value.trim()||'';
+  const editId = document.getElementById('editListingId')?.value||'';
+
+  let err='';
+  if(!titre)                       err='Title is required';
+  else if(!desc||desc.length<20)   err='Description must be at least 20 characters';
+  else if(!prix||prix<=0)          err='Price must be greater than 0';
+  if(err){
+    if(errEl){ errEl.textContent=err; errEl.style.display='block'; }
+    return;
+  }
+
+  const payload={titre,ville,description:desc,prix,max_participants:maxP,duree_heures:duree,id_categorie:catId,statut,image_url:imgUrl||null};
+  const isEdit=!!editId;
+  if(isEdit) payload.id=parseInt(editId);
+
+  const btnId=statut==='publie'?'btnPublish':'btnDraft';
+  const btn=document.getElementById(btnId);
+  if(btn) btn.disabled=true;
+
+  try{
+    const res  = await fetch(LISTINGS_API, {
+      method: isEdit?'PUT':'POST',
+      headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if(data.success){
+      showToast(statut==='publie'?'🚀 Listing published!':'💾 Saved as draft.');
+      cancelEditListing();
+      loadListings();
+    } else {
+      if(errEl){ errEl.textContent=data.error||'Failed to save listing'; errEl.style.display='block'; }
+    }
+  } catch(e){
+    if(errEl){ errEl.textContent='Network error'; errEl.style.display='block'; }
+  } finally {
+    if(btn) btn.disabled=false;
+  }
+}
+
+/* ══ EARNINGS — REAL DATA ════════════════════════════ */
+async function loadEarnings(){
+  try{
+    const res  = await fetch(EARNINGS_API, {credentials:'include'});
+    const data = await res.json();
+    if(!data.success) return;
+    const s=data.stats||{};
+
+    setEl('earnThisMonth', parseFloat(s.this_month||0).toFixed(0));
+    setEl('earnLastMonth', parseFloat(s.last_month||0).toFixed(0));
+    setEl('earnTotal',     parseFloat(s.total||0).toFixed(0));
+    setEl('earnPending',   '0');
+
+    const tbody=document.getElementById('earningsTbody');
+    if(!tbody) return;
+    const tx=data.transactions||[];
+    if(tx.length===0){
+      tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text-m);padding:2rem;font-style:italic;">No transactions yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML=tx.map(t=>`
+      <tr>
+        <td style="color:var(--text-m);font-size:0.78rem;">${(t.date_reservation||'').substring(0,10)}</td>
+        <td class="td-name">${esc(t.tourist||'')}</td>
+        <td>${esc(t.activite||'')}</td>
+        <td>${t.montant_total||0} TND</td>
+        <td style="color:var(--red,#c0392b);">−${Math.round((t.montant_total||0)*0.10)} TND</td>
+        <td style="color:var(--green,#4a9e6a);font-weight:500;">${Math.round((t.montant_total||0)*0.90)} TND</td>
+        <td>${statusBadge(t.statut)}</td>
+      </tr>`).join('');
+  } catch(e){ console.error('loadEarnings error:', e); }
+}
+
+/* ══ PROFILE ═════════════════════════════════════════ */
+async function loadProfile(){
+  // Already filled by loadCurrentUser — nothing extra needed
+}
+
+async function saveProfile(){
+  const fullName=(document.getElementById('pfName')?.value||'').trim().split(' ');
+  const prenom=fullName[0]||'';
+  const nom=fullName.slice(1).join(' ')||'';
+  const specialite=document.getElementById('pfSpecialite')?.value||'';
+  const ville=document.getElementById('pfVille')?.value||'';
+  const bio=document.getElementById('pfBio')?.value||'';
+
+  try{
+    const res  = await fetch(PROFILE_API,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body: JSON.stringify({nom,prenom,specialite,ville,bio})
+    });
+    const data = await res.json();
+    if(data.success){
+      showToast('✓ Profile saved!');
+      setEl('sidebarName',(prenom+' '+nom).trim());
+      localStorage.setItem('tc_user', JSON.stringify({
+        ...JSON.parse(localStorage.getItem('tc_user')||'{}'),
+        nom, prenom
+      }));
+    } else showToast(data.error||'Could not save profile', true);
+  } catch(e){ showToast('Network error', true); }
+}
+
+/* ══ LOGOUT ══════════════════════════════════════════ */
+async function handleLogout(){
+  try{ await fetch('php/auth/logout.php', { method:'POST' , credentials:'include'}); } catch(e){}
+  localStorage.removeItem('tc_user');
+  sessionStorage.clear();
+  window.location.href='tuncover-login.html';
+}
+</script>
+
+
+
+
+<div id="mobileTabs" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--ink);border-top:1px solid rgba(255,255,255,0.08);padding:0.5rem 0;z-index:150;padding-bottom:env(safe-area-inset-bottom,0.5rem);">
+  <div style="display:flex;justify-content:space-around;align-items:center;">
+    <button onclick="showPanel('overview',document.querySelectorAll('.nav-item')[0])" style="display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;padding:0.3rem 0.6rem;color:rgba(255,255,255,0.55);font-family:'DM Sans',sans-serif;font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;">
+      <span style="font-size:1.2rem;">🏠</span>Overview
+    </button>
+    <button onclick="showPanel('bookings',document.querySelectorAll('.nav-item')[1])" style="display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;padding:0.3rem 0.6rem;color:rgba(255,255,255,0.55);font-family:'DM Sans',sans-serif;font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;">
+      <span style="font-size:1.2rem;">📅</span>Bookings
+    </button>
+    <button onclick="showPanel('listings',document.querySelectorAll('.nav-item')[2])" style="display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;padding:0.3rem 0.6rem;color:rgba(255,255,255,0.55);font-family:'DM Sans',sans-serif;font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;">
+      <span style="font-size:1.2rem;">🏺</span>Listings
+    </button>
+    <button onclick="showPanel('addlisting',document.querySelectorAll('.nav-item')[3])" style="display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;padding:0.3rem 0.6rem;color:rgba(255,255,255,0.55);font-family:'DM Sans',sans-serif;font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;">
+      <span style="font-size:1.2rem;">＋</span>Add
+    </button>
+    <button onclick="showPanel('earnings',document.querySelectorAll('.nav-item')[4])" style="display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;padding:0.3rem 0.6rem;color:rgba(255,255,255,0.55);font-family:'DM Sans',sans-serif;font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;">
+      <span style="font-size:1.2rem;">💰</span>Earnings
+    </button>
+  </div>
+</div>
+
+
+
+<div id="mobileTabs" style="position:fixed;bottom:0;left:0;right:0;background:var(--ink);border-top:1px solid rgba(255,255,255,0.08);z-index:150;display:none;">
+  <div style="display:flex;justify-content:space-around;padding:0.6rem 0;">
+    <button onclick="showPanel('overview',document.querySelectorAll('.nav-item')[0])" style="display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.56rem;color:rgba(255,255,255,0.5);letter-spacing:0.05em;text-transform:uppercase;padding:0 0.5rem;">
+      <span style="font-size:1.3rem;">🏠</span>Home
+    </button>
+    <button onclick="showPanel('bookings',document.querySelectorAll('.nav-item')[1])" style="display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.56rem;color:rgba(255,255,255,0.5);letter-spacing:0.05em;text-transform:uppercase;padding:0 0.5rem;">
+      <span style="font-size:1.3rem;">📅</span>Bookings
+    </button>
+    <button onclick="showPanel('listings',document.querySelectorAll('.nav-item')[2])" style="display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.56rem;color:rgba(255,255,255,0.5);letter-spacing:0.05em;text-transform:uppercase;padding:0 0.5rem;">
+      <span style="font-size:1.3rem;">🏺</span>Listings
+    </button>
+    <button onclick="showPanel('addlisting',document.querySelectorAll('.nav-item')[3])" style="display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.56rem;color:rgba(255,255,255,0.5);letter-spacing:0.05em;text-transform:uppercase;padding:0 0.5rem;">
+      <span style="font-size:1.3rem;">➕</span>Add
+    </button>
+    <button onclick="showPanel('earnings',document.querySelectorAll('.nav-item')[4])" style="display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.56rem;color:rgba(255,255,255,0.5);letter-spacing:0.05em;text-transform:uppercase;padding:0 0.5rem;">
+      <span style="font-size:1.3rem;">💰</span>Earnings
+    </button>
+  </div>
+</div>
+<style>
+@media(max-width:768px){
+  #mobileTabs{display:block!important;}
+  .dash-panel.active{padding-bottom:5.5rem!important;}
+}
+.field-error{display:block;font-size:0.72rem;color:#e05252;margin-top:0.25rem;}
+</style>
+
+</body>
+</html>

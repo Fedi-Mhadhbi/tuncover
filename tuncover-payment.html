@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TunCover - Payment</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/payment.css">
+</head>
+<body>
+  <div class="pay-shell">
+    <aside class="pay-summary">
+      <a href="tuncover-home.html" class="brand">TunCover</a>
+      <p class="eyebrow">Secure checkout</p>
+      <h1>Complete your  payment</h1>
+
+      <div class="summary-card">
+        <div class="summary-row">
+          <span>Experience</span>
+          <strong id="sumTitle">Loading...</strong>
+        </div>
+        <div class="summary-row">
+          <span>Hosted by</span>
+          <strong id="sumArtisan">-</strong>
+        </div>
+        <div class="summary-row">
+          <span>Date</span>
+          <strong id="sumDate">-</strong>
+        </div>
+        <div class="summary-row">
+          <span>Guests</span>
+          <strong id="sumGuests">-</strong>
+        </div>
+        <div class="summary-row total">
+          <span>Total to pay</span>
+          <strong id="sumAmount">0.00 TND</strong>
+        </div>
+      </div>
+
+      <div class="note-card">
+        <div class="note-title">Demo card tips</div>
+        <p>Use any valid-looking card number with 12 to 19 digits. The amount is locked to the booking total .</p>
+      </div>
+    </aside>
+
+    <main class="pay-main">
+      <div class="checkout-card">
+        <div class="checkout-head">
+          <p class="eyebrow"> card payment</p>
+          <h2>Card details</h2>
+        </div>
+
+        <form id="paymentForm" class="checkout-form">
+          <label>
+            Card holder
+            <input type="text" id="cardHolder" placeholder="Rania Rh" required/>
+          </label>
+
+          <label>
+            Card number
+            <input type="text" id="cardNumber" placeholder="4242 4242 4242 4242" inputmode="numeric" required/>
+          </label>
+
+          <div class="form-grid">
+            <label>
+              Exp. month
+              <input type="text" id="expMonth" placeholder="08" inputmode="numeric" maxlength="2" required/>
+            </label>
+            <label>
+              Exp. year
+              <input type="text" id="expYear" placeholder="28" inputmode="numeric" maxlength="4" required/>
+            </label>
+            <label>
+              CVV
+              <input type="password" id="cvv" placeholder="123" inputmode="numeric" maxlength="4" required/>
+            </label>
+          </div>
+
+          <label>
+            Amount
+            <input type="text" id="amountInput" readonly/>
+          </label>
+
+          <div class="demo-cards">
+            <div class="demo-title">Virtual cards for testing</div>
+            <div id="demoCards" class="demo-list"></div>
+          </div>
+
+          <div id="payError" class="pay-error"></div>
+
+          <div class="actions">
+            <a class="btn-secondary" id="backToDashboard" href="tuncover-tourist.html">Pay later</a>
+            <button type="submit" id="payBtn" class="btn-primary">Pay now</button>
+          </div>
+        </form>
+
+        <div id="successBox" class="success-box">
+          <h3>Payment completed</h3>
+          <p id="successText">Your fake payment was recorded successfully.</p>
+          <div class="success-actions">
+            <a class="btn-secondary" id="downloadReceiptLink" href="#">Download receipt</a>
+            <a class="btn-secondary" href="tuncover-tourist.html">Go to dashboard</a>
+            <a class="btn-primary" id="viewBookingLink" href="tuncover-tourist.html">View booking</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const reservationId = parseInt(new URLSearchParams(window.location.search).get('reservation_id') || '0', 10);
+    let paymentData = null;
+    let testCards = [];
+
+    function fmtMoney(v){
+      return `${Number(v || 0).toFixed(2)} TND`;
+    }
+
+    function setError(msg){
+      const box = document.getElementById('payError');
+      box.textContent = msg || '';
+      box.style.display = msg ? 'block' : 'none';
+    }
+
+    function setPaymentAvailability(canPay, message){
+      const form = document.getElementById('paymentForm');
+      const payBtn = document.getElementById('payBtn');
+      const controls = form ? form.querySelectorAll('input, button') : [];
+      controls.forEach((el) => {
+        if (el.id === 'amountInput' || el.id === 'backToDashboard' || el.id === 'payBtn') return;
+        el.disabled = !canPay;
+      });
+      if (payBtn) {
+        payBtn.disabled = !canPay;
+        payBtn.textContent = canPay ? 'Pay now' : 'Waiting for artisan confirmation';
+      }
+      if (!canPay && message) {
+        setError(message);
+      }
+    }
+
+    async function loadCheckout(){
+      if(!reservationId){
+        setError('Missing reservation ID.');
+        return;
+      }
+
+      try{
+        const res = await fetch(`php/tourist/payment.php?reservation_id=${reservationId}`, { credentials:'include' });
+        const data = await res.json();
+        if(!data.success){
+          setError(data.error || 'Could not load payment details.');
+          return;
+        }
+
+        paymentData = data.payment;
+        testCards = Array.isArray(data.test_cards) ? data.test_cards : [];
+        document.getElementById('sumTitle').textContent = paymentData.activity_title || '-';
+        document.getElementById('sumArtisan').textContent = paymentData.artisan_name || '-';
+        document.getElementById('sumDate').textContent = `${paymentData.date_activite || '-'} ${paymentData.heure_activite || ''}`.trim();
+        document.getElementById('sumGuests').textContent = `${paymentData.participants || 1} guest(s)`;
+        document.getElementById('sumAmount').textContent = fmtMoney(paymentData.amount);
+        document.getElementById('amountInput').value = fmtMoney(paymentData.amount);
+        document.getElementById('backToDashboard').href = 'tuncover-tourist.html';
+        document.getElementById('viewBookingLink').href = 'tuncover-tourist.html';
+        document.getElementById('downloadReceiptLink').href = `php/tourist/receipt.php?format=pdf&reservation_id=${reservationId}`;
+
+        if(paymentData.payment_status === 'completed'){
+          showSuccess(`This booking was already paid with transaction ${paymentData.transaction_ref || ''}.`);
+        } else if (paymentData.reservation_status !== 'confirmee') {
+          setPaymentAvailability(false, 'You can pay only after the artisan accepts this reservation.');
+        } else {
+          setPaymentAvailability(true, '');
+        }
+
+        renderDemoCards();
+      }catch(e){
+        setError('Network error while loading checkout.');
+      }
+    }
+
+    function renderDemoCards(){
+      const root = document.getElementById('demoCards');
+      if(!root) return;
+      if(!testCards.length){
+        root.innerHTML = '<p class="demo-empty">No virtual cards available.</p>';
+        return;
+      }
+      root.innerHTML = testCards.map((c, idx) => `
+        <button type="button" class="demo-card-btn" onclick="fillDemoCard(${idx})">
+          <strong>${c.card_brand}</strong>
+          <span>${c.card_holder}</span>
+          <code>${c.card_number}</code>
+          <small>${c.exp_month}/${String(c.exp_year).slice(-2)} | CVV ${c.cvv}</small>
+        </button>
+      `).join('');
+    }
+
+    function fillDemoCard(index){
+      const c = testCards[index];
+      if(!c) return;
+      document.getElementById('cardHolder').value = c.card_holder || '';
+      document.getElementById('cardNumber').value = c.card_number || '';
+      document.getElementById('expMonth').value = c.exp_month || '';
+      document.getElementById('expYear').value = String(c.exp_year || '');
+      document.getElementById('cvv').value = c.cvv || '';
+    }
+
+    function showSuccess(message){
+      document.getElementById('paymentForm').style.display = 'none';
+      document.getElementById('successText').textContent = message;
+      document.getElementById('successBox').style.display = 'block';
+      setError('');
+    }
+
+    document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if(!paymentData) return;
+      if (paymentData.reservation_status !== 'confirmee') {
+        setError('You can pay only after the artisan accepts this reservation.');
+        return;
+      }
+
+      const btn = document.getElementById('payBtn');
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
+      setError('');
+
+      try{
+        const res = await fetch('php/tourist/payment.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            reservation_id: reservationId,
+            card_holder: document.getElementById('cardHolder').value.trim(),
+            card_number: document.getElementById('cardNumber').value.trim(),
+            exp_month: document.getElementById('expMonth').value.trim(),
+            exp_year: document.getElementById('expYear').value.trim(),
+            cvv: document.getElementById('cvv').value.trim(),
+            amount: paymentData.amount
+          })
+        });
+
+        const data = await res.json();
+        if(!res.ok || !data.success){
+          setError(data.error || 'Payment failed.');
+          return;
+        }
+
+        showSuccess(`Transaction ${data.payment.transaction_ref} was saved. The artisan received ${fmtMoney(data.payment.artisan_amount)} and the admin can now track this payment.`);
+        document.getElementById('downloadReceiptLink').href = `php/tourist/receipt.php?format=pdf&reservation_id=${reservationId}`;
+      }catch(err){
+        setError('Network error while processing payment.');
+      }finally{
+        btn.disabled = false;
+        btn.textContent = 'Pay now';
+      }
+    });
+
+    loadCheckout();
+  </script>
+</body>
+</html>

@@ -235,12 +235,21 @@
           <option value="annulee">Cancelled</option>
           <option value="terminee">Completed</option>
         </select>
+        <select class="filter-select" id="resPaymentFilter" onchange="renderReservations()">
+          <option value="">All Payments</option>
+          <option value="paid">Paid</option>
+          <option value="unpaid">Unpaid</option>
+        </select>
+        <input class="filter-input" type="date" id="resDateFrom" onchange="renderReservations()" style="max-width:170px;" title="From date"/>
+        <input class="filter-input" type="date" id="resDateTo" onchange="renderReservations()" style="max-width:170px;" title="To date"/>
+        <button class="btn-primary-sm" onclick="exportReservations('csv')">Export CSV</button>
+        <button class="btn-primary-sm" onclick="exportReservations('pdf')">Export PDF</button>
         <span class="filter-count" id="resCount"></span>
       </div>
       <div class="card">
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Tourist</th><th>Activity</th><th>Date</th><th>Guests</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Tourist</th><th>Activity</th><th>Date</th><th>Guests</th><th>Amount</th><th>Status</th><th>Artisan</th><th>Payment</th><th>Actions</th></tr></thead>
             <tbody id="reservationsTable"></tbody>
           </table>
         </div>
@@ -362,6 +371,7 @@ const API = {
   artisans:     'php/admin/artisans.php',
   activities:   'php/admin/activities.php',
   reservations: 'php/admin/reservations.php',
+  reservationsExport: 'php/admin/reservations_export.php',
   reviews:      'php/admin/reviews.php',
 };
 
@@ -782,17 +792,31 @@ async function toggleActivity(id, newStatus) {
 }
 
 /* ══ RESERVATIONS ════════════════════════════════════ */
+function buildReservationFilters(includeFormat = false, format = 'csv') {
+  const params = new URLSearchParams();
+  const statut = document.getElementById('resStatusFilter')?.value || '';
+  const payment = document.getElementById('resPaymentFilter')?.value || '';
+  const dateFrom = document.getElementById('resDateFrom')?.value || '';
+  const dateTo = document.getElementById('resDateTo')?.value || '';
+  if (statut) params.set('statut', statut);
+  if (payment) params.set('payment', payment);
+  if (dateFrom) params.set('date_from', dateFrom);
+  if (dateTo) params.set('date_to', dateTo);
+  if (includeFormat) params.set('format', format);
+  return params.toString();
+}
+
 async function loadReservations() {
   try {
-    const statut = document.getElementById('resStatusFilter')?.value || '';
-    const res    = await fetch(`${API.reservations}?statut=${statut}`);
+    const query = buildReservationFilters();
+    const res = await fetch(`${API.reservations}${query ? ('?' + query) : ''}`);
     const data   = await res.json();
     if (!data.success) return;
     setTxt('resCount', data.reservations.length + ' reservations');
     const tbody = document.getElementById('reservationsTable');
     if (!tbody) return;
     if (!data.reservations.length) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-m);padding:1.5rem;">No reservations found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-m);padding:1.5rem;">No reservations found</td></tr>';
       return;
     }
     tbody.innerHTML = data.reservations.map(r => `
@@ -804,11 +828,61 @@ async function loadReservations() {
         <td style="color:var(--green);">${r.montant_total||0} TND</td>
         <td>${reservationBadge(r.statut)}</td>
         <td style="font-size:0.75rem;color:var(--text-m);">${esc(r.artisan_nom||'')}</td>
+        <td style="font-size:0.75rem;color:var(--text-m);">
+          ${r.payment_status === 'completed'
+            ? '<span class="badge badge-green">Paid</span>'
+            : r.payment_status === 'refunded'
+              ? '<span class="badge badge-blue">Refunded</span>'
+              : '<span class="badge badge-amber">Unpaid</span>'}
+          ${r.transaction_ref ? `<span style="display:block;margin-top:0.2rem;color:var(--text-m);font-size:0.72rem;">${esc(r.transaction_ref)}</span>` : ''}
+        </td>
+        <td>
+          <div class="action-group">
+            ${r.statut==='en_attente' ? `<button class="btn-action btn-approve" onclick="adminReservationAction(${r.id_reservation},'confirm')">Confirm</button>` : ''}
+            ${r.statut==='confirmee' ? `<button class="btn-action btn-approve" onclick="adminReservationAction(${r.id_reservation},'complete')">Complete</button>` : ''}
+            ${r.statut!=='annulee' && r.statut!=='terminee' ? `<button class="btn-action btn-ban" onclick="adminReservationAction(${r.id_reservation},'cancel')">Cancel</button>` : ''}
+            ${r.payment_status==='completed' ? `<button class="btn-action btn-delete" onclick="adminReservationAction(${r.id_reservation},'refund')">Refund</button>` : ''}
+          </div>
+        </td>
       </tr>`).join('');
   } catch(e) { console.error('loadReservations:', e); }
 }
 
 function renderReservations() { loadReservations(); }
+
+function exportReservations(format){
+  const query = buildReservationFilters(true, format === 'pdf' ? 'pdf' : 'csv');
+  const url = `${API.reservationsExport}${query ? ('?' + query) : ''}`;
+  window.open(url, '_blank');
+}
+
+async function adminReservationAction(id, action){
+  const labels = {
+    confirm: 'confirm this reservation',
+    complete: 'mark this reservation as completed',
+    cancel: 'cancel this reservation',
+    refund: 'refund this paid reservation'
+  };
+  if (!confirm(`Do you want to ${labels[action] || action}?`)) return;
+  try {
+    const res = await fetch(API.reservations, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({id, action})
+    });
+    const data = await res.json();
+    if (!data.success) {
+      showToast(data.error || 'Action failed','error');
+      return;
+    }
+    showToast('Reservation updated','success');
+    loadReservations();
+    loadDashboard();
+    loadStats();
+  } catch(e) {
+    showToast('Network error','error');
+  }
+}
 
 /* ══ REVIEWS ══════════════════════════════════════════ */
 async function loadReviews() {

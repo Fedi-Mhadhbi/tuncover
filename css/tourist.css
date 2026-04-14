@@ -124,6 +124,125 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--sand);co
 .reviewer{display:flex;align-items:center;gap:0.6rem;}
 .reviewer-avatar{width:34px;height:34px;border-radius:50%;background:var(--clay);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:500;}
 
+/* Refined bookings UI */
+#bkList{display:grid;gap:1rem;}
+.booking-item{
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:1.25rem;
+  align-items:stretch;
+  padding:1.3rem 1.4rem;
+  border-radius:1.2rem;
+  background:linear-gradient(180deg,#fff 0%, #fdfaf5 100%);
+  box-shadow:0 10px 30px rgba(26,20,16,0.05);
+}
+.booking-item-compact{grid-template-columns:1fr;}
+.booking-main{display:grid;gap:1rem;min-width:0;}
+.booking-header-row{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;}
+.booking-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.5rem;
+  line-height:1.02;
+  margin-bottom:0.35rem;
+  max-width:18ch;
+}
+.booking-artisan{
+  color:var(--text-m);
+  font-size:0.86rem;
+}
+.booking-meta-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0.9rem;
+}
+.booking-meta-cell{
+  background:rgba(245,239,224,0.7);
+  border:1px solid var(--sand2);
+  border-radius:0.95rem;
+  padding:0.9rem 1rem;
+  display:grid;
+  gap:0.3rem;
+}
+.booking-meta-label{
+  font-size:0.7rem;
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  color:var(--text-m);
+}
+.booking-meta-cell strong{
+  font-size:0.96rem;
+  color:var(--ink);
+}
+.booking-actions{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:0.7rem;
+  min-width:150px;
+}
+.btn-sm{
+  border:none;
+  border-radius:999px;
+  padding:0.8rem 1.1rem;
+  font-size:0.8rem;
+  font-weight:600;
+  letter-spacing:0.01em;
+  transition:transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
+.btn-sm:hover{transform:translateY(-1px);}
+.btn-review{
+  color:#fff;
+  background:linear-gradient(135deg,var(--clay) 0%,var(--clay2) 100%);
+  box-shadow:0 10px 18px rgba(201,112,58,0.22);
+}
+.btn-review:hover{
+  background:linear-gradient(135deg,var(--clay2) 0%,#8e421d 100%);
+}
+.btn-cancel{
+  color:#8d3d31;
+  background:#fff4f1;
+  border:1px solid #f0c5bc;
+}
+.btn-cancel:hover{
+  background:#fde7e2;
+  box-shadow:0 8px 18px rgba(173,75,53,0.12);
+}
+.btn-pay{
+  color:#fff;
+  background:linear-gradient(135deg,#2f8f5b 0%,#20663f 100%);
+  box-shadow:0 10px 18px rgba(40,120,76,0.22);
+}
+.btn-pay:hover{
+  background:linear-gradient(135deg,#27814f 0%,#1a5a36 100%);
+}
+.btn-receipt{
+  color:#234f7d;
+  background:#edf5ff;
+  border:1px solid #c5daee;
+}
+.btn-receipt:hover{
+  background:#dfefff;
+  box-shadow:0 8px 18px rgba(54,103,156,0.14);
+}
+.btn-reviewed{
+  color:#476a32;
+  background:#eef6e8;
+  border:1px solid #cfe3c2;
+  cursor:not-allowed;
+}
+.section-title-sm button{
+  border:none;
+  border-radius:999px;
+  padding:0.7rem 1rem;
+  background:#fff;
+  border:1px solid var(--sand2);
+  color:var(--clay) !important;
+  box-shadow:0 8px 18px rgba(26,20,16,0.05);
+}
+.section-title-sm button:hover{
+  background:var(--clay);
+  color:#fff !important;
+}
+
 /* ── RECOMMEND CARDS ── */
 .rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
 .rec-card{background:#fff;border-radius:0.9rem;overflow:hidden;border:1px solid var(--sand2);cursor:pointer;transition:transform 0.2s;}
@@ -169,8 +288,9 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--sand);co
   .stats-row{grid-template-columns:repeat(2,1fr);gap:0.8rem;}
   .stat-card{padding:1rem;}
   .stat-card-num{font-size:1.6rem;}
-  .booking-item{grid-template-columns:64px 1fr;gap:0.8rem;}
-  .booking-actions{grid-column:1/-1;flex-direction:row;justify-content:flex-start;}
+  .booking-item{grid-template-columns:1fr;gap:1rem;padding:1rem;}
+  .booking-meta-grid{grid-template-columns:1fr;}
+  .booking-actions{min-width:0;flex-direction:row;justify-content:flex-start;flex-wrap:wrap;}
   .profile-grid{grid-template-columns:1fr;}
   .form-grid-2{grid-template-columns:1fr;}
   .rec-grid{grid-template-columns:1fr 1fr;}
@@ -182,6 +302,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--sand);co
   .stats-row{grid-template-columns:1fr 1fr;gap:0.6rem;}
   .stat-card-num{font-size:1.4rem;}
   .booking-item{grid-template-columns:1fr;}
+  .booking-title{font-size:1.28rem;max-width:none;}
   .booking-img{width:100%;height:140px;border-radius:0.5rem;}
   .rec-grid{grid-template-columns:1fr;}
   .profile-grid{grid-template-columns:1fr;}

@@ -16,7 +16,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .gallery-thumb{overflow:hidden;}
 .gallery-thumb img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s;}
 .gallery-thumb:hover img{transform:scale(1.05);}
-.gallery-btn{position:absolute;bottom:1rem;right:1rem;background:rgba(255,255,255,0.92);border:none;border-radius:0.5rem;padding:0.5rem 1rem;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:500;cursor:pointer;}
+.gallery-btn{position:absolute;bottom:1rem;right:1rem;background:rgba(255,255,255,0.96);color:var(--ink);border:1px solid rgba(26,20,16,0.08);border-radius:0.65rem;padding:0.55rem 1rem;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;box-shadow:0 8px 22px rgba(26,20,16,0.12);}
 
 /* MAIN LAYOUT */
 .detail-layout{display:grid;grid-template-columns:1fr 380px;gap:3.5rem;max-width:1200px;margin:0 auto;padding:3rem 3.5rem 5rem;}
@@ -36,7 +36,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 
 /* TABS */
 .detail-tabs{display:flex;gap:0;border-bottom:2px solid var(--sand2);margin-bottom:2rem;}
-.d-tab{padding:0.75rem 1.5rem;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:500;background:none;border:none;cursor:pointer;color:var(--text-m);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s;}
+.d-tab{padding:0.75rem 1.5rem;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:500;background:none;border:none;cursor:pointer;color:var(--ink2);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s;}
 .d-tab.active,.d-tab:hover{color:var(--clay);border-bottom-color:var(--clay);}
 
 .tab-content{display:none;}
@@ -52,7 +52,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .artisan-mini img{width:56px;height:56px;border-radius:50%;object-fit:cover;}
 .artisan-mini-info h4{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400;}
 .artisan-mini-info p{font-size:0.78rem;color:var(--text-m);}
-.artisan-mini-link{margin-left:auto;font-size:0.78rem;color:var(--clay);text-decoration:none;white-space:nowrap;}
+.artisan-mini-link{margin-left:auto;font-size:0.78rem;color:var(--clay2);font-weight:600;text-decoration:none;white-space:nowrap;}
+.artisan-mini-link:hover{color:var(--clay);}
 
 /* REVIEWS */
 .review-card{border:1px solid var(--sand2);border-radius:0.9rem;padding:1.2rem;margin-bottom:1rem;}
@@ -81,9 +82,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .price-breakdown{margin:1.2rem 0;padding:1rem 0;border-top:1px solid var(--sand2);border-bottom:1px solid var(--sand2);}
 .price-row{display:flex;justify-content:space-between;font-size:0.82rem;color:var(--text-m);margin-bottom:0.4rem;}
 .price-row.total{font-weight:500;color:var(--ink);font-size:0.9rem;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--sand2);}
-.book-btn{width:100%;background:var(--clay);color:#fff;border:none;padding:1rem;border-radius:3rem;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;cursor:pointer;transition:background 0.2s,transform 0.2s;margin-bottom:0.7rem;}
+.book-btn{width:100%;background:var(--clay);color:#fff;border:none;padding:1rem;border-radius:3rem;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;transition:background 0.2s,transform 0.2s,box-shadow 0.2s;margin-bottom:0.7rem;box-shadow:0 12px 24px rgba(201,112,58,0.22);}
 .book-btn:hover{background:var(--clay2);transform:translateY(-1px);}
 .book-note{text-align:center;font-size:0.72rem;color:var(--text-m);}
+
+.exp-header-row button,
+.booking-card > div:last-child button{
+  color:var(--ink2) !important;
+}
+
+.exp-header-row button:hover,
+.booking-card > div:last-child button:hover{
+  color:var(--clay) !important;
+}
 
 /* MAP MINI */
 .map-mini{height:200px;background:var(--sand);border-radius:0.9rem;overflow:hidden;display:flex;align-items:center;justify-content:center;border:1px solid var(--sand2);margin-top:1.5rem;font-size:0.8rem;color:var(--text-m);font-style:italic;}

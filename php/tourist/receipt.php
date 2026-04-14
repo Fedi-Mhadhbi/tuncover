@@ -1,0 +1,180 @@
+<?php
+
+header('Content-Type: application/json; charset=utf-8');
+
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/payments.php';
+require_once __DIR__ . '/../config/pdf_simple.php';
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'Not authenticated']);
+    exit;
+}
+
+$reservationId = (int)($_GET['reservation_id'] ?? 0);
+$format = strtolower(trim((string)($_GET['format'] ?? 'json')));
+
+if ($reservationId <= 0) {
+    echo json_encode(['success' => false, 'error' => 'Reservation ID is required']);
+    exit;
+}
+
+$db = getDB();
+ensurePaymentsTable($db);
+
+$stmt = $db->prepare("
+    SELECT
+        r.id_reservation,
+        r.date_reservation,
+        r.date_activite,
+        r.heure_activite,
+        r.nb_participants,
+        r.montant_total,
+        r.statut AS reservation_status,
+        p.id_payment,
+        p.amount,
+        p.platform_fee,
+        p.artisan_amount,
+        p.currency,
+        p.payment_method,
+        p.card_holder,
+        p.card_last4,
+        p.transaction_ref,
+        p.payment_status,
+        p.paid_at,
+        a.titre AS activity_title,
+        a.ville AS activity_city,
+        CONCAT(ut.prenom, ' ', ut.nom) AS tourist_name,
+        ut.email AS tourist_email,
+        CONCAT(ua.prenom, ' ', ua.nom) AS artisan_name
+    FROM reservations r
+    JOIN utilisateurs ut ON r.id_touriste = ut.id_utilisateur
+    JOIN activites a ON r.id_activite = a.id_activite
+    JOIN artisans ar ON a.id_artisan = ar.id_artisan
+    JOIN utilisateurs ua ON ar.id_utilisateur = ua.id_utilisateur
+    LEFT JOIN payments p ON p.id_reservation = r.id_reservation
+    WHERE r.id_reservation = ? AND r.id_touriste = ?
+    LIMIT 1
+");
+$stmt->execute([$reservationId, (int)$_SESSION['user_id']]);
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$row) {
+    http_response_code(404);
+    echo json_encode(['success' => false, 'error' => 'Reservation not found']);
+    exit;
+}
+
+if (($row['payment_status'] ?? '') !== 'completed') {
+    echo json_encode(['success' => false, 'error' => 'Receipt is only available for paid reservations']);
+    exit;
+}
+
+$receipt = [
+    'reservation_id' => (int)$row['id_reservation'],
+    'payment_id' => (int)$row['id_payment'],
+    'transaction_ref' => $row['transaction_ref'],
+    'payment_date' => $row['paid_at'],
+    'currency' => $row['currency'] ?: 'TND',
+    'amount' => (float)$row['amount'],
+    'platform_fee' => (float)$row['platform_fee'],
+    'artisan_amount' => (float)$row['artisan_amount'],
+    'card_holder' => $row['card_holder'],
+    'card_last4' => $row['card_last4'],
+    'payment_method' => $row['payment_method'],
+    'tourist_name' => $row['tourist_name'],
+    'tourist_email' => $row['tourist_email'],
+    'artisan_name' => $row['artisan_name'],
+    'activity_title' => $row['activity_title'],
+    'activity_city' => $row['activity_city'],
+    'activity_date' => $row['date_activite'],
+    'activity_time' => $row['heure_activite'],
+    'participants' => (int)$row['nb_participants'],
+    'reservation_status' => $row['reservation_status'],
+];
+
+if ($format === 'txt') {
+    $safeRef = preg_replace('/[^A-Za-z0-9\-]/', '', (string)$receipt['transaction_ref']);
+    if ($safeRef === '') {
+        $safeRef = 'receipt-' . $receipt['reservation_id'];
+    }
+
+    header('Content-Type: text/plain; charset=utf-8');
+    header('Content-Disposition: attachment; filename="TunCover-Receipt-' . $safeRef . '.txt"');
+
+    echo "TunCover Payment Receipt\n";
+    echo "=======================\n\n";
+    echo "Transaction Reference: " . $receipt['transaction_ref'] . "\n";
+    echo "Payment Date: " . $receipt['payment_date'] . "\n";
+    echo "Reservation ID: " . $receipt['reservation_id'] . "\n";
+    echo "Payment ID: " . $receipt['payment_id'] . "\n\n";
+
+    echo "Tourist Name: " . $receipt['tourist_name'] . "\n";
+    echo "Tourist Email: " . $receipt['tourist_email'] . "\n\n";
+
+    echo "Experience: " . $receipt['activity_title'] . "\n";
+    echo "City: " . $receipt['activity_city'] . "\n";
+    echo "Artisan: " . $receipt['artisan_name'] . "\n";
+    echo "Activity Date: " . $receipt['activity_date'] . " " . $receipt['activity_time'] . "\n";
+    echo "Participants: " . $receipt['participants'] . "\n\n";
+
+    echo "Amount Paid: " . number_format((float)$receipt['amount'], 2) . " " . $receipt['currency'] . "\n";
+    echo "Platform Fee: " . number_format((float)$receipt['platform_fee'], 2) . " " . $receipt['currency'] . "\n";
+    echo "Amount to Artisan: " . number_format((float)$receipt['artisan_amount'], 2) . " " . $receipt['currency'] . "\n";
+    echo "Payment Method: " . $receipt['payment_method'] . "\n";
+    echo "Card Holder: " . $receipt['card_holder'] . "\n";
+    echo "Card Last4: " . $receipt['card_last4'] . "\n";
+    echo "Reservation Status: " . $receipt['reservation_status'] . "\n\n";
+    echo "This is a receipt generated by TunCover.\n";
+    exit;
+}
+
+if ($format === 'pdf') {
+    $safeRef = preg_replace('/[^A-Za-z0-9\-]/', '', (string)$receipt['transaction_ref']);
+    if ($safeRef === '') {
+        $safeRef = 'invoice-' . $receipt['reservation_id'];
+    }
+
+    $lines = [
+        'TunCover Invoice',
+        '================',
+        '',
+        'Invoice Ref: ' . $receipt['transaction_ref'],
+        'Payment Date: ' . $receipt['payment_date'],
+        'Reservation ID: ' . $receipt['reservation_id'],
+        'Payment ID: ' . $receipt['payment_id'],
+        '',
+        'Tourist Name: ' . $receipt['tourist_name'],
+        'Tourist Email: ' . $receipt['tourist_email'],
+        '',
+        'Experience: ' . $receipt['activity_title'],
+        'City: ' . $receipt['activity_city'],
+        'Artisan: ' . $receipt['artisan_name'],
+        'Activity Date: ' . $receipt['activity_date'] . ' ' . $receipt['activity_time'],
+        'Participants: ' . $receipt['participants'],
+        '',
+        'Amount Paid: ' . number_format((float)$receipt['amount'], 2) . ' ' . $receipt['currency'],
+        'Platform Fee: ' . number_format((float)$receipt['platform_fee'], 2) . ' ' . $receipt['currency'],
+        'Amount to Artisan: ' . number_format((float)$receipt['artisan_amount'], 2) . ' ' . $receipt['currency'],
+        'Payment Method: ' . $receipt['payment_method'],
+        'Card Holder: ' . $receipt['card_holder'],
+        'Card Last4: ' . $receipt['card_last4'],
+        'Reservation Status: ' . $receipt['reservation_status'],
+        '',
+        'Generated by TunCover'
+    ];
+
+    $pdf = buildSimpleTextPdf($lines, 'TunCover Invoice');
+    header('Content-Type: application/pdf');
+    header('Content-Disposition: attachment; filename="TunCover-Invoice-' . $safeRef . '.pdf"');
+    header('Content-Length: ' . strlen($pdf));
+    echo $pdf;
+    exit;
+}
+
+echo json_encode(['success' => true, 'receipt' => $receipt]);

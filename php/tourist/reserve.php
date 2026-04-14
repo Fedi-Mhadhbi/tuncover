@@ -7,6 +7,8 @@
 header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/payments.php';
+require_once __DIR__ . '/../config/engagement.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -95,6 +97,8 @@ if (strtotime($date_activite) < strtotime(date('Y-m-d'))) {
 
 try {
     $db = getDB();
+    ensurePaymentsTable($db);
+    ensureNotificationsTable($db);
 
     // ============================================================
     // 5) Load activity
@@ -194,6 +198,21 @@ try {
 
     $reservationId = $db->lastInsertId();
 
+    $artisanUserStmt = $db->prepare("SELECT id_utilisateur FROM artisans WHERE id_artisan = ? LIMIT 1");
+    $artisanUserStmt->execute([(int)$activity['id_artisan']]);
+    $artisanUserId = (int)$artisanUserStmt->fetchColumn();
+    if ($artisanUserId > 0) {
+        createNotification(
+            $db,
+            $artisanUserId,
+            'booking_created',
+            'New Reservation Request',
+            'You received a new reservation for "' . $activity['titre'] . '" on ' . $date_activite . '.',
+            'tuncover-artisan-dashboard.html',
+            (int)$reservationId
+        );
+    }
+
     // ============================================================
     // 10) Success response
     // ============================================================
@@ -201,7 +220,9 @@ try {
         'success'         => true,
         'message'         => 'Reservation created successfully',
         'id_reservation'  => $reservationId,
+        'payment_url'     => '../../tuncover-payment.html?reservation_id=' . $reservationId,
         'titre'           => $activity['titre'],
+        'id_artisan'      => $activity['id_artisan'],
         'ville'           => $activity['ville'],
         'date_activite'   => $date_activite,
         'heure_activite'  => $heure_activite,

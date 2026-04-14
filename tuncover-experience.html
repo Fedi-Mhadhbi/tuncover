@@ -66,7 +66,7 @@
       <span class="exp-type-badge">🏺 Craft Workshop</span>
       <button style="background:none;border:none;font-size:1.3rem;cursor:pointer;" title="Save">♡</button>
     </div>
-    <h1 class="exp-title">Traditional Pottery<br/>Workshop — Nabeul</h1>
+    <h1 class="exp-title" id="expTitle">Traditional Pottery<br/>Workshop — Nabeul</h1>
     <div class="exp-meta-row">
       <div class="meta-item"><span class="rating-stars">★★★★★</span>&nbsp;<strong>4.8</strong>&nbsp;(94 reviews)</div>
       <div class="meta-item">📍 <strong>Nabeul</strong>, Tunisia</div>
@@ -76,12 +76,12 @@
     </div>
 
     <div class="artisan-mini">
-      <img src="https://images.unsplash.com/photo-1607799279861-4dd421887fb3?w=100&q=70" alt="Mohamed"/>
+      <img id="artisanAvatar" src="https://images.unsplash.com/photo-1607799279861-4dd421887fb3?w=100&q=70" alt="Artisan" style="width:60px;height:60px;border-radius:50%;object-fit:cover;"/>
       <div class="artisan-mini-info">
-        <h4>Mohamed Trabelsi</h4>
-        <p>Master Potter · 30 years experience · Nabeul</p>
+        <h4 id="artisanName">Loading…</h4>
+        <p id="artisanSub">Artisan · Tunisia</p>
       </div>
-      <a href="tuncover-artisans.html" class="artisan-mini-link">View profile →</a>
+      <a href="tuncover-artisans.html" class="artisan-mini-link" id="artisanProfileLink">View profile →</a>
     </div>
 
     <!-- TABS -->
@@ -155,7 +155,7 @@
   <!-- BOOKING CARD -->
   <aside>
     <div class="booking-card">
-      <div class="booking-price">60 TND <span>/ person</span></div>
+      <div class="booking-price" id="bookingPrice">60 TND <span>/ person</span></div>
       <div class="booking-rating"><span style="color:var(--gold);">★</span> 4.8 · 94 reviews</div>
 
       <div class="form-group">
@@ -186,7 +186,7 @@
         <div class="price-row total"><span>Total</span><span id="total">132 TND</span></div>
       </div>
 
-      <button class="book-btn" onclick="window.location='tuncover-tourist.html'">Reserve Now</button>
+      <button class="book-btn" onclick="reserveNow()">Reserve Now</button>
       <p class="book-note">Free cancellation up to 48h before</p>
 
       <div style="display:flex;justify-content:center;gap:1.5rem;margin-top:1.5rem;">
@@ -232,52 +232,344 @@ function showTab(id,btn){
 
 
 <script>
-/* Smart nav — shows user name if logged in, Sign In if not */
-(function(){
-  const nav = document.getElementById('nav');
-  if(!nav) return;
-  // Always add scrolled class since these pages have solid cream nav
-  nav.classList.add('scrolled');
-  window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',window.scrollY>30));
-
-  // Check if logged in
+async function reserveNow(){
+  const u=JSON.parse(localStorage.getItem('tc_user')||'null');
+  if(!u||!u.id){
+    window.location.href='tuncover-login.html';
+    return;
+  }
+  if(u.role==='artisan'||u.role==='admin'){
+    alert('Only tourist accounts can make reservations.');
+    return;
+  }
+  const dateEl=document.getElementById('bookDate');
+  const date=dateEl?dateEl.value:'';
+  if(!date){alert('Please select a date first.');if(dateEl)dateEl.focus();return;}
+  const guestEl=document.getElementById('guestCount');
+  const guests=guestEl?parseInt(guestEl.textContent)||1:1;
+  const params=new URLSearchParams(window.location.search);
+  const actId=parseInt(params.get('id'))||1;
+  const timeEl=document.querySelector('.date-row select');
+  let timeVal='10:00';
+  if(timeEl){
+    const tv=timeEl.value;
+    const pm=tv.match(/^(\d+):(\d+)\s*PM$/i);
+    const am=tv.match(/^(\d+):(\d+)\s*AM$/i);
+    if(pm){const h=parseInt(pm[1]);timeVal=String(h<12?h+12:h).padStart(2,'0')+':'+pm[2];}
+    else if(am){timeVal=am[1].padStart(2,'0')+':'+am[2];}
+    else{timeVal=tv.replace(/\s*(AM|PM)/i,'').trim();}
+  }
+  const btn=document.querySelector('.book-btn');
+  if(btn){btn.disabled=true;btn.textContent='Booking...';}
   try{
-    const u = JSON.parse(localStorage.getItem('tc_user')||'null');
-    if(!u||!u.id) return; // not logged in — keep "Sign In" button
-    
-    // Replace "Sign In" with user name + dashboard link + logout
-    const links = document.getElementById('navLinks');
-    if(!links) return;
-    const cta = links.querySelector('.nav-cta');
-    if(cta){
-      const ini = ((u.prenom||'?')[0]+(u.nom||'?')[0]).toUpperCase();
-      // Replace Sign In button with user chip + logout
-      cta.outerHTML = 
-        '<a href="'+getDashboard(u.role)+'" style="font-size:0.82rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:var(--text-m);display:flex;align-items:center;gap:0.5rem;">'+
-          '<span style="width:28px;height:28px;border-radius:50%;background:var(--clay,#C9703A);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;">'+ini+'</span>'+
-          (u.prenom||'My Account')+
-        '</a>'+
-        '<a href="#" onclick="doLogout()" style="font-size:0.78rem;color:var(--text-m,#6B5C4E);text-decoration:none;letter-spacing:0.05em;text-transform:uppercase;">Sign Out</a>';
+    const res=await fetch('php/tourist/reserve.php',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body:JSON.stringify({id_activite:actId,date_activite:date,heure_activite:timeVal,nb_participants:guests})
+    });
+    const data=await res.json();
+    if(data.success){
+      if(btn)btn.textContent='Booked!';
+      const nextUrl = data.payment_url ? data.payment_url.replace('../../','') : 'tuncover-tourist.html';
+      setTimeout(()=>window.location.href=nextUrl,700);
+    }else{
+      alert('Booking failed: '+(data.error||'Unknown error'));
+      if(btn){btn.disabled=false;btn.textContent='Reserve Now';}
     }
-    // Also fix mobile menu
-    const mobileMenu = document.getElementById('mobileMenu');
-    if(mobileMenu){
-      const mobileCta = mobileMenu.querySelector('.menu-cta');
-      if(mobileCta) mobileCta.href = getDashboard(u.role);
+  }catch(e){
+    alert('Connection error.');
+    if(btn){btn.disabled=false;btn.textContent='Reserve Now';}
+  }
+}
+</script>
+
+<script>
+/* ── Load real activity data from DB by ?id= ── */
+(async function loadActivity(){
+  const id = parseInt(new URLSearchParams(window.location.search).get('id'));
+  if(!id) return; // no id param, keep static defaults
+
+  try{
+    const res  = await fetch('php/public/activity.php?id='+id);
+    const data = await res.json();
+    if(!data.success) return;
+
+    const a = data.activity;
+
+    // ── Page title ──
+    document.title = 'TunCover — '+a.titre;
+
+    // ── Experience title ──
+    const titleEl = document.getElementById('expTitle');
+    if(titleEl) titleEl.innerHTML = esc(a.titre).replace(' — ','<br/>');
+
+    // ── Gallery main image ──
+    if(a.image_url){
+      const gMain = document.querySelector('.gallery-main img');
+      if(gMain){ gMain.src = a.image_url; gMain.alt = a.titre; }
+      const thumbs = document.querySelectorAll('.gallery-thumb img');
+      thumbs.forEach(t=>{ t.src=a.image_url; });
     }
-  }catch(e){}
+
+    // ── Badge ──
+    const badge = document.querySelector('.exp-type-badge');
+    if(badge) badge.textContent = '🏺 '+(a.categorie||'Experience');
+
+    // ── Meta row ──
+    const metaRow = document.querySelector('.exp-meta-row');
+    if(metaRow){
+      const rating = parseFloat(a.avg_rating)>0 ? parseFloat(a.avg_rating).toFixed(1) : 'New';
+      const nb     = parseInt(a.nb_reviews)||0;
+      metaRow.innerHTML =
+        '<div class="meta-item"><span class="rating-stars">★★★★★</span>&nbsp;<strong>'+rating+'</strong>'+(nb>0?'&nbsp;('+nb+' reviews)':'')+'</div>'+
+        '<div class="meta-item">📍 <strong>'+esc(a.ville)+'</strong>, Tunisia</div>'+
+        '<div class="meta-item">⏱ <strong>'+a.duree_heures+' hour'+(a.duree_heures!=1?'s':'')+'</strong></div>'+
+        '<div class="meta-item">👥 <strong>Max '+a.max_participants+'</strong> guests</div>'+
+        '<div class="meta-item">🗣 Arabic, French</div>';
+    }
+
+    // ── Artisan mini ──
+    const nameEl = document.getElementById('artisanName');
+    if(nameEl) nameEl.textContent = (a.artisan_prenom||'')+' '+(a.artisan_nom||'');
+
+    const subEl  = document.getElementById('artisanSub');
+    if(subEl)  subEl.textContent  = (a.specialite||a.categorie||'Artisan')+' · '+a.ville;
+
+    const avEl   = document.getElementById('artisanAvatar');
+    if(avEl && a.avatar_url){ avEl.src=a.avatar_url; avEl.alt=(a.artisan_prenom||'')+' '+(a.artisan_nom||''); }
+
+    const profLink = document.getElementById('artisanProfileLink');
+    if(profLink && a.id_artisan) profLink.href = 'profile.html?id='+a.id_artisan;
+
+    // ── Description ──
+    const descEl = document.querySelector('#about .desc-text');
+    if(descEl && a.description) descEl.textContent = a.description;
+    // Remove the second static paragraph (Mohamed's workshop text)
+    const descEls = document.querySelectorAll('#about .desc-text');
+    if(descEls.length > 1) for(let i=1;i<descEls.length;i++) descEls[i].style.display='none';
+
+    // ── Booking card price ──
+    const priceEl = document.getElementById('bookingPrice');
+    if(priceEl) priceEl.innerHTML = parseFloat(a.prix).toFixed(0)+' TND <span>/ person</span>';
+
+    // Update price calculation with real price
+    window._actPrice = parseFloat(a.prix)||60;
+    updatePriceReal();
+
+    // ── Reviews tab ──
+    if(data.reviews && data.reviews.length){
+      const revCont = document.getElementById('reviews');
+      if(revCont){
+        const rating2 = parseFloat(a.avg_rating)>0?parseFloat(a.avg_rating).toFixed(1):'—';
+        const nb2     = parseInt(a.nb_reviews)||0;
+        const cards   = data.reviews.map(r=>{
+          const stars='★'.repeat(Math.max(0,Math.round(r.note)))+'☆'.repeat(Math.max(0,5-Math.round(r.note)));
+          const date=r.date_avis?new Date(r.date_avis).toLocaleDateString('en-GB',{month:'long',year:'numeric'}):'';
+          const ini=((r.tourist_prenom||'?')[0]+(r.tourist_nom||'?')[0]).toUpperCase();
+          return '<div class="review-card"><div class="review-header"><div class="reviewer"><div class="reviewer-avatar">'+ini+'</div><div><div class="reviewer-name">'+esc(r.tourist_prenom)+' '+esc((r.tourist_nom||'').charAt(0))+'.</div><div class="reviewer-date">'+date+'</div></div></div><span style="color:var(--gold);">'+stars+'</span></div><p class="review-text">'+esc(r.commentaire||'')+'</p></div>';
+        }).join('');
+        revCont.innerHTML='<div style="display:flex;align-items:center;gap:2rem;margin-bottom:2rem;padding:1.5rem;background:var(--sand);border-radius:0.9rem;"><div style="text-align:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:3.5rem;font-weight:300;color:var(--ink);line-height:1;">'+rating2+'</div><div style="color:var(--gold);font-size:1.1rem;">★★★★★</div><div style="font-size:0.75rem;color:var(--text-m);">'+nb2+' reviews</div></div></div>'+cards;
+        // update tab label
+        const revTab=document.querySelector('.d-tab[onclick*="reviews"]');
+        if(revTab&&nb2>0) revTab.textContent='Reviews ('+nb2+')';
+      }
+    }
+
+    // ── Breadcrumb ──
+    const crumbCity = document.querySelector('.breadcrumb a:last-of-type');
+    if(crumbCity) crumbCity.textContent = a.ville;
+    const crumbTitle = document.querySelector('.breadcrumb span:last-child');
+    if(crumbTitle) crumbTitle.textContent = a.titre;
+
+  }catch(e){ console.error('loadActivity error:', e); }
 })();
 
-function getDashboard(role){
-  if(role==='admin')   return 'tuncover-admin.html';
-  if(role==='artisan') return 'tuncover-artisan-dashboard.html';
-  return 'tuncover-tourist.html';
+function updatePriceReal(){
+  const price = window._actPrice || 60;
+  const g     = parseInt(document.getElementById('guestCount')?.textContent)||2;
+  const sub   = price * g;
+  const fee   = Math.round(sub * 0.1);
+  const pl    = document.getElementById('priceLabel');
+  const sl    = document.getElementById('subtotal');
+  const tl    = document.getElementById('total');
+  const rows  = document.querySelectorAll('.price-row');
+  if(pl) pl.textContent = price+' TND × '+g+' guest'+(g>1?'s':'');
+  if(sl) sl.textContent = sub+' TND';
+  if(rows[1]) rows[1].querySelector('span:last-child').textContent = fee+' TND';
+  if(tl) tl.textContent = (sub+fee)+' TND';
 }
-async function doLogout(){
-  try{await fetch('php/auth/logout.php',{method:'POST'});}catch(e){}
+
+// Override changeGuests to use real price
+const _origChangeGuests = window.changeGuests;
+window.changeGuests = function(d){
+  let g = parseInt(document.getElementById('guestCount')?.textContent)||2;
+  g = Math.max(1, Math.min(8, g+d));
+  document.getElementById('guestCount').textContent = g;
+  updatePriceReal();
+};
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+</script>
+
+<script>
+function escSafe(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function updatePriceRealFixed(){
+  const price = window._actPrice || 60;
+  const g = parseInt(document.getElementById('guestCount')?.textContent, 10) || 2;
+  const sub = price * g;
+  const fee = Math.round(sub * 0.1);
+  const labelEl = document.getElementById('priceLabel');
+  const subtotalEl = document.getElementById('subtotal');
+  const totalEl = document.getElementById('total');
+  const feeRow = document.querySelectorAll('.price-row')[1];
+
+  if(labelEl) labelEl.textContent = price + ' TND × ' + g + ' guest' + (g > 1 ? 's' : '');
+  if(subtotalEl) subtotalEl.textContent = sub + ' TND';
+  if(feeRow){
+    const feeValue = feeRow.querySelector('span:last-child');
+    if(feeValue) feeValue.textContent = fee + ' TND';
+  }
+  if(totalEl) totalEl.textContent = (sub + fee) + ' TND';
+}
+
+window.changeGuests = function(d){
+  let g = parseInt(document.getElementById('guestCount')?.textContent, 10) || 2;
+  g = Math.max(1, Math.min(8, g + d));
+  document.getElementById('guestCount').textContent = g;
+  updatePriceRealFixed();
+};
+
+(async function loadActivityFixed(){
+  const id = parseInt(new URLSearchParams(window.location.search).get('id'), 10);
+  if(!id) return;
+
+  try{
+    const res = await fetch('php/public/activity.php?id=' + id);
+    const data = await res.json();
+    if(!data.success || !data.activity) return;
+
+    const a = data.activity;
+    const fullName = [a.artisan_prenom, a.artisan_nom].filter(Boolean).join(' ').trim();
+    const rating = parseFloat(a.avg_rating) > 0 ? parseFloat(a.avg_rating).toFixed(1) : 'New';
+    const reviewCount = parseInt(a.nb_reviews, 10) || 0;
+
+    document.title = 'TunCover - ' + a.titre;
+
+    const titleEl = document.getElementById('expTitle');
+    if(titleEl) titleEl.innerHTML = escSafe(a.titre).replace(' - ','<br/>').replace(' — ','<br/>');
+
+    if(a.image_url){
+      const mainImg = document.querySelector('.gallery-main img');
+      if(mainImg){
+        mainImg.src = a.image_url;
+        mainImg.alt = a.titre;
+      }
+      document.querySelectorAll('.gallery-thumb img').forEach((img) => {
+        img.src = a.image_url;
+        img.alt = a.titre;
+      });
+    }
+
+    const badgeEl = document.querySelector('.exp-type-badge');
+    if(badgeEl) badgeEl.textContent = a.categorie || 'Experience';
+
+    const metaRow = document.querySelector('.exp-meta-row');
+    if(metaRow){
+      metaRow.innerHTML =
+        '<div class="meta-item"><span class="rating-stars">★★★★★</span>&nbsp;<strong>' + rating + '</strong>' + (reviewCount ? '&nbsp;(' + reviewCount + ' reviews)' : '') + '</div>' +
+        '<div class="meta-item">📍 <strong>' + escSafe(a.ville) + '</strong>, Tunisia</div>' +
+        '<div class="meta-item">⏱ <strong>' + a.duree_heures + ' hour' + (a.duree_heures != 1 ? 's' : '') + '</strong></div>' +
+        '<div class="meta-item">👥 <strong>Max ' + a.max_participants + '</strong> guests</div>' +
+        '<div class="meta-item">🗣 Arabic, French</div>';
+    }
+
+    const nameEl = document.getElementById('artisanName');
+    if(nameEl) nameEl.textContent = fullName || 'Artisan';
+
+    const subEl = document.getElementById('artisanSub');
+    if(subEl) subEl.textContent = (a.specialite || a.categorie || 'Artisan') + ' · ' + (a.ville || 'Tunisia');
+
+    const avatarEl = document.getElementById('artisanAvatar');
+    if(avatarEl && a.avatar_url){
+      avatarEl.src = a.avatar_url;
+      avatarEl.alt = fullName || 'Artisan';
+    }
+
+    const profileLink = document.getElementById('artisanProfileLink');
+    if(profileLink && a.id_artisan) profileLink.href = 'profile.html?id=' + a.id_artisan;
+
+    const descEl = document.querySelector('#about .desc-text');
+    if(descEl && a.description) descEl.textContent = a.description;
+    const descEls = document.querySelectorAll('#about .desc-text');
+    for(let i = 1; i < descEls.length; i++) descEls[i].style.display = 'none';
+
+    const priceEl = document.getElementById('bookingPrice');
+    if(priceEl) priceEl.innerHTML = parseFloat(a.prix).toFixed(0) + ' TND <span>/ person</span>';
+    window._actPrice = parseFloat(a.prix) || 60;
+    updatePriceRealFixed();
+
+    const crumbCity = document.querySelector('.breadcrumb a:last-of-type');
+    if(crumbCity) crumbCity.textContent = a.ville;
+    const crumbTitle = document.querySelector('.breadcrumb span:last-child');
+    if(crumbTitle) crumbTitle.textContent = a.titre;
+
+    if(data.reviews && data.reviews.length){
+      const reviewsEl = document.getElementById('reviews');
+      if(reviewsEl){
+        const reviewCards = data.reviews.map((r) => {
+          const initials = ((r.tourist_prenom || '?')[0] + (r.tourist_nom || '?')[0]).toUpperCase();
+          const stars = '★'.repeat(Math.max(0, Math.round(r.note))) + '☆'.repeat(Math.max(0, 5 - Math.round(r.note)));
+          const date = r.date_avis ? new Date(r.date_avis).toLocaleDateString('en-GB', { month:'long', year:'numeric' }) : '';
+          return '<div class="review-card"><div class="review-header"><div class="reviewer"><div class="reviewer-avatar">' + initials + '</div><div><div class="reviewer-name">' + escSafe(r.tourist_prenom) + ' ' + escSafe((r.tourist_nom || '').charAt(0)) + '.</div><div class="reviewer-date">' + date + '</div></div></div><span style="color:var(--gold);">' + stars + '</span></div><p class="review-text">' + escSafe(r.commentaire || '') + '</p></div>';
+        }).join('');
+
+        reviewsEl.innerHTML = `<div style="display:flex;align-items:center;gap:2rem;margin-bottom:2rem;padding:1.5rem;background:var(--sand);border-radius:0.9rem;"><div style="text-align:center;"><div style="font-family:'Cormorant Garamond',serif;font-size:3.5rem;font-weight:300;color:var(--ink);line-height:1;">${rating}</div><div style="color:var(--gold);font-size:1.1rem;">★★★★★</div><div style="font-size:0.75rem;color:var(--text-m);">${reviewCount} reviews</div></div></div>${reviewCards}`;
+
+        const reviewsTab = document.querySelector('.d-tab[onclick*="reviews"]');
+        if(reviewsTab) reviewsTab.textContent = 'Reviews (' + reviewCount + ')';
+      }
+    }
+  }catch(e){
+    console.error('loadActivityFixed error:', e);
+  }
+})();
+</script>
+
+<script>
+(function(){
+  const nav=document.getElementById('nav');
+  if(nav){
+    nav.classList.add('scrolled');
+    window.addEventListener('scroll',function(){nav.classList.toggle('scrolled',window.scrollY>30);});
+  }
+  try{
+    const u=JSON.parse(localStorage.getItem('tc_user')||'null');
+    if(!u||!u.id)return;
+    const dest=u.role==='admin'?'tuncover-admin.html':u.role==='artisan'?'tuncover-artisan-dashboard.html':'tuncover-tourist.html';
+    const ini=((u.prenom||'?')[0]+(u.nom||'?')[0]).toUpperCase();
+    const name=u.prenom||'Account';
+    const links=document.getElementById('navLinks');
+    if(links){
+      const cta=links.querySelector('.nav-cta');
+      if(cta){
+        cta.outerHTML='<a href="'+dest+'" style="font-size:0.82rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:var(--text-m,#6B5C4E);display:flex;align-items:center;gap:0.5rem;"><span style="width:28px;height:28px;border-radius:50%;background:var(--clay,#C9703A);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;">'+ini+'</span>'+name+'</a><a href="#" onclick="navLogout(event)" style="font-size:0.78rem;color:var(--text-m,#6B5C4E);text-decoration:none;letter-spacing:0.05em;text-transform:uppercase;margin-left:0.5rem;">Sign Out</a>';
+      }
+    }
+    const mm=document.getElementById('mobileMenu');
+    if(mm){const mc=mm.querySelector('.menu-cta');if(mc){mc.href=dest;mc.textContent=name;}}
+  }catch(e){}
+})();
+async function navLogout(e){
+  if(e)e.preventDefault();
+  try{await fetch('php/auth/logout.php',{method:'POST'});}catch(err){}
   localStorage.removeItem('tc_user');
   window.location.href='tuncover-login.html';
 }
 </script>
+
 </body>
 </html>

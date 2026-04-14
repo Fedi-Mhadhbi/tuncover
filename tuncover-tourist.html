@@ -1,18 +1,18 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="theme-color" content="#1A1410"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
-<title>TunCover — My Dashboard</title>
+<title>TunCover - My Dashboard</title>
 <link rel="manifest" href="manifest.json"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="css/tourist.css">
 </head>
 <body>
 
-<!-- ── MOBILE TOP BAR (only on mobile) ── -->
+<!-- â”€â”€ MOBILE TOP BAR (only on mobile) â”€â”€ -->
 <div class="mobile-topbar">
   <a href="tuncover-home.html" class="logo">TunCover</a>
   <div class="mobile-topbar-right">
@@ -24,7 +24,7 @@
   </div>
 </div>
 
-<!-- ── MAIN FLEX WRAP ── -->
+<!-- â”€â”€ MAIN FLEX WRAP â”€â”€ -->
 <div class="dash-wrap">
 
   <!-- SIDEBAR (desktop only) -->
@@ -39,16 +39,16 @@
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section-label">Main</div>
-      <a class="nav-item active" onclick="showPanel('overview',this)"><span class="ic">🏠</span> Overview</a>
-      <a class="nav-item" onclick="showPanel('bookings',this)"><span class="ic">📅</span> My Bookings</a>
-      <a class="nav-item" onclick="showPanel('wishlist',this)"><span class="ic">♡</span> Wishlist</a>
-      <a class="nav-item" onclick="showPanel('reviews',this)"><span class="ic">⭐</span> My Reviews</a>
+          <a class="nav-item active" onclick="showPanel('overview',this)"><span class="ic">Overview</span></a>
+          <a class="nav-item" onclick="showPanel('bookings',this)"><span class="ic">Bookings</span></a>
+          <a class="nav-item" onclick="showPanel('wishlist',this)"><span class="ic">Wishlist</span></a>
+          <a class="nav-item" onclick="showPanel('reviews',this)"><span class="ic">Reviews</span></a>
       <div class="nav-section-label">Account</div>
-      <a class="nav-item" onclick="showPanel('profile',this)"><span class="ic">👤</span> Profile</a>
-      <a class="nav-item" href="tuncover-explore.html"><span class="ic">🔍</span> Explore</a>
+          <a class="nav-item" onclick="showPanel('profile',this)"><span class="ic">Profile</span></a>
+          <a class="nav-item" href="tuncover-explore.html"><span class="ic">Explore</span></a>
     </nav>
     <div class="sidebar-bottom">
-      <a href="#" onclick="handleLogout()"><span>↩</span> Sign Out</a>
+          <a href="#" onclick="handleLogout()"><span>Back</span> Sign Out</a>
     </div>
   </aside>
 
@@ -59,23 +59,23 @@
     <header class="dash-topbar">
       <h1 id="panelTitle">Overview</h1>
       <div class="topbar-actions">
-        <button class="notif-btn">🔔<span class="notif-dot"></span></button>
+          <button class="notif-btn">&#128276;<span class="notif-dot"></span></button>
         <a href="tuncover-explore.html" class="explore-btn">+ Explore</a>
       </div>
     </header>
 
     <!-- OVERVIEW -->
     <div class="dash-panel active" id="panel-overview">
-      <p style="font-family:'Cormorant Garamond',serif;font-size:1.05rem;color:var(--text-m);font-style:italic;margin-bottom:1.4rem;"><span id="greetMsg">Good afternoon</span>, <span id="greetName">...</span> 👋</p>
+      <p style="font-family:'Cormorant Garamond',serif;font-size:1.05rem;color:var(--text-m);font-style:italic;margin-bottom:1.4rem;"><span id="greetMsg">Good afternoon</span>, <span id="greetName">...</span></p>
       <div class="stats-row">
-        <div class="stat-card"><div class="stat-card-label">Total Bookings</div><div class="stat-card-num" id="statTotal">—</div><div class="stat-card-sub" id="statTotalSub">loading…</div></div>
-        <div class="stat-card"><div class="stat-card-label">Upcoming</div><div class="stat-card-num" id="statUpcoming">—</div><div class="stat-card-sub" id="statUpcomingSub">loading…</div></div>
-        <div class="stat-card"><div class="stat-card-label">Wishlist</div><div class="stat-card-num" id="statWishlist">—</div><div class="stat-card-sub">Saved experiences</div></div>
-        <div class="stat-card"><div class="stat-card-label">Reviews Left</div><div class="stat-card-num" id="statReviews">—</div><div class="stat-card-sub">reviews submitted</div></div>
+        <div class="stat-card"><div class="stat-card-label">Total Bookings</div><div class="stat-card-num" id="statTotal">-</div><div class="stat-card-sub" id="statTotalSub">loading...</div></div>
+        <div class="stat-card"><div class="stat-card-label">Upcoming</div><div class="stat-card-num" id="statUpcoming">-</div><div class="stat-card-sub" id="statUpcomingSub">loading...</div></div>
+        <div class="stat-card"><div class="stat-card-label">Wishlist</div><div class="stat-card-num" id="statWishlist">-</div><div class="stat-card-sub">Saved experiences</div></div>
+        <div class="stat-card"><div class="stat-card-label">Reviews Left</div><div class="stat-card-num" id="statReviews">-</div><div class="stat-card-sub">reviews submitted</div></div>
       </div>
 
             <div class="section-title-sm">Upcoming Experiences</div>
-      <div id="overviewBookings"><p style="color:var(--text-m);font-size:0.85rem;">Loading…</p></div>
+        <div id="overviewBookings"><p style="color:var(--text-m);font-size:0.85rem;">Loading...</p></div>
       <div class="section-title-sm" style="margin-top:1.8rem;">Recommended For You</div>
       <div class="rec-grid">
         <div class="rec-card" onclick="window.location='tuncover-experience.html'">
@@ -101,20 +101,20 @@
         <button class="b-tab" onclick="filterBookings('terminee',this)">Completed</button>
         <button class="b-tab" onclick="filterBookings('annulee',this)">Cancelled</button>
       </div>
-      <div id="bkList"><p style="color:var(--text-m);font-size:0.85rem;padding:1rem 0;">Loading…</p></div>
+        <div id="bkList"><p style="color:var(--text-m);font-size:0.85rem;padding:1rem 0;">Loading...</p></div>
     </div>
         <!-- WISHLIST -->
     <div class="dash-panel" id="panel-wishlist">
       <div class="section-title-sm">Saved Experiences</div>
-      <div class="wishlist-grid" id="wlGrid"><p style="color:var(--text-m);font-size:0.85rem;">Loading…</p></div>
+        <div class="wishlist-grid" id="wlGrid"><p style="color:var(--text-m);font-size:0.85rem;">Loading...</p></div>
     </div>
         <!-- REVIEWS -->
     <div class="dash-panel" id="panel-reviews">
       <div class="section-title-sm" style="display:flex;justify-content:space-between;align-items:center;">
         My Reviews
-        <button onclick="showPanel('bookings',document.querySelectorAll('.nav-item')[1])" style="font-size:0.78rem;color:var(--clay);background:none;border:none;cursor:pointer;font-family:inherit;">+ Leave a review →</button>
+          <button onclick="showPanel('bookings',document.querySelectorAll('.nav-item')[1])" style="font-size:0.78rem;color:var(--clay);background:none;border:none;cursor:pointer;font-family:inherit;">+ Leave a review -></button>
       </div>
-      <div id="rvList"><p style="color:var(--text-m);font-size:0.85rem;padding:1rem 0;">Loading…</p></div>
+        <div id="rvList"><p style="color:var(--text-m);font-size:0.85rem;padding:1rem 0;">Loading...</p></div>
     </div>
     <!-- PROFILE -->
     <div class="dash-panel" id="panel-profile">
@@ -124,7 +124,7 @@
             <div class="profile-avatar-big" id="profAvatar">SB</div>
             <div class="profile-name-big" id="profName">...</div>
             <div class="profile-meta" id="profMeta">Tourist Account</div>
-            <button class="change-photo-btn">📷 Change Photo</button>
+          <button class="change-photo-btn">Change Photo</button>
           </div>
           <div style="background:#fff;border-radius:1rem;padding:1.4rem;border:1px solid var(--sand2);margin-top:1rem;">
             <div style="font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-m);margin-bottom:1rem;font-weight:500;">Preferences</div>
@@ -148,10 +148,10 @@
             <div class="pf-group"><label>Language</label><select><option>Arabic</option><option selected>French</option><option>English</option></select></div>
           </div>
           <div class="form-section-title" style="margin-top:1.4rem;">Change Password</div>
-          <div class="pf-group"><label>Current Password</label><input type="password" placeholder="••••••••"/></div>
+          <div class="pf-group"><label>Current Password</label><input type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"/></div>
           <div class="form-grid-2">
-            <div class="pf-group"><label>New Password</label><input type="password" placeholder="••••••••"/></div>
-            <div class="pf-group"><label>Confirm</label><input type="password" placeholder="••••••••"/></div>
+            <div class="pf-group"><label>New Password</label><input type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"/></div>
+            <div class="pf-group"><label>Confirm</label><input type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"/></div>
           </div>
           <button class="save-btn" onclick="saveProfile()">Save Changes</button>
         </div>
@@ -164,11 +164,11 @@
 <!-- MOBILE BOTTOM TABS -->
 <nav class="mobile-tabs">
   <div class="mobile-tabs-inner">
-    <button class="mob-tab active" id="tab-overview" onclick="showPanel('overview',this)"><span class="tab-icon">🏠</span>Home</button>
-    <button class="mob-tab" id="tab-bookings" onclick="showPanel('bookings',this)"><span class="tab-icon">📅</span>Bookings</button>
-    <button class="mob-tab" id="tab-wishlist" onclick="showPanel('wishlist',this)"><span class="tab-icon">♡</span>Saved</button>
-    <button class="mob-tab" id="tab-reviews" onclick="showPanel('reviews',this)"><span class="tab-icon">⭐</span>Reviews</button>
-    <button class="mob-tab" id="tab-profile" onclick="showPanel('profile',this)"><span class="tab-icon">👤</span>Profile</button>
+      <button class="mob-tab active" id="tab-overview" onclick="showPanel('overview',this)"><span class="tab-icon">Home</span></button>
+      <button class="mob-tab" id="tab-bookings" onclick="showPanel('bookings',this)"><span class="tab-icon">Bookings</span></button>
+      <button class="mob-tab" id="tab-wishlist" onclick="showPanel('wishlist',this)"><span class="tab-icon">Saved</span></button>
+      <button class="mob-tab" id="tab-reviews" onclick="showPanel('reviews',this)"><span class="tab-icon">Reviews</span></button>
+      <button class="mob-tab" id="tab-profile" onclick="showPanel('profile',this)"><span class="tab-icon">Profile</span></button>
   </div>
 </nav>
 
@@ -178,17 +178,17 @@
   <div style="background:var(--cream);border-radius:1rem;padding:2rem;width:420px;max-width:92vw;border:1px solid var(--sand2);">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
       <h3 style="font-family:'Cormorant Garamond',serif;font-weight:300;font-size:1.3rem;">Leave a Review</h3>
-      <button onclick="closeRvModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--text-m);">✕</button>
+        <button onclick="closeRvModal()" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--text-m);">X</button>
     </div>
     <p id="rvActTitle" style="font-size:0.82rem;color:var(--text-m);margin-bottom:1rem;font-style:italic;"></p>
     <div style="margin-bottom:1rem;">
       <div style="font-size:0.7rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-m);margin-bottom:0.4rem;">Rating *</div>
       <div id="rvStars" style="display:flex;gap:0.4rem;font-size:2.2rem;cursor:pointer;">
-        <span class="rv-star" data-v="1" onclick="setStars(1)">☆</span>
-        <span class="rv-star" data-v="2" onclick="setStars(2)">☆</span>
-        <span class="rv-star" data-v="3" onclick="setStars(3)">☆</span>
-        <span class="rv-star" data-v="4" onclick="setStars(4)">☆</span>
-        <span class="rv-star" data-v="5" onclick="setStars(5)">☆</span>
+            <span class="rv-star" data-v="1" onclick="setStars(1)">☆</span>
+            <span class="rv-star" data-v="2" onclick="setStars(2)">☆</span>
+            <span class="rv-star" data-v="3" onclick="setStars(3)">☆</span>
+            <span class="rv-star" data-v="4" onclick="setStars(4)">☆</span>
+            <span class="rv-star" data-v="5" onclick="setStars(5)">☆</span>
       </div>
     </div>
     <div style="margin-bottom:1rem;">
@@ -204,14 +204,14 @@
 </div>
 
 <div id="tcToast" style="position:fixed;bottom:2rem;right:1.5rem;background:var(--ink);color:#fff;padding:0.9rem 1.3rem;border-radius:0.75rem;font-size:0.82rem;transform:translateY(80px);opacity:0;transition:all 0.35s;z-index:300;pointer-events:none;"></div>
-<!-- ✅ FULL FIXED VERSION (keep your existing HTML structure exactly the same) -->
+<!-- âœ… FULL FIXED VERSION (keep your existing HTML structure exactly the same) -->
 <!-- Only these important corrected parts need to be inside your file -->
 
-<!-- ✅ FULL FIXED VERSION (keep your existing HTML structure exactly the same) -->
+<!-- âœ… FULL FIXED VERSION (keep your existing HTML structure exactly the same) -->
 <!-- Only these important corrected parts need to be inside your file -->
 
 <script>
-/* ══ API ✅ FIXED PATHS ══════════════════════════════════════════════ */
+/* â•â• API âœ… FIXED PATHS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const TAPI={
   me:       'php/auth/me.php',
   logout:   'php/auth/logout.php',
@@ -222,14 +222,14 @@ const TAPI={
   acts:     'php/activites/list.php',
 };
 
-/* ══ HELPERS ══════════════════════════════════════════ */
+/* â•â• HELPERS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function gel(id){return document.getElementById(id);}
 function setEl(id,v){const e=gel(id);if(e)e.textContent=v||'';}
 function setVal(id,v){const e=gel(id);if(e)e.value=v||'';}
 function toast(msg,ok=true){
   const t=gel('tcToast');if(!t)return;
-  t.textContent=(ok?'✓ ':'✗ ')+msg;
+    t.textContent=(ok?'OK: ':'Error: ')+msg;
   t.style.transform='translateY(0)';
   t.style.opacity='1';
   setTimeout(()=>{
@@ -238,7 +238,7 @@ function toast(msg,ok=true){
   },3000);
 }
 
-/* ══ PANELS ═══════════════════════════════════════════ */
+/* â•â• PANELS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const PTITLES={
   overview:'Overview',
   bookings:'My Bookings',
@@ -263,7 +263,7 @@ function showPanel(id,el){
   if(id==='reviews') loadReviews();
 }
 
-/* ══ AUTH + LOAD ══════════════════════════════════════ */
+/* â•â• AUTH + LOAD â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 (function(){
   try{
     const u=JSON.parse(localStorage.getItem('tc_user')||'null');
@@ -294,7 +294,7 @@ function quickInject(u){
   // greeting
   setEl('greetName',u.prenom||'');
 
-  // profile panel ✅ now replaces static SB
+  // profile panel âœ… now replaces static SB
   setEl('profAvatar',ini);
   setEl('profName',fullName);
 
@@ -305,14 +305,19 @@ function quickInject(u){
 }
 
 async function verifyAndLoad(){
+  // Try to refresh user data from server, but NEVER redirect or clear cache on failure
+  // The user stays logged in via localStorage regardless of PHP session state
   try{
-    const res=await fetch(TAPI.me,{credentials:'include'});
-    const data=await res.json();
+    const res=await fetch(TAPI.me);
+    let data;
+    try{ data=JSON.parse(await res.text()); }
+    catch(e){ loadOverviewData(); return; } // non-JSON response â€” just load data
 
-    if(data.success){
+    if(data.success && data.user){
       const u=data.user;
+      // Update localStorage with fresh server data
       localStorage.setItem('tc_user',JSON.stringify({
-        id:u.id_utilisateur,
+        id:u.id_utilisateur||u.id,
         nom:u.nom,
         prenom:u.prenom,
         email:u.email,
@@ -320,16 +325,15 @@ async function verifyAndLoad(){
       }));
       quickInject({prenom:u.prenom,nom:u.nom,email:u.email,role:u.role});
     }
-
-    loadOverviewData();
-
+    // If me.php fails (session expired etc) â€” keep using localStorage data, don't redirect
   }catch(e){
-    console.error(e);
-    loadOverviewData();
+    // Network error â€” keep using localStorage, don't redirect
+    console.warn('Could not verify session with server, using cached data');
   }
+  loadOverviewData();
 }
 
-/* ══ OVERVIEW DATA ════════════════════════════════════ */
+/* â•â• OVERVIEW DATA â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 async function loadOverviewData(){
   try{
     const res=await fetch(TAPI.bookings,{credentials:'include'});
@@ -360,15 +364,18 @@ function bkCard(b){
   return `
     <div class="booking-item">
       <div><strong>${esc(b.activite_titre||'')}</strong></div>
-      <div>📅 ${b.date_activite||'—'}</div>
-      <div>👥 ${b.nb_participants||1}</div>
-      <div>💰 ${b.montant_total||0} TND</div>
+              <div>Date: ${b.date_activite||'-'}</div>
+              <div>Guests: ${b.nb_participants||1}</div>
+              <div>Total: ${b.montant_total||0} TND</div>
       <div>Status: ${b.statut||''}</div>
     </div>`;
 }
 
-/* ══ BOOKINGS PANEL ═══════════════════════════════════ */
+/* â•â• BOOKINGS PANEL â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 let allBk=[];
+let currentBkFilter='all';
+let activeReviewBooking=null;
+let activeReviewStars=0;
 
 async function loadBookings(){
   const c=gel('bkList');
@@ -393,9 +400,9 @@ async function loadBookings(){
     c.innerHTML=allBk.map(b=>`
       <div class="booking-item">
         <strong>${esc(b.activite_titre)}</strong><br>
-        📅 ${b.date_activite}<br>
-        👥 ${b.nb_participants}<br>
-        💰 ${b.montant_total} TND<br>
+          Date: ${b.date_activite}<br>
+          Guests: ${b.nb_participants}<br>
+          Total: ${b.montant_total} TND<br>
         <button onclick="cancelBk(${b.id_reservation})">Cancel</button>
       </div>
     `).join('');
@@ -406,7 +413,7 @@ async function loadBookings(){
   }
 }
 
-/* ══ CANCEL BOOKING ✅ FIXED ══════════════════════════ */
+/* â•â• CANCEL BOOKING âœ… FIXED â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 async function cancelBk(id){
   if(!confirm('Cancel this booking?')) return;
 
@@ -436,6 +443,522 @@ async function cancelBk(id){
 /* placeholders so sidebar never breaks */
 async function loadWishlist(){}
 async function loadReviews(){}
+
+currentBkFilter='all';
+
+function filterBookings(type,btn){
+  currentBkFilter=type||'all';
+  document.querySelectorAll('#bkTabs .b-tab').forEach(el=>el.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderBookings();
+}
+
+function renderBookings(){
+  const c=gel('bkList');
+  if(!c) return;
+
+  const rows=(allBk||[]).filter(b=>{
+    if(currentBkFilter==='all') return true;
+    if(currentBkFilter==='upcoming') return b.statut==='confirmee' || b.statut==='en_attente';
+    return b.statut===currentBkFilter;
+  });
+
+  if(!rows.length){
+    c.innerHTML='<p style="color:var(--text-m);font-size:0.85rem;padding:1rem 0;">No bookings in this section.</p>';
+    return;
+  }
+
+  c.innerHTML=rows.map(b=>{
+    const artisan=[b.artisan_prenom,b.artisan_nom].filter(Boolean).join(' ').trim()||'Artisan';
+    const canCancel=['en_attente','confirmee'].includes(b.statut);
+    const reviewDone=parseInt(b.has_review||0,10)>0;
+    const canReview=(b.statut==='confirmee' || b.statut==='terminee') && !reviewDone;
+    return `
+      <div class="booking-item">
+        <strong>${esc(b.activite_titre||'')}</strong><br>
+        <span>Artisan: ${esc(artisan)}</span><br>
+        <span>Date: ${esc(b.date_activite||'-')} ${esc(b.heure_activite||'')}</span><br>
+        <span>Guests: ${b.nb_participants||1}</span><br>
+        <span>Total: ${b.montant_total||0} TND</span><br>
+        <span>Status: ${esc(b.statut||'')}</span><br>
+        <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:0.8rem;">
+          ${canCancel ? `<button onclick="cancelBk(${b.id_reservation})">Cancel</button>` : ''}
+          ${canReview ? `<button onclick="openRvModal(${b.id_reservation})">Leave Review</button>` : ''}
+          ${reviewDone ? `<button disabled style="opacity:0.65;cursor:not-allowed;">Reviewed</button>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+loadBookings = async function(){
+  const c=gel('bkList');
+  if(c) c.innerHTML='<p>Loading...</p>';
+
+  try{
+    const res=await fetch(TAPI.bookings,{credentials:'include'});
+    const d=await res.json();
+
+    if(!d.success){
+      if(c) c.innerHTML='<p>Failed loading bookings</p>';
+      return;
+    }
+
+    allBk=d.bookings||[];
+
+    if(!allBk.length){
+      if(c) c.innerHTML='<p>No bookings found</p>';
+      return;
+    }
+
+    renderBookings();
+  }catch(e){
+    console.error(e);
+    if(c) c.innerHTML='<p>Network error</p>';
+  }
+};
+
+loadReviews = async function(){
+  const list=gel('rvList');
+  if(list) list.innerHTML='<p style="color:var(--text-m);font-size:0.85rem;padding:1rem 0;">Loading...</p>';
+
+  try{
+    const res=await fetch(TAPI.reviews,{credentials:'include'});
+    const d=await res.json();
+
+    if(!d.success){
+      if(list) list.innerHTML='<p style="color:#a33;">Failed loading reviews</p>';
+      return;
+    }
+
+    const reviews=d.reviews||[];
+    setEl('statReviews',reviews.length);
+
+    if(!list) return;
+    if(!reviews.length){
+      list.innerHTML='<p style="color:var(--text-m);font-size:0.85rem;padding:1rem 0;">No reviews yet. Open a confirmed booking and leave one.</p>';
+      return;
+    }
+
+    list.innerHTML=reviews.map(r=>{
+    const stars='★'.repeat(Math.max(0,Math.round(r.note)))+'☆'.repeat(Math.max(0,5-Math.round(r.note)));
+      const date=r.date_avis?new Date(r.date_avis).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'';
+      return `
+        <div class="booking-item">
+          <strong>${esc(r.activite_titre||'')}</strong><br>
+          <span>Artisan: ${esc(r.artisan_nom||'Artisan')}</span><br>
+          <span style="color:var(--gold);font-size:1rem;">${stars}</span><br>
+          <span>${esc(date)}</span>
+          <p style="margin-top:0.7rem;">${esc(r.commentaire||'')}</p>
+        </div>
+      `;
+    }).join('');
+  }catch(e){
+    console.error(e);
+    if(list) list.innerHTML='<p style="color:#a33;">Network error</p>';
+  }
+};
+
+function openRvModal(id){
+  const booking=(allBk||[]).find(b=>parseInt(b.id_reservation,10)===parseInt(id,10));
+  if(!booking){
+    toast('Booking not found',false);
+    return;
+  }
+
+  activeReviewBooking=booking;
+  activeReviewStars=0;
+  setStars(0);
+  if(gel('rvComment')) gel('rvComment').value='';
+  if(gel('rvError')){
+    gel('rvError').style.display='none';
+    gel('rvError').textContent='';
+  }
+  setEl('rvActTitle',(booking.activite_titre||'Activity')+' with '+([booking.artisan_prenom,booking.artisan_nom].filter(Boolean).join(' ')||'Artisan'));
+  const modal=gel('rvModal');
+  if(modal) modal.style.display='flex';
+}
+
+function closeRvModal(){
+  const modal=gel('rvModal');
+  if(modal) modal.style.display='none';
+  activeReviewBooking=null;
+  activeReviewStars=0;
+  setStars(0);
+}
+
+function setStars(value){
+  activeReviewStars=value;
+  document.querySelectorAll('#rvStars .rv-star').forEach((star,idx)=>{
+    star.textContent = idx < value ? '★' : '☆';
+  });
+}
+
+async function submitReview(){
+  if(!activeReviewBooking){
+    toast('Select a booking first',false);
+    return;
+  }
+
+  const comment=(gel('rvComment')?.value||'').trim();
+  const err=gel('rvError');
+  const btn=gel('rvSubmitBtn');
+
+  if(activeReviewStars < 1){
+    if(err){
+      err.textContent='Please choose a rating';
+      err.style.display='block';
+    }
+    return;
+  }
+  if(comment.length < 10){
+    if(err){
+      err.textContent='Please write at least 10 characters';
+      err.style.display='block';
+    }
+    return;
+  }
+
+  if(err){
+    err.style.display='none';
+    err.textContent='';
+  }
+
+  if(btn){
+    btn.disabled=true;
+    btn.textContent='Submitting...';
+  }
+
+  try{
+    const res=await fetch(TAPI.reviews,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body:JSON.stringify({
+        id_reservation:activeReviewBooking.id_reservation,
+        note:activeReviewStars,
+        commentaire:comment
+      })
+    });
+    const raw=await res.text();
+    let d;
+    try{
+      d=JSON.parse(raw);
+    }catch(parseErr){
+      d={success:false,error:raw&&raw.trim()?raw.trim():'Invalid server response'};
+    }
+
+    if(!res.ok || !d.success){
+      if(err){
+        err.textContent=d.error||'Could not submit review';
+        err.style.display='block';
+      }else{
+        toast(d.error||'Could not submit review',false);
+      }
+      return;
+    }
+
+    toast('Review submitted');
+    closeRvModal();
+    await loadBookings();
+    await loadReviews();
+  }catch(e){
+    console.error(e);
+    if(err){
+      err.textContent='Network error';
+      err.style.display='block';
+    }else{
+      toast('Network error',false);
+    }
+  }finally{
+    if(btn){
+      btn.disabled=false;
+      btn.textContent='Submit';
+    }
+  }
+}
+
+function statusMeta(statut){
+  if(statut==='confirmee') return { cls:'status-confirmed', label:'Confirmed' };
+  if(statut==='terminee') return { cls:'status-completed', label:'Completed' };
+  if(statut==='annulee') return { cls:'status-cancelled', label:'Cancelled' };
+  return { cls:'status-pending', label:'Pending' };
+}
+
+function paymentLabel(paymentStatus){
+  if(paymentStatus==='completed') return 'Paid';
+  if(paymentStatus==='refunded') return 'Refunded';
+  return 'Unpaid';
+}
+
+bkCard = function(b){
+  const meta=statusMeta(b.statut||'');
+  const pStatus=(b.payment_status||'pending');
+  const canPay=!['completed','refunded'].includes(pStatus) && b.statut!=='annulee' && b.statut!=='terminee';
+  const canReceipt=(b.payment_status||'pending')==='completed';
+  return `
+    <div class="booking-item booking-item-compact">
+      <div class="booking-main">
+        <div class="booking-header-row">
+          <div class="booking-title">${esc(b.activite_titre||'')}</div>
+          <span class="status-badge ${meta.cls}">${meta.label}</span>
+        </div>
+        <div class="booking-meta-grid">
+          <div class="booking-meta-cell">
+            <span class="booking-meta-label">Date</span>
+            <strong>${esc(b.date_activite||'-')}</strong>
+          </div>
+          <div class="booking-meta-cell">
+            <span class="booking-meta-label">Guests</span>
+            <strong>${b.nb_participants||1}</strong>
+          </div>
+          <div class="booking-meta-cell">
+            <span class="booking-meta-label">Total</span>
+            <strong>${b.montant_total||0} TND</strong>
+          </div>
+          <div class="booking-meta-cell">
+            <span class="booking-meta-label">Payment</span>
+            <strong>${paymentLabel(pStatus)}</strong>
+          </div>
+        </div>
+      </div>
+      ${(canPay || canReceipt) ? `<div class="booking-actions">
+        ${canPay ? `<button class="btn-sm btn-pay" onclick="window.location='tuncover-payment.html?reservation_id=${b.id_reservation}'">Pay now</button>` : ''}
+          ${canReceipt ? `<button class="btn-sm btn-receipt" onclick="window.location='php/tourist/receipt.php?format=pdf&reservation_id=${b.id_reservation}'">Receipt</button>` : ''}
+        <button class="btn-sm" onclick="openChatModal(${b.id_reservation})">Chat</button>
+      </div>` : ''}
+    </div>`;
+};
+
+renderBookings = function(){
+  const c=gel('bkList');
+  if(!c) return;
+
+  const rows=(allBk||[]).filter(b=>{
+    if(currentBkFilter==='all') return true;
+    if(currentBkFilter==='upcoming') return b.statut==='confirmee' || b.statut==='en_attente';
+    return b.statut===currentBkFilter;
+  });
+
+  if(!rows.length){
+    c.innerHTML='<p style="color:var(--text-m);font-size:0.85rem;padding:1rem 0;">No bookings in this section.</p>';
+    return;
+  }
+
+  c.innerHTML=rows.map(b=>{
+    const artisan=[b.artisan_prenom,b.artisan_nom].filter(Boolean).join(' ').trim()||'Artisan';
+    const canCancel=['en_attente','confirmee'].includes(b.statut);
+    const reviewDone=parseInt(b.has_review||0,10)>0;
+    const canReview=(b.statut==='confirmee' || b.statut==='terminee') && !reviewDone;
+    const meta=statusMeta(b.statut||'');
+    const canReceipt=(b.payment_status||'pending')==='completed';
+    const pStatus=(b.payment_status||'pending');
+    const canPay=!['completed','refunded'].includes(pStatus) && b.statut!=='annulee' && b.statut!=='terminee';
+
+    return `
+      <div class="booking-item">
+        <div class="booking-main">
+          <div class="booking-header-row">
+            <div>
+              <div class="booking-title">${esc(b.activite_titre||'')}</div>
+              <div class="booking-artisan">Hosted by ${esc(artisan)}</div>
+            </div>
+            <span class="status-badge ${meta.cls}">${meta.label}</span>
+          </div>
+          <div class="booking-meta-grid">
+            <div class="booking-meta-cell">
+              <span class="booking-meta-label">Date</span>
+              <strong>${esc(b.date_activite||'-')} ${esc(b.heure_activite||'')}</strong>
+            </div>
+            <div class="booking-meta-cell">
+              <span class="booking-meta-label">Guests</span>
+              <strong>${b.nb_participants||1} guest(s)</strong>
+            </div>
+          <div class="booking-meta-cell">
+              <span class="booking-meta-label">Total</span>
+              <strong>${b.montant_total||0} TND</strong>
+            </div>
+            <div class="booking-meta-cell">
+              <span class="booking-meta-label">Payment</span>
+              <strong>${paymentLabel(pStatus)}</strong>
+            </div>
+          </div>
+        </div>
+        <div class="booking-actions">
+          ${canPay
+            ? `<button class="btn-sm btn-pay" onclick="window.location='tuncover-payment.html?reservation_id=${b.id_reservation}'">Pay now</button>`
+            : ''}
+          ${canReceipt
+            ? `<button class="btn-sm btn-receipt" onclick="window.location='php/tourist/receipt.php?format=pdf&reservation_id=${b.id_reservation}'">Receipt</button>`
+            : ''}
+          <button class="btn-sm" onclick="openChatModal(${b.id_reservation})">Chat</button>
+          ${canCancel ? `<button class="btn-sm btn-cancel" onclick="cancelBk(${b.id_reservation})">Cancel</button>` : ''}
+          ${canReview ? `<button class="btn-sm btn-review" onclick="openRvModal(${b.id_reservation})">Leave Review</button>` : ''}
+          ${reviewDone ? `<button class="btn-sm btn-reviewed" disabled>Reviewed</button>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+};
+
+async function handleLogout(){
+  try{
+    await fetch('php/auth/logout.php',{
+      method:'POST',
+      credentials:'include'
+    });
+  }catch(e){
+    console.warn('Logout request failed, clearing local session anyway');
+  }
+
+  localStorage.removeItem('tc_user');
+  window.location.href='tuncover-login.html';
+}
+</script>
+
+<script>
+const ENG_API = {
+  notifications: 'php/shared/notifications.php',
+  chat: 'php/shared/chat.php'
+};
+let chatReservationId = 0;
+
+function ensureTouristCommsUI(){
+  if(document.getElementById('tcNotifModal')) return;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `
+  <div id="tcNotifModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:330;align-items:center;justify-content:center;">
+    <div style="width:min(640px,94vw);max-height:82vh;background:var(--cream);border-radius:1rem;border:1px solid var(--sand2);display:flex;flex-direction:column;overflow:hidden;">
+      <div style="padding:1rem 1.2rem;border-bottom:1px solid var(--sand2);display:flex;justify-content:space-between;align-items:center;">
+        <strong>Notifications</strong>
+        <div style="display:flex;gap:.5rem;">
+          <button onclick="markAllNotificationsRead()" class="btn-sm">Mark all read</button>
+          <button onclick="closeNotifModal()" class="btn-sm">Close</button>
+        </div>
+      </div>
+      <div id="tcNotifList" style="overflow:auto;padding:0.9rem 1rem;"></div>
+    </div>
+  </div>
+  <div id="tcChatModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:340;align-items:center;justify-content:center;">
+    <div style="width:min(760px,96vw);max-height:86vh;background:var(--cream);border-radius:1rem;border:1px solid var(--sand2);display:flex;flex-direction:column;overflow:hidden;">
+      <div style="padding:1rem 1.2rem;border-bottom:1px solid var(--sand2);display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <strong id="tcChatTitle">Booking Chat</strong>
+          <div id="tcChatSub" style="font-size:.75rem;color:var(--text-m);"></div>
+        </div>
+        <button onclick="closeChatModal()" class="btn-sm">Close</button>
+      </div>
+      <div id="tcChatMessages" style="overflow:auto;padding:1rem;display:grid;gap:.6rem;background:#fff9f3;"></div>
+      <div style="padding:0.9rem;border-top:1px solid var(--sand2);display:flex;gap:.6rem;">
+        <input id="tcChatInput" placeholder="Write a message..." style="flex:1;border:1px solid var(--sand2);border-radius:.7rem;padding:.7rem;background:#fff;"/>
+        <button class="btn-sm btn-review" onclick="sendChatMessage()">Send</button>
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(wrap);
+}
+
+async function loadNotifications(){
+  try{
+    const res = await fetch(ENG_API.notifications,{credentials:'include'});
+    const data = await res.json();
+    if(!data.success) return;
+    const dot = document.querySelector('.notif-dot');
+    if(dot) dot.style.display = data.unread_count > 0 ? '' : 'none';
+    const list = document.getElementById('tcNotifList');
+    if(!list) return;
+    if(!(data.notifications||[]).length){
+      list.innerHTML='<p style="color:var(--text-m);">No notifications yet.</p>';
+      return;
+    }
+    list.innerHTML = data.notifications.map(n=>`
+      <div onclick="markNotificationRead(${n.id_notification},'${(n.link_url||'').replace(/'/g,"&#39;")}')" style="padding:.8rem;border:1px solid var(--sand2);border-radius:.7rem;background:${n.is_read==1?'#fff':'#fff3e7'};margin-bottom:.55rem;cursor:pointer;">
+        <div style="display:flex;justify-content:space-between;gap:.6rem;">
+          <strong style="font-size:.85rem;">${esc(n.title||'Notification')}</strong>
+          <span style="font-size:.7rem;color:var(--text-m);">${(n.created_at||'').substring(0,16)}</span>
+        </div>
+        <div style="font-size:.8rem;color:var(--text-m);margin-top:.25rem;">${esc(n.message||'')}</div>
+      </div>
+    `).join('');
+  }catch(e){}
+}
+
+function openNotifModal(){ ensureTouristCommsUI(); const m=document.getElementById('tcNotifModal'); if(m) m.style.display='flex'; loadNotifications(); }
+function closeNotifModal(){ const m=document.getElementById('tcNotifModal'); if(m) m.style.display='none'; }
+
+async function markNotificationRead(id, link){
+  try{
+    await fetch(ENG_API.notifications,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({mode:'single',id_notification:id})});
+    await loadNotifications();
+  }catch(e){}
+  if(link){ window.location.href = link; }
+}
+
+async function markAllNotificationsRead(){
+  try{
+    await fetch(ENG_API.notifications,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({mode:'all'})});
+    await loadNotifications();
+  }catch(e){}
+}
+
+async function openChatModal(reservationId){
+  ensureTouristCommsUI();
+  chatReservationId = parseInt(reservationId,10)||0;
+  const bk = (allBk||[]).find(x=>parseInt(x.id_reservation,10)===chatReservationId);
+  setEl('tcChatTitle', 'Chat with ' + ((bk ? [bk.artisan_prenom,bk.artisan_nom].filter(Boolean).join(' ') : 'Artisan') || 'Artisan'));
+  setEl('tcChatSub', bk ? ('Reservation #' + bk.id_reservation + ' - ' + (bk.activite_titre||'')) : '');
+  const m = document.getElementById('tcChatModal');
+  if(m) m.style.display='flex';
+  await loadChatMessages();
+}
+
+function closeChatModal(){ const m=document.getElementById('tcChatModal'); if(m) m.style.display='none'; chatReservationId=0; }
+
+async function loadChatMessages(){
+  if(!chatReservationId) return;
+  const box = document.getElementById('tcChatMessages');
+  if(box) box.innerHTML = '<p style="color:var(--text-m);">Loading chat...</p>';
+  try{
+    const res = await fetch(`${ENG_API.chat}?reservation_id=${chatReservationId}`,{credentials:'include'});
+    const data = await res.json();
+    if(!data.success){ if(box) box.innerHTML = `<p style="color:#a33;">${esc(data.error||'Could not load chat')}</p>`; return; }
+    const me = JSON.parse(localStorage.getItem('tc_user')||'{}').id;
+    const msgs = data.messages||[];
+    if(!msgs.length){ if(box) box.innerHTML = '<p style="color:var(--text-m);">No messages yet. Start the conversation.</p>'; return; }
+    box.innerHTML = msgs.map(msg=>{
+      const mine = parseInt(msg.id_sender,10)===parseInt(me,10);
+      return `<div style="display:flex;justify-content:${mine?'flex-end':'flex-start'};">
+        <div style="max-width:74%;padding:.62rem .75rem;border-radius:.75rem;border:1px solid ${mine?'#d8b59a':'var(--sand2)'};background:${mine?'#f7dfcf':'#fff'};">
+          <div style="font-size:.78rem;line-height:1.45;">${esc(msg.message||'')}</div>
+          <div style="font-size:.68rem;color:var(--text-m);margin-top:.25rem;">${esc(msg.sender_name||'')} - ${(msg.created_at||'').substring(0,16)}</div>
+        </div>
+      </div>`;
+    }).join('');
+    box.scrollTop = box.scrollHeight;
+  }catch(e){ if(box) box.innerHTML='<p style="color:#a33;">Network error</p>'; }
+}
+
+async function sendChatMessage(){
+  if(!chatReservationId) return;
+  const inp = document.getElementById('tcChatInput');
+  const message = (inp?.value||'').trim();
+  if(!message) return;
+  try{
+    const res = await fetch(ENG_API.chat,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({reservation_id:chatReservationId,message})});
+    const data = await res.json();
+    if(!data.success){ toast(data.error||'Could not send message',false); return; }
+    inp.value='';
+    loadChatMessages();
+  }catch(e){ toast('Network error',false); }
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  ensureTouristCommsUI();
+  const btn = document.querySelector('.notif-btn');
+  if(btn) btn.addEventListener('click', openNotifModal);
+  loadNotifications();
+  setInterval(loadNotifications, 30000);
+});
 </script>
 
 

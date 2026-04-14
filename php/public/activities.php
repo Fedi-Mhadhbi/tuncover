@@ -25,14 +25,15 @@ $sql = "
     JOIN  utilisateurs u     ON ar.id_utilisateur = u.id_utilisateur
     LEFT JOIN avis av        ON av.id_activite    = a.id_activite
     LEFT JOIN reservations r ON r.id_activite     = a.id_activite AND r.statut != 'annulee'
-    WHERE a.statut = 'publie' AND ar.statut_validation = 'valide'
+    WHERE a.statut IN ('publie', 'published')
+      AND (ar.statut_validation = 'valide' OR ar.statut_validation = 'en_attente' OR ar.statut_validation IS NULL)
 ";
 $params = [];
 if ($q)       { $p="%$q%"; $sql.=" AND (a.titre LIKE ? OR a.description LIKE ? OR a.ville LIKE ? OR u.nom LIKE ? OR u.prenom LIKE ? OR c.nom LIKE ?)"; $params=array_merge($params,[$p,$p,$p,$p,$p,$p]); }
 if ($ville)   { $sql.=" AND a.ville=?"; $params[]=$ville; }
 if ($cat)     { $sql.=" AND c.nom LIKE ?"; $params[]="%$cat%"; }
 if ($max_prix){ $sql.=" AND a.prix<=?"; $params[]=$max_prix; }
-$sql .= " GROUP BY a.id_activite ORDER BY nb_bookings DESC, a.date_creation DESC";
+$sql .= " GROUP BY a.id_activite ORDER BY nb_bookings DESC, a.id_activite DESC";
 
 try {
     $s=$db->prepare($sql); $s->execute($params);

@@ -3,6 +3,7 @@
 header('Content-Type: application/json; charset=utf-8');
 session_start();
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/payments.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     http_response_code(403);
@@ -10,6 +11,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 }
 
 $db = getDB();
+ensurePaymentsTable($db);
 
 // Users by role
 $u = $db->query("SELECT role, COUNT(*) as cnt FROM utilisateurs GROUP BY role")->fetchAll();
@@ -30,9 +32,10 @@ $totalAct  = (int)$db->query("SELECT COUNT(*) FROM activites WHERE statut='publi
 $pendingAct= (int)$db->query("SELECT COUNT(*) FROM activites WHERE statut='brouillon'")->fetchColumn();
 
 // Revenue — use all non-cancelled reservations (not just 'terminee' since that status may not be used yet)
-$revenue      = (float)$db->query("SELECT COALESCE(SUM(montant_total),0) FROM reservations WHERE statut NOT IN('annulee')")->fetchColumn();
-$monthRevenue = (float)$db->query("SELECT COALESCE(SUM(montant_total),0) FROM reservations WHERE statut NOT IN('annulee') AND MONTH(date_reservation)=MONTH(NOW()) AND YEAR(date_reservation)=YEAR(NOW())")->fetchColumn();
-$avgBooking   = $totalRes > 0 ? round($revenue / $totalRes, 0) : 0;
+$revenue      = (float)$db->query("SELECT COALESCE(SUM(amount),0) FROM payments WHERE payment_status='completed'")->fetchColumn();
+$monthRevenue = (float)$db->query("SELECT COALESCE(SUM(amount),0) FROM payments WHERE payment_status='completed' AND MONTH(paid_at)=MONTH(NOW()) AND YEAR(paid_at)=YEAR(NOW())")->fetchColumn();
+$totalPaid    = (int)$db->query("SELECT COUNT(*) FROM payments WHERE payment_status='completed'")->fetchColumn();
+$avgBooking   = $totalPaid > 0 ? round($revenue / $totalPaid, 0) : 0;
 
 // Platform rating (average of all reviews)
 $ratingRow   = $db->query("SELECT COALESCE(AVG(note),0) AS avg_note, COUNT(*) AS total FROM avis")->fetch();
@@ -73,13 +76,14 @@ $activitiesByCategory = $db->query("
 // Top artisans by bookings
 $topArtisans = $db->query("
     SELECT CONCAT(u.prenom,' ',u.nom) AS nom,
-           COUNT(r.id_reservation) AS bookings,
-           COALESCE(SUM(r.montant_total),0) AS revenue
-    FROM reservations r
+           COUNT(p.id_payment) AS bookings,
+           COALESCE(SUM(p.amount),0) AS revenue
+    FROM payments p
+    JOIN reservations r ON p.id_reservation=r.id_reservation
     JOIN activites a ON r.id_activite=a.id_activite
     JOIN artisans ar ON a.id_artisan=ar.id_artisan
     JOIN utilisateurs u ON ar.id_utilisateur=u.id_utilisateur
-    WHERE r.statut NOT IN('annulee')
+    WHERE p.payment_status='completed'
     GROUP BY ar.id_artisan
     ORDER BY bookings DESC LIMIT 5
 ")->fetchAll();

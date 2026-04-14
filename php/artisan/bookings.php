@@ -7,6 +7,8 @@
 
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/payments.php';
+require_once __DIR__ . '/../config/engagement.php';
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
@@ -18,6 +20,8 @@ if (!isset($_SESSION['user_id'])) {
 $userId = $_SESSION['user_id'];
 $method = $_SERVER['REQUEST_METHOD'];
 $db     = getDB();
+ensurePaymentsTable($db);
+ensureNotificationsTable($db);
 
 // Get artisan id from user id
 $artStmt = $db->prepare("SELECT id_artisan FROM artisans WHERE id_utilisateur = ?");
@@ -44,6 +48,9 @@ if ($method === 'GET') {
             r.nb_participants,
             r.montant_total,
             r.statut,
+            COALESCE(p.payment_status, 'pending') AS payment_status,
+            p.transaction_ref,
+            p.paid_at,
             a.titre AS activite_titre,
             u.nom AS tourist_nom,
             u.prenom AS tourist_prenom,
@@ -51,6 +58,7 @@ if ($method === 'GET') {
         FROM reservations r
         JOIN activites a ON r.id_activite = a.id_activite
         JOIN utilisateurs u ON r.id_touriste = u.id_utilisateur
+        LEFT JOIN payments p ON p.id_reservation = r.id_reservation
         WHERE a.id_artisan = ?
     ";
     $params = [$artisanId];
@@ -74,27 +82,105 @@ if ($method === 'POST') {
     $id     = (int)($data['id']     ?? 0);
     $statut = $data['statut'] ?? '';
 
-    if (!$id || !in_array($statut, ['confirmee','annulee'])) {
+    if (!$id || !in_array($statut, ['confirmee','annulee','terminee'])) {
         echo json_encode(['success'=>false,'error'=>'Invalid parameters']); exit;
     }
 
     // Verify this booking belongs to this artisan
     $check = $db->prepare("
-        SELECT r.id_reservation
+        SELECT
+            r.id_reservation,
+            r.statut,
+            r.id_touriste,
+            a.titre AS activite_titre,
+            COALESCE(p.payment_status,'pending') AS payment_status
         FROM reservations r
         JOIN activites a ON r.id_activite = a.id_activite
+        LEFT JOIN payments p ON p.id_reservation = r.id_reservation
         WHERE r.id_reservation = ? AND a.id_artisan = ?
     ");
     $check->execute([$id, $artisanId]);
-    if (!$check->fetch()) {
+    $existing = $check->fetch();
+    if (!$existing) {
         http_response_code(403);
         echo json_encode(['success'=>false,'error'=>'Booking not found or access denied']);
         exit;
     }
 
-    $stmt = $db->prepare("UPDATE reservations SET statut = ? WHERE id_reservation = ?");
-    $stmt->execute([$statut, $id]);
-    echo json_encode(['success'=>true, 'statut'=>$statut]);
+    // Lifecycle transitions:
+    // en_attente -> confirmee / annulee
+    // confirmee  -> terminee / annulee
+    // terminee/annulee are final
+    $current = $existing['statut'] ?? '';
+    $allowed = [
+        'en_attente' => ['confirmee','annulee'],
+        'confirmee'  => ['terminee','annulee'],
+        'terminee'   => [],
+        'annulee'    => [],
+    ];
+    if (!isset($allowed[$current]) || !in_array($statut, $allowed[$current], true)) {
+        echo json_encode(['success'=>false,'error'=>'Invalid status transition']); exit;
+    }
+
+    try {
+        $db->beginTransaction();
+        $stmt = $db->prepare("UPDATE reservations SET statut = ? WHERE id_reservation = ?");
+        $stmt->execute([$statut, $id]);
+
+        if ($statut === 'annulee' && ($existing['payment_status'] ?? 'pending') === 'completed') {
+            $db->prepare("UPDATE payments SET payment_status='refunded', updated_at=NOW() WHERE id_reservation=?")->execute([$id]);
+            createNotification(
+                $db,
+                (int)$existing['id_touriste'],
+                'payment_refunded',
+                'Payment Refunded',
+                'Your paid reservation for "' . ($existing['activite_titre'] ?? 'activity') . '" was refunded by the artisan.',
+                'tuncover-tourist.html',
+                $id
+            );
+        }
+
+        if ($statut === 'confirmee') {
+            createNotification(
+                $db,
+                (int)$existing['id_touriste'],
+                'booking_confirmed',
+                'Reservation Confirmed',
+                'Your reservation for "' . ($existing['activite_titre'] ?? 'activity') . '" is now confirmed.',
+                'tuncover-tourist.html',
+                $id
+            );
+        } elseif ($statut === 'terminee') {
+            createNotification(
+                $db,
+                (int)$existing['id_touriste'],
+                'booking_completed',
+                'Reservation Completed',
+                'Your reservation for "' . ($existing['activite_titre'] ?? 'activity') . '" is marked as completed.',
+                'tuncover-tourist.html',
+                $id
+            );
+        } elseif ($statut === 'annulee') {
+            createNotification(
+                $db,
+                (int)$existing['id_touriste'],
+                'booking_cancelled',
+                'Reservation Cancelled',
+                'Your reservation for "' . ($existing['activite_titre'] ?? 'activity') . '" was cancelled by the artisan.',
+                'tuncover-tourist.html',
+                $id
+            );
+        }
+
+        $db->commit();
+        echo json_encode(['success'=>true, 'statut'=>$statut]);
+    } catch (Throwable $e) {
+        if ($db->inTransaction()) {
+            $db->rollBack();
+        }
+        http_response_code(500);
+        echo json_encode(['success'=>false,'error'=>'Could not update booking: ' . $e->getMessage()]);
+    }
     exit;
 }
 

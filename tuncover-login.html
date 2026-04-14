@@ -195,27 +195,16 @@ function redirectByRole(role){
 }
 
 /* ══ AUTO-REDIRECT IF ALREADY LOGGED IN ══════════════ */
-(async function(){
+(function(){
+  // If already logged in (localStorage has valid user), redirect immediately
+  // Do NOT call me.php here — that would clear localStorage on PHP session expiry
   try{
     const u=JSON.parse(localStorage.getItem('tc_user')||'null');
-    if(!u||!u.id||!u.role) return; // not logged in, stay on login page
-
-    // Verify session is still valid with server before redirecting
-    const res = await fetch('php/auth/me.php',{credentials:'include'});
-    const data = await res.json();
-    if(data.success && data.user.role){
-      // Session valid — update localStorage with fresh data and redirect
-      localStorage.setItem('tc_user', JSON.stringify({
-        id: data.user.id, nom: data.user.nom, prenom: data.user.prenom,
-        email: data.user.email, role: data.user.role
-      }));
-      redirectByRole(data.user.role);
-    } else {
-      // Session expired — clear localStorage, stay on login page
-      localStorage.removeItem('tc_user');
+    if(u&&u.id&&u.role){
+      redirectByRole(u.role);
     }
   }catch(e){
-    // Network error or XAMPP not running — clear and stay
+    // Invalid JSON in localStorage — clear it
     localStorage.removeItem('tc_user');
   }
 })();

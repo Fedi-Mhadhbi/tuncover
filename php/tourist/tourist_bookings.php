@@ -9,6 +9,7 @@ header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/payments.php';
 require_once __DIR__ . '/../config/engagement.php';
+require_once __DIR__ . '/../config/activity_capacity.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -25,6 +26,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 $db     = getDB();
 ensurePaymentsTable($db);
 ensureNotificationsTable($db);
+ensureActivityCapacityColumns($db);
 
 if ($method === 'GET') {
     $statut = $_GET['statut'] ?? '';
@@ -88,6 +90,8 @@ if ($method === 'DELETE') {
         SELECT
             r.id_reservation,
             r.statut,
+            r.id_activite,
+            r.nb_participants,
             r.date_activite,
             r.heure_activite,
             COALESCE(p.payment_status, 'pending') AS payment_status,
@@ -128,6 +132,10 @@ if ($method === 'DELETE') {
 
         $stmt = $db->prepare("UPDATE reservations SET statut = 'annulee' WHERE id_reservation = ?");
         $stmt->execute([$id]);
+
+        if (($booking['statut'] ?? '') === 'confirmee') {
+            adjustReservedPlaces($db, (int)$booking['id_activite'], -max(1, (int)$booking['nb_participants']));
+        }
 
         if (($booking['payment_status'] ?? 'pending') === 'completed') {
             $refund = $db->prepare("

@@ -822,6 +822,8 @@ const ENG_API = {
   chat: 'php/shared/chat.php'
 };
 let chatReservationId = 0;
+let chatDirectUserId = 0;
+let chatMode = 'reservation';
 
 function ensureTouristCommsUI(){
   if(document.getElementById('tcNotifModal')) return;
@@ -903,6 +905,8 @@ async function markAllNotificationsRead(){
 
 async function openChatModal(reservationId){
   ensureTouristCommsUI();
+  chatMode = 'reservation';
+  chatDirectUserId = 0;
   chatReservationId = parseInt(reservationId,10)||0;
   const bk = (allBk||[]).find(x=>parseInt(x.id_reservation,10)===chatReservationId);
   setEl('tcChatTitle', 'Chat with ' + ((bk ? [bk.artisan_prenom,bk.artisan_nom].filter(Boolean).join(' ') : 'Artisan') || 'Artisan'));
@@ -914,12 +918,32 @@ async function openChatModal(reservationId){
 
 function closeChatModal(){ const m=document.getElementById('tcChatModal'); if(m) m.style.display='none'; chatReservationId=0; }
 
+async function openDirectChatModal(userId, label){
+  ensureTouristCommsUI();
+  chatMode = 'direct';
+  chatReservationId = 0;
+  chatDirectUserId = parseInt(userId,10)||0;
+  if(!chatDirectUserId){
+    toast('Chat user not found', false);
+    return;
+  }
+  setEl('tcChatTitle', 'Chat with ' + (label || 'Artisan'));
+  setEl('tcChatSub', 'Direct chat before reservation');
+  const m = document.getElementById('tcChatModal');
+  if(m) m.style.display='flex';
+  await loadChatMessages();
+}
+
 async function loadChatMessages(){
-  if(!chatReservationId) return;
+  if(chatMode==='reservation' && !chatReservationId) return;
+  if(chatMode==='direct' && !chatDirectUserId) return;
   const box = document.getElementById('tcChatMessages');
   if(box) box.innerHTML = '<p style="color:var(--text-m);">Loading chat...</p>';
   try{
-    const res = await fetch(`${ENG_API.chat}?reservation_id=${chatReservationId}`,{credentials:'include'});
+    const url = chatMode==='direct'
+      ? `${ENG_API.chat}?direct_user_id=${chatDirectUserId}`
+      : `${ENG_API.chat}?reservation_id=${chatReservationId}`;
+    const res = await fetch(url,{credentials:'include'});
     const data = await res.json();
     if(!data.success){ if(box) box.innerHTML = `<p style="color:#a33;">${esc(data.error||'Could not load chat')}</p>`; return; }
     const me = JSON.parse(localStorage.getItem('tc_user')||'{}').id;
@@ -939,12 +963,16 @@ async function loadChatMessages(){
 }
 
 async function sendChatMessage(){
-  if(!chatReservationId) return;
+  if(chatMode==='reservation' && !chatReservationId) return;
+  if(chatMode==='direct' && !chatDirectUserId) return;
   const inp = document.getElementById('tcChatInput');
   const message = (inp?.value||'').trim();
   if(!message) return;
   try{
-    const res = await fetch(ENG_API.chat,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({reservation_id:chatReservationId,message})});
+    const payload = chatMode==='direct'
+      ? {direct_user_id:chatDirectUserId,message}
+      : {reservation_id:chatReservationId,message};
+    const res = await fetch(ENG_API.chat,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify(payload)});
     const data = await res.json();
     if(!data.success){ toast(data.error||'Could not send message',false); return; }
     inp.value='';
@@ -958,6 +986,12 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(btn) btn.addEventListener('click', openNotifModal);
   loadNotifications();
   setInterval(loadNotifications, 30000);
+  const qs = new URLSearchParams(window.location.search);
+  const directUser = parseInt(qs.get('direct_user') || '0', 10);
+  if (directUser > 0) {
+    const directName = qs.get('direct_name') || 'Artisan';
+    openDirectChatModal(directUser, directName);
+  }
 });
 </script>
 

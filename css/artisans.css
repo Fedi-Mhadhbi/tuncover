@@ -51,6 +51,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .artisan-rating{display:flex;align-items:center;gap:0.3rem;font-size:0.78rem;color:var(--text-m);}
 .artisan-rating .star{color:var(--gold);}
 .artisan-workshops{font-size:0.75rem;color:var(--text-m);}
+.artisan-actions{display:flex;align-items:center;gap:0.45rem;}
+.btn-chat{font-size:0.74rem;color:var(--clay2);font-weight:700;text-decoration:none;border:1px solid rgba(201,112,58,0.4);background:linear-gradient(180deg,#fff 0%,#fff4ea 100%);padding:0.38rem 0.9rem;border-radius:2rem;cursor:pointer;transition:all 0.2s;box-shadow:0 6px 14px rgba(163,82,42,0.12);}
+.btn-chat:hover{background:var(--clay);border-color:var(--clay);color:#fff;transform:translateY(-1px);}
 .btn-visit{font-size:0.75rem;color:var(--clay2);font-weight:600;text-decoration:none;border:1px solid var(--clay);padding:0.38rem 0.9rem;border-radius:2rem;transition:all 0.2s;background:#fff;}
 .btn-visit:hover{background:var(--clay);color:#fff;}
 
@@ -129,6 +132,7 @@ footer{background:var(--ink);color:rgba(255,255,255,0.45);padding:3rem 3.5rem 1.
   .filter-bar { padding: 1rem 1.2rem; }
   .artisans-page { padding: 2rem 1.2rem 4rem; }
   .artisans-grid { grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); }
+  .artisan-actions { flex-wrap:wrap; justify-content:flex-end; }
   .join-cta { grid-template-columns: 1fr; text-align: center; padding: 2rem; gap: 1.5rem; }
 
   /* LOGIN */

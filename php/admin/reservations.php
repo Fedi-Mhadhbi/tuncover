@@ -5,6 +5,7 @@ session_start();
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/payments.php';
 require_once __DIR__ . '/../config/engagement.php';
+require_once __DIR__ . '/../config/activity_capacity.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     http_response_code(403); echo json_encode(['success'=>false,'error'=>'Admin only']); exit;
@@ -13,6 +14,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 $db     = getDB();
 ensurePaymentsTable($db);
 ensureNotificationsTable($db);
+ensureActivityCapacityColumns($db);
 $statut = $_GET['statut'] ?? '';
 $payment = $_GET['payment'] ?? '';
 $q      = trim($_GET['q'] ?? '');
@@ -72,6 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             r.id_reservation,
             r.statut,
             r.id_touriste,
+            r.id_activite,
+            r.nb_participants,
             a.titre AS activite_titre,
             ar.id_utilisateur AS artisan_user_id,
             COALESCE(p.payment_status,'pending') AS payment_status
@@ -95,19 +99,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($row['statut'] !== 'en_attente') {
                 throw new RuntimeException('Only pending reservations can be confirmed');
             }
+            $activity = loadActivityForAvailability($db, (int)$row['id_activite'], true);
+            if (!$activity || ($activity['statut'] ?? '') !== 'publie') {
+                throw new RuntimeException('Activity is no longer available');
+            }
+            $needed = max(1, (int)$row['nb_participants']);
+            if (remainingPlacesFromRow($activity) < $needed) {
+                throw new RuntimeException('Not enough places remain to confirm this reservation');
+            }
             $db->prepare("UPDATE reservations SET statut='confirmee' WHERE id_reservation=?")->execute([$id]);
+            adjustReservedPlaces($db, (int)$row['id_activite'], max(1, (int)$row['nb_participants']));
             createNotification($db, (int)$row['id_touriste'], 'booking_confirmed', 'Reservation Confirmed', 'Admin confirmed your reservation for "' . ($row['activite_titre'] ?? 'activity') . '".', 'tuncover-tourist.html', $id);
         } elseif ($action === 'complete') {
             if ($row['statut'] !== 'confirmee') {
                 throw new RuntimeException('Only confirmed reservations can be completed');
             }
             $db->prepare("UPDATE reservations SET statut='terminee' WHERE id_reservation=?")->execute([$id]);
+            adjustReservedPlaces($db, (int)$row['id_activite'], -max(1, (int)$row['nb_participants']));
             createNotification($db, (int)$row['id_touriste'], 'booking_completed', 'Reservation Completed', 'Admin marked your reservation for "' . ($row['activite_titre'] ?? 'activity') . '" as completed.', 'tuncover-tourist.html', $id);
         } elseif ($action === 'cancel') {
             if (in_array($row['statut'], ['annulee','terminee'], true)) {
                 throw new RuntimeException('This reservation cannot be cancelled');
             }
             $db->prepare("UPDATE reservations SET statut='annulee' WHERE id_reservation=?")->execute([$id]);
+            if ($row['statut'] === 'confirmee') {
+                adjustReservedPlaces($db, (int)$row['id_activite'], -max(1, (int)$row['nb_participants']));
+            }
             createNotification($db, (int)$row['id_touriste'], 'booking_cancelled', 'Reservation Cancelled', 'Admin cancelled your reservation for "' . ($row['activite_titre'] ?? 'activity') . '".', 'tuncover-tourist.html', $id);
             createNotification($db, (int)$row['artisan_user_id'], 'booking_cancelled', 'Reservation Cancelled', 'Admin cancelled reservation #' . $id . ' for "' . ($row['activite_titre'] ?? 'activity') . '".', 'tuncover-artisan-dashboard.html', $id);
             if (($row['payment_status'] ?? 'pending') === 'completed') {

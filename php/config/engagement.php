@@ -59,6 +59,59 @@ function ensureChatMessagesTable(PDO $db): void {
     $ready = true;
 }
 
+function ensureDirectMessagesTable(PDO $db): void {
+    static $ready = false;
+    if ($ready) return;
+
+    $db->exec("
+        CREATE TABLE IF NOT EXISTS direct_messages (
+            id_direct_message INT AUTO_INCREMENT PRIMARY KEY,
+            id_sender INT NOT NULL,
+            id_receiver INT NOT NULL,
+            message TEXT NOT NULL,
+            is_read TINYINT(1) NOT NULL DEFAULT 0,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            KEY idx_dm_sender (id_sender),
+            KEY idx_dm_receiver_read (id_receiver, is_read),
+            KEY idx_dm_created (created_at),
+            CONSTRAINT fk_dm_sender
+              FOREIGN KEY (id_sender) REFERENCES utilisateurs(id_utilisateur)
+              ON DELETE CASCADE,
+            CONSTRAINT fk_dm_receiver
+              FOREIGN KEY (id_receiver) REFERENCES utilisateurs(id_utilisateur)
+              ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+
+    $ready = true;
+}
+
+function ensureArtisanPortfolioTable(PDO $db): void {
+    static $ready = false;
+    if ($ready) return;
+
+    $db->exec("
+        CREATE TABLE IF NOT EXISTS artisan_portfolio (
+            id_portfolio INT AUTO_INCREMENT PRIMARY KEY,
+            id_artisan INT NOT NULL,
+            title VARCHAR(180) NOT NULL,
+            media_type ENUM('image','video') NOT NULL DEFAULT 'image',
+            media_url VARCHAR(600) NOT NULL,
+            thumbnail_url VARCHAR(600) DEFAULT NULL,
+            display_order INT NOT NULL DEFAULT 0,
+            is_public TINYINT(1) NOT NULL DEFAULT 1,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            KEY idx_portfolio_artisan (id_artisan),
+            KEY idx_portfolio_public (is_public),
+            CONSTRAINT fk_portfolio_artisan
+              FOREIGN KEY (id_artisan) REFERENCES artisans(id_artisan)
+              ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    ");
+
+    $ready = true;
+}
+
 function createNotification(
     PDO $db,
     int $userId,

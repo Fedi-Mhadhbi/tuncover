@@ -235,7 +235,38 @@
           <div class="fg"><label>Experience (years)</label><input type="number" value=""/></div>
         </div>
         <div class="fg"><label>Languages Spoken</label><input type="text" value="Arabic, French, English"/></div>
-        <button class="save-btn">Save Profile</button>
+        <button class="save-btn" onclick="saveProfile()">Save Profile</button>
+      </div>
+      <div class="form-card" style="margin-top:1rem;">
+        <div class="form-section-title">Portfolio Gallery</div>
+        <div class="form-grid-2">
+          <div class="fg">
+            <label>Title *</label>
+            <input type="text" id="portTitle" placeholder="e.g. Hand-painted ceramic set"/>
+          </div>
+          <div class="fg">
+            <label>Type</label>
+            <select id="portType">
+              <option value="image">Image</option>
+              <option value="video">Video</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg">
+          <label>Upload from your computer</label>
+          <input type="file" id="portFile" accept="image/*,video/*"/>
+          <div style="font-size:0.72rem;color:var(--text-m);margin-top:0.25rem;">Accepted: JPG, PNG, WEBP, GIF, MP4, WEBM, OGG, MOV (max 50MB)</div>
+        </div>
+        <div class="fg">
+          <label>Media URL (optional)</label>
+          <input type="url" id="portMediaUrl" placeholder="https://..."/>
+        </div>
+        <div class="fg">
+          <label>Thumbnail URL (optional for videos)</label>
+          <input type="url" id="portThumbUrl" placeholder="https://..."/>
+        </div>
+        <button class="save-btn" onclick="addPortfolioItem()" style="margin-bottom:1rem;">Add to Portfolio</button>
+        <div id="portfolioList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0.8rem;"></div>
       </div>
     </div>
   </main>
@@ -250,6 +281,7 @@ const LISTINGS_API = 'php/artisan/listings.php';
 const EARNINGS_API = 'php/artisan/earnings.php';
 const ME_API       = 'php/artisan/me.php';
 const PROFILE_API  = 'php/artisan/profile.php';
+const PORTFOLIO_API = 'php/artisan/portfolio.php';
 let artisanBookingsCache = [];
 
 /* â•â• HELPERS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
@@ -599,6 +631,11 @@ async function loadListings(){
             <span>${l.total_bookings||0} bookings</span>
             ${l.avg_rating>0?`<span>Rating ${parseFloat(l.avg_rating).toFixed(1)}</span>`:''}
           </div>
+          <div class="listing-meta" style="margin-top:0.35rem;padding-top:0.55rem;border-top:1px dashed var(--sand2);">
+            <span>Capacity ${parseInt(l.capacity_total || l.max_participants || 0, 10) || 0}</span>
+            <span>Reserved ${parseInt(l.places_reservees_live || 0, 10) || 0}</span>
+            <span style="font-weight:600;color:${(parseInt(l.places_restantes || 0, 10) || 0) > 0 ? 'var(--green,#4a9e6a)' : '#b5533e'};">Remaining ${parseInt(l.places_restantes || 0, 10) || 0}</span>
+          </div>
           <div class="listing-actions">
             <button class="lst-btn" onclick="editListing(${l.id_activite})">Edit</button>
             <button class="lst-btn" onclick="toggleListingStatus(${l.id_activite},'${l.statut==='publie'?'brouillon':'publie'}')">${l.statut==='publie'?'Pause':'Publish'}</button>
@@ -769,7 +806,7 @@ async function loadEarnings(){
 
 /* â•â• PROFILE â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 async function loadProfile(){
-  // Already filled by loadCurrentUser â€” nothing extra needed
+  loadPortfolio();
 }
 
 async function saveProfile(){
@@ -862,6 +899,8 @@ async function handleLogout(){
 <script>
 const SHARED_API = { notifications:'php/shared/notifications.php', chat:'php/shared/chat.php' };
 let artChatReservationId = 0;
+let artDirectUserId = 0;
+let artChatMode = 'reservation';
 
 function ensureArtCommsUI(){
   if (document.getElementById('artNotifModal')) return;
@@ -939,6 +978,8 @@ async function markAllArtNotifsRead(){
 
 async function openArtChatModal(resId){
   ensureArtCommsUI();
+  artChatMode = 'reservation';
+  artDirectUserId = 0;
   artChatReservationId = parseInt(resId,10)||0;
   const bk=(artisanBookingsCache||[]).find(x=>parseInt(x.id_reservation,10)===artChatReservationId);
   const tourist=(bk?[bk.tourist_prenom,bk.tourist_nom].filter(Boolean).join(' '):'Tourist')||'Tourist';
@@ -949,14 +990,176 @@ async function openArtChatModal(resId){
   loadArtChatMessages();
 }
 
-function closeArtChatModal(){ const m=document.getElementById('artChatModal'); if(m) m.style.display='none'; artChatReservationId=0; }
+function portfolioMediaHtml(it){
+  const type = String(it.media_type || 'image').toLowerCase();
+  const title = esc(it.title || 'Portfolio item');
+  if(type === 'video'){
+    const u = String(it.media_url || '');
+    const yt = u.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{6,})/i);
+    if(yt && yt[1]){
+      return `<iframe src="https://www.youtube.com/embed/${yt[1]}" style="width:100%;height:100%;border:0;" loading="lazy" allowfullscreen></iframe>`;
+    }
+    const vm = u.match(/vimeo\.com\/(\d+)/i);
+    if(vm && vm[1]){
+      return `<iframe src="https://player.vimeo.com/video/${vm[1]}" style="width:100%;height:100%;border:0;" loading="lazy" allowfullscreen></iframe>`;
+    }
+    return `<video controls preload="metadata" src="${esc(u)}" style="width:100%;height:100%;object-fit:cover;background:#000;"></video>`;
+  }
+  return `<img src="${esc(it.media_url || '')}" alt="${title}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&q=70'" style="width:100%;height:100%;object-fit:cover;"/>`;
+}
+
+async function loadPortfolio(){
+  const list = document.getElementById('portfolioList');
+  if(!list) return;
+  list.innerHTML = '<div style="grid-column:1/-1;color:var(--text-m);font-style:italic;">Loading portfolio...</div>';
+  try{
+    const res = await fetch(PORTFOLIO_API, {credentials:'include'});
+    const data = await res.json();
+    if(!data.success){
+      list.innerHTML = `<div style="grid-column:1/-1;color:#a33;">${esc(data.error || 'Could not load portfolio')}</div>`;
+      return;
+    }
+    const items = data.items || [];
+    if(!items.length){
+      list.innerHTML = '<div style="grid-column:1/-1;color:var(--text-m);font-style:italic;">No portfolio items yet.</div>';
+      return;
+    }
+    list.innerHTML = items.map(it => `
+      <div style="background:#fff;border:1px solid var(--sand2);border-radius:0.8rem;overflow:hidden;">
+        <div style="height:140px;background:#f6efe4;">${portfolioMediaHtml(it)}</div>
+        <div style="padding:0.65rem 0.75rem;">
+          <div style="font-size:0.8rem;font-weight:600;">${esc(it.title || '')}</div>
+          <div style="font-size:0.68rem;color:var(--clay);letter-spacing:0.08em;text-transform:uppercase;margin-top:0.15rem;">${esc(it.media_type || '')}</div>
+          <button onclick="deletePortfolioItem(${parseInt(it.id_portfolio,10) || 0})" style="margin-top:0.45rem;background:none;border:1px solid #d9c7b3;color:#a44;border-radius:999px;padding:0.22rem 0.65rem;font-size:0.7rem;cursor:pointer;">Remove</button>
+        </div>
+      </div>
+    `).join('');
+  }catch(e){
+    list.innerHTML = '<div style="grid-column:1/-1;color:#a33;">Network error while loading portfolio</div>';
+  }
+}
+
+async function addPortfolioItem(){
+  const title = (document.getElementById('portTitle')?.value || '').trim();
+  const media_type = (document.getElementById('portType')?.value || 'image').trim();
+  const media_url = (document.getElementById('portMediaUrl')?.value || '').trim();
+  const thumbnail_url = (document.getElementById('portThumbUrl')?.value || '').trim();
+  const file = document.getElementById('portFile')?.files?.[0] || null;
+
+  if(!title){
+    showToast('Please fill title', true);
+    return;
+  }
+  if(!file && !media_url){
+    showToast('Please upload a file or provide media URL', true);
+    return;
+  }
+  try{
+    let res;
+    if(file){
+      const fd = new FormData();
+      fd.append('title', title);
+      fd.append('media_type', media_type);
+      fd.append('thumbnail_url', thumbnail_url);
+      fd.append('is_public', '1');
+      fd.append('media_file', file);
+      if(media_url) fd.append('media_url', media_url);
+      res = await fetch(PORTFOLIO_API, {
+        method:'POST',
+        credentials:'include',
+        body: fd
+      });
+    } else {
+      res = await fetch(PORTFOLIO_API, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        credentials:'include',
+        body: JSON.stringify({title, media_type, media_url, thumbnail_url, is_public:1})
+      });
+    }
+    const data = await res.json();
+    if(!data.success){
+      showToast(data.error || 'Could not add portfolio item', true);
+      return;
+    }
+    showToast('Portfolio item added');
+    const a = document.getElementById('portTitle'); if(a) a.value = '';
+    const b = document.getElementById('portMediaUrl'); if(b) b.value = '';
+    const c = document.getElementById('portThumbUrl'); if(c) c.value = '';
+    const d = document.getElementById('portFile'); if(d) d.value = '';
+    loadPortfolio();
+  }catch(e){
+    showToast('Network error while adding portfolio item', true);
+  }
+}
+
+document.addEventListener('change', (e) => {
+  const t = e.target;
+  if(!t || t.id !== 'portFile') return;
+  const f = t.files && t.files[0] ? t.files[0] : null;
+  if(!f) return;
+  const sel = document.getElementById('portType');
+  if(sel && /^video\//i.test(f.type || '')) sel.value = 'video';
+  if(sel && /^image\//i.test(f.type || '')) sel.value = 'image';
+});
+
+async function deletePortfolioItem(id){
+  const itemId = parseInt(id, 10) || 0;
+  if(!itemId) return;
+  try{
+    const res = await fetch(PORTFOLIO_API, {
+      method:'DELETE',
+      headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body: JSON.stringify({id_portfolio:itemId})
+    });
+    const data = await res.json();
+    if(!data.success){
+      showToast(data.error || 'Could not remove item', true);
+      return;
+    }
+    showToast('Portfolio item removed');
+    loadPortfolio();
+  }catch(e){
+    showToast('Network error while removing item', true);
+  }
+}
+
+function openArtDirectChatModal(userId, label){
+  ensureArtCommsUI();
+  artChatMode = 'direct';
+  artChatReservationId = 0;
+  artDirectUserId = parseInt(userId,10) || 0;
+  if (!artDirectUserId) {
+    showToast('Invalid user for chat', true);
+    return;
+  }
+  const displayName = (label || 'Tourist').toString();
+  setEl('artChatTitle','Chat with '+displayName);
+  setEl('artChatSub','Direct chat');
+  const m=document.getElementById('artChatModal');
+  if(m) m.style.display='flex';
+  loadArtChatMessages();
+}
+
+function closeArtChatModal(){
+  const m=document.getElementById('artChatModal');
+  if(m) m.style.display='none';
+  artChatReservationId=0;
+  artDirectUserId=0;
+  artChatMode='reservation';
+}
 
 async function loadArtChatMessages(){
-  if(!artChatReservationId) return;
+  if(artChatMode === 'reservation' && !artChatReservationId) return;
+  if(artChatMode === 'direct' && !artDirectUserId) return;
   const box=document.getElementById('artChatMessages');
   if(box) box.innerHTML='<p style="color:var(--text-m);">Loading chat...</p>';
   try{
-    const res=await fetch(`${SHARED_API.chat}?reservation_id=${artChatReservationId}`,{credentials:'include'});
+    const query = artChatMode === 'direct'
+      ? `direct_user_id=${encodeURIComponent(artDirectUserId)}`
+      : `reservation_id=${encodeURIComponent(artChatReservationId)}`;
+    const res=await fetch(`${SHARED_API.chat}?${query}`,{credentials:'include'});
     const data=await res.json();
     if(!data.success){ if(box) box.innerHTML='<p style="color:#a33;">'+esc(data.error||'Could not load chat')+'</p>'; return; }
     const me=JSON.parse(localStorage.getItem('tc_user')||'{}').id;
@@ -976,12 +1179,16 @@ async function loadArtChatMessages(){
 }
 
 async function sendArtChatMessage(){
-  if(!artChatReservationId) return;
+  if(artChatMode === 'reservation' && !artChatReservationId) return;
+  if(artChatMode === 'direct' && !artDirectUserId) return;
   const inp=document.getElementById('artChatInput');
   const message=(inp?.value||'').trim();
   if(!message) return;
+  const payload = artChatMode === 'direct'
+    ? { direct_user_id: artDirectUserId, message }
+    : { reservation_id: artChatReservationId, message };
   try{
-    const res=await fetch(SHARED_API.chat,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({reservation_id:artChatReservationId,message})});
+    const res=await fetch(SHARED_API.chat,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify(payload)});
     const data=await res.json();
     if(!data.success){ showToast(data.error||'Could not send message',true); return; }
     inp.value='';
@@ -993,6 +1200,12 @@ document.addEventListener('DOMContentLoaded',()=>{
   ensureArtCommsUI();
   loadArtNotifications();
   setInterval(loadArtNotifications,30000);
+  const params = new URLSearchParams(window.location.search);
+  const directUser = parseInt(params.get('direct_user') || '0', 10);
+  const directName = (params.get('direct_name') || '').trim();
+  if (directUser > 0) {
+    openArtDirectChatModal(directUser, directName || 'Tourist');
+  }
 });
 </script>
 </body>

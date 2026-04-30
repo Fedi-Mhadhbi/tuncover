@@ -133,6 +133,18 @@ nav{position:sticky;top:0;z-index:100;background:rgba(253,250,245,0.96);
 .review-text{font-size:0.82rem;color:var(--text-m);line-height:1.65;}
 .no-reviews{text-align:center;padding:3rem;color:var(--text-m);font-style:italic;}
 
+/* Portfolio */
+.portfolio-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;}
+.portfolio-card{background:#fff;border:1px solid var(--sand2);border-radius:1rem;overflow:hidden;box-shadow:0 4px 14px rgba(26,20,16,0.05);}
+.portfolio-media{height:190px;background:#f2e8d8;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.portfolio-media img{width:100%;height:100%;object-fit:cover;}
+.portfolio-media video{width:100%;height:100%;object-fit:cover;background:#000;}
+.portfolio-iframe{width:100%;height:100%;border:0;}
+.portfolio-body{padding:.85rem 1rem;}
+.portfolio-title{font-size:.88rem;font-weight:600;color:var(--ink);line-height:1.4;}
+.portfolio-type{font-size:.68rem;color:var(--clay);letter-spacing:.08em;text-transform:uppercase;margin-top:.22rem;}
+.no-portfolio{text-align:center;padding:3rem;color:var(--text-m);font-style:italic;background:#fff;border:1px dashed var(--sand2);border-radius:1rem;}
+
 /* Loading skeleton */
 .skeleton{background:linear-gradient(90deg,var(--sand) 25%,var(--sand2) 50%,var(--sand) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:0.5rem;}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
@@ -211,6 +223,7 @@ footer{background:var(--ink);color:rgba(255,255,255,0.7);padding:3rem 2rem 1.5re
 <div class="profile-tabs" id="profileTabs">
   <button class="p-tab active" onclick="showTab('about',this)">About</button>
   <button class="p-tab" onclick="showTab('activities',this)">Experiences</button>
+  <button class="p-tab" onclick="showTab('portfolio',this)">Portfolio</button>
   <button class="p-tab" onclick="showTab('reviews',this)">Reviews</button>
 </div>
 
@@ -251,6 +264,14 @@ footer{background:var(--ink);color:rgba(255,255,255,0.7);padding:3rem 2rem 1.5re
     <div class="section-label" style="margin-bottom:1.2rem;">Available Experiences</div>
     <div class="activities-grid" id="activitiesGrid">
       <div style="padding:3rem;text-align:center;color:var(--text-m);font-style:italic;">Loading experiences…</div>
+    </div>
+  </div>
+
+  <!-- PORTFOLIO -->
+  <div class="p-panel" id="panel-portfolio">
+    <div class="section-label" style="margin-bottom:1.2rem;">Portfolio Gallery</div>
+    <div class="portfolio-grid" id="portfolioGrid">
+      <div class="no-portfolio">Loading portfolioâ€¦</div>
     </div>
   </div>
 
@@ -325,6 +346,7 @@ async function loadProfile(){
     if(!data.success){ showError(data.error||'Artisan not found'); return; }
     renderProfile(data.artisan);
     renderActivities(data.activities);
+    renderPortfolio(data.portfolio || []);
     renderReviews(data.reviews, data.artisan);
   } catch(e){
     showError('Could not load profile. Is XAMPP running?');
@@ -382,7 +404,9 @@ function renderProfile(a){
   // Update tab label
   const actTab = document.querySelectorAll('.p-tab')[1];
   if(actTab) actTab.textContent = `Experiences (${a.nb_activites||0})`;
-  const revTab = document.querySelectorAll('.p-tab')[2];
+  const portTab = document.querySelectorAll('.p-tab')[2];
+  if(portTab) portTab.textContent = `Portfolio`;
+  const revTab = document.querySelectorAll('.p-tab')[3];
   if(revTab) revTab.textContent = `Reviews (${a.nb_reviews||0})`;
 }
 
@@ -438,6 +462,47 @@ function renderActivities(activities){
           <div class="act-price">From ${parseFloat(a.prix).toFixed(0)} TND</div>
           <div class="act-rating"><span class="star">★</span> ${rating}${reviews>0?' ('+reviews+')':''}</div>
         </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toVideoEmbed(url){
+  const u = String(url || '').trim();
+  if (!u) return null;
+  const yt = u.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{6,})/i);
+  if (yt && yt[1]) return `https://www.youtube.com/embed/${yt[1]}`;
+  const vm = u.match(/vimeo\.com\/(\d+)/i);
+  if (vm && vm[1]) return `https://player.vimeo.com/video/${vm[1]}`;
+  return null;
+}
+
+function renderPortfolio(items){
+  const grid = document.getElementById('portfolioGrid');
+  if(!grid) return;
+  if(!items || !items.length){
+    grid.innerHTML = '<div class="no-portfolio">No portfolio items yet.</div>';
+    return;
+  }
+  grid.innerHTML = items.map(it => {
+    const type = (it.media_type || 'image').toLowerCase();
+    const title = esc(it.title || 'Portfolio item');
+    let media = '';
+    if(type === 'video'){
+      const embed = toVideoEmbed(it.media_url);
+      if(embed){
+        media = `<iframe class="portfolio-iframe" src="${esc(embed)}" loading="lazy" allowfullscreen></iframe>`;
+      } else {
+        media = `<video controls preload="metadata" src="${esc(it.media_url)}"></video>`;
+      }
+    } else {
+      media = `<img src="${esc(it.media_url)}" alt="${title}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&q=70'"/>`;
+    }
+    return `<div class="portfolio-card">
+      <div class="portfolio-media">${media}</div>
+      <div class="portfolio-body">
+        <div class="portfolio-title">${title}</div>
+        <div class="portfolio-type">${type}</div>
       </div>
     </div>`;
   }).join('');

@@ -9,6 +9,7 @@ header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/payments.php';
 require_once __DIR__ . '/../config/engagement.php';
+require_once __DIR__ . '/../config/activity_capacity.php';
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
@@ -22,6 +23,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 $db     = getDB();
 ensurePaymentsTable($db);
 ensureNotificationsTable($db);
+ensureActivityCapacityColumns($db);
 
 // Get artisan id from user id
 $artStmt = $db->prepare("SELECT id_artisan FROM artisans WHERE id_utilisateur = ?");
@@ -46,6 +48,7 @@ if ($method === 'GET') {
             r.date_activite,
             r.heure_activite,
             r.nb_participants,
+            r.id_activite,
             r.montant_total,
             r.statut,
             COALESCE(p.payment_status, 'pending') AS payment_status,
@@ -92,6 +95,8 @@ if ($method === 'POST') {
             r.id_reservation,
             r.statut,
             r.id_touriste,
+            r.id_activite,
+            r.nb_participants,
             a.titre AS activite_titre,
             COALESCE(p.payment_status,'pending') AS payment_status
         FROM reservations r
@@ -124,8 +129,31 @@ if ($method === 'POST') {
 
     try {
         $db->beginTransaction();
+
+        if ($statut === 'confirmee') {
+            $activity = loadActivityForAvailability($db, (int)$existing['id_activite'], true);
+            if (!$activity || ($activity['statut'] ?? '') !== 'publie') {
+                throw new RuntimeException('Activity is no longer available');
+            }
+            $remaining = remainingPlacesFromRow($activity);
+            $needed = max(1, (int)$existing['nb_participants']);
+            if ($remaining < $needed) {
+                throw new RuntimeException('Not enough places remain to confirm this reservation');
+            }
+        }
+
         $stmt = $db->prepare("UPDATE reservations SET statut = ? WHERE id_reservation = ?");
         $stmt->execute([$statut, $id]);
+
+        if ($current === 'en_attente' && $statut === 'confirmee') {
+            adjustReservedPlaces($db, (int)$existing['id_activite'], max(1, (int)$existing['nb_participants']));
+        }
+        if ($current === 'confirmee' && $statut === 'terminee') {
+            adjustReservedPlaces($db, (int)$existing['id_activite'], -max(1, (int)$existing['nb_participants']));
+        }
+        if ($current === 'confirmee' && $statut === 'annulee') {
+            adjustReservedPlaces($db, (int)$existing['id_activite'], -max(1, (int)$existing['nb_participants']));
+        }
 
         if ($statut === 'annulee' && ($existing['payment_status'] ?? 'pending') === 'completed') {
             $db->prepare("UPDATE payments SET payment_status='refunded', updated_at=NOW() WHERE id_reservation=?")->execute([$id]);

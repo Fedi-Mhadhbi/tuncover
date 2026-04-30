@@ -51,6 +51,7 @@ function ensureTestCardsTable(PDO $db): void {
     $db->exec("
         CREATE TABLE IF NOT EXISTS test_cards (
             id_card INT AUTO_INCREMENT PRIMARY KEY,
+            id_utilisateur INT DEFAULT NULL,
             card_holder VARCHAR(120) NOT NULL,
             card_number VARCHAR(19) NOT NULL,
             exp_month CHAR(2) NOT NULL,
@@ -59,14 +60,25 @@ function ensureTestCardsTable(PDO $db): void {
             card_brand VARCHAR(30) NOT NULL DEFAULT 'VISA',
             is_active TINYINT(1) NOT NULL DEFAULT 1,
             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE KEY uniq_test_card_number (card_number)
+            UNIQUE KEY uniq_test_card_number (card_number),
+            KEY idx_test_cards_user (id_utilisateur)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
 
+    try {
+        $db->exec("ALTER TABLE test_cards ADD COLUMN id_utilisateur INT DEFAULT NULL");
+    } catch (Throwable $e) {
+    }
+    try {
+        $db->exec("ALTER TABLE test_cards ADD KEY idx_test_cards_user (id_utilisateur)");
+    } catch (Throwable $e) {
+    }
+
     $seed = $db->prepare("
-        INSERT INTO test_cards (card_holder, card_number, exp_month, exp_year, cvv, card_brand, is_active)
-        VALUES (?, ?, ?, ?, ?, ?, 1)
+        INSERT INTO test_cards (id_utilisateur, card_holder, card_number, exp_month, exp_year, cvv, card_brand, is_active)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 1)
         ON DUPLICATE KEY UPDATE
+            id_utilisateur = VALUES(id_utilisateur),
             card_holder = VALUES(card_holder),
             exp_month = VALUES(exp_month),
             exp_year = VALUES(exp_year),
@@ -102,7 +114,7 @@ function ensureTestCardsTable(PDO $db): void {
         $cvv = str_pad((string)(100 + ($id % 900)), 3, '0', STR_PAD_LEFT);
         $brand = $brands[$idx % count($brands)];
 
-        $seed->execute([$holder, $cardNumber, $expMonth, $expYear, $cvv, $brand]);
+        $seed->execute([$id, $holder, $cardNumber, $expMonth, $expYear, $cvv, $brand]);
     }
 
     $ready = true;

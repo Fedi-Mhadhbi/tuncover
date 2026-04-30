@@ -5,6 +5,7 @@ header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/payments.php';
 require_once __DIR__ . '/../config/engagement.php';
+require_once __DIR__ . '/../config/activity_capacity.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -20,6 +21,7 @@ $db = getDB();
 ensurePaymentsTable($db);
 ensureTestCardsTable($db);
 ensureNotificationsTable($db);
+ensureActivityCapacityColumns($db);
 
 $userId = (int) $_SESSION['user_id'];
 $method = $_SERVER['REQUEST_METHOD'];
@@ -95,13 +97,18 @@ if ($method === 'GET') {
             'card_last4' => $reservation['card_last4'],
             'paid_at' => $reservation['paid_at'],
         ],
-        'test_cards' => $db->query("
-            SELECT card_holder, card_number, exp_month, exp_year, cvv, card_brand
-            FROM test_cards
-            WHERE is_active = 1
-            ORDER BY id_card ASC
-            LIMIT 6
-        ")->fetchAll(PDO::FETCH_ASSOC),
+        'test_cards' => (function() use ($db, $userId) {
+            $stmt = $db->prepare("
+                SELECT card_holder, card_number, exp_month, exp_year, cvv, card_brand
+                FROM test_cards
+                WHERE is_active = 1
+                  AND id_utilisateur = ?
+                ORDER BY id_card ASC
+                LIMIT 3
+            ");
+            $stmt->execute([$userId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        })(),
     ]);
     exit;
 }
@@ -150,13 +157,14 @@ if ($method === 'POST') {
         SELECT id_card
         FROM test_cards
         WHERE is_active = 1
+          AND id_utilisateur = ?
           AND card_number = ?
           AND exp_month = ?
           AND exp_year = ?
           AND cvv = ?
         LIMIT 1
     ");
-    $cardCheck->execute([$cardNumber, $expMonth, strlen($expYear) === 2 ? ('20' . $expYear) : $expYear, $cvv]);
+    $cardCheck->execute([$userId, $cardNumber, $expMonth, strlen($expYear) === 2 ? ('20' . $expYear) : $expYear, $cvv]);
     if (!$cardCheck->fetch(PDO::FETCH_ASSOC)) {
         echo json_encode([
             'success' => false,
@@ -185,6 +193,11 @@ if ($method === 'POST') {
     }
     if (($reservation['payment_status'] ?? '') === 'completed') {
         echo json_encode(['success' => false, 'error' => 'This reservation is already paid']);
+        exit;
+    }
+    $activity = loadActivityForAvailability($db, (int)$reservation['id_activite'], false);
+    if (!$activity || ($activity['statut'] ?? '') === 'supprime') {
+        echo json_encode(['success' => false, 'error' => 'This activity is no longer available']);
         exit;
     }
 

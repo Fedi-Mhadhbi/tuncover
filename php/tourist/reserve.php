@@ -9,6 +9,7 @@ header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../config/payments.php';
 require_once __DIR__ . '/../config/engagement.php';
+require_once __DIR__ . '/../config/activity_capacity.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -99,12 +100,16 @@ try {
     $db = getDB();
     ensurePaymentsTable($db);
     ensureNotificationsTable($db);
+    ensureActivityCapacityColumns($db);
 
     // ============================================================
     // 5) Load activity
     // ============================================================
     $stmt = $db->prepare("
-        SELECT id_activite, titre, prix, max_participants, statut, ville, id_artisan
+        SELECT id_activite, titre, prix, max_participants, statut, ville, id_artisan,
+               COALESCE(capacite, max_participants, 1) AS capacite,
+               COALESCE(places_reservees, 0) AS places_reservees,
+               availability_status
         FROM activites
         WHERE id_activite = ?
     ");
@@ -125,6 +130,21 @@ try {
         echo json_encode([
             'success' => false,
             'error'   => 'Activity not available'
+        ]);
+        exit;
+    }
+    $placesRestantes = max(0, (int)$activity['capacite'] - (int)$activity['places_reservees']);
+    if (($activity['availability_status'] ?? 'disponible') === 'complet' || $placesRestantes <= 0) {
+        echo json_encode([
+            'success' => false,
+            'error'   => 'This activity is full'
+        ]);
+        exit;
+    }
+    if ($nb_participants > $placesRestantes) {
+        echo json_encode([
+            'success' => false,
+            'error'   => 'Only ' . $placesRestantes . ' place(s) remain for this activity'
         ]);
         exit;
     }
@@ -230,7 +250,8 @@ try {
         'subtotal'        => $subtotal,
         'service_fee'     => $serviceFee,
         'total'           => $total,
-        'statut'          => 'en_attente'
+        'statut'          => 'en_attente',
+        'places_restantes'=> $placesRestantes
     ]);
 
 } catch (PDOException $e) {

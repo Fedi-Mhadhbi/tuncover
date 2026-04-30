@@ -199,7 +199,10 @@ function renderArtisans(){
             <div class="artisan-rating"><span class="star">★</span>${rating} ${a.note_moyenne>0?'('+Math.round(a.note_moyenne*10)/10+')':''}</div>
             <div class="artisan-workshops">${nbActs} workshop${nbActs!==1?'s':''} available</div>
           </div>
-          <a href="profile.html?id=${a.id_artisan}" class="btn-visit" onclick="event.stopPropagation()">View Profile</a>
+          <div class="artisan-actions">
+            <button class="btn-chat" onclick="openArtisanDirectChat(event, ${parseInt(a.artisan_user_id||0,10)}, '${esc(fullName)}')">Chat</button>
+            <a href="profile.html?id=${a.id_artisan}" class="btn-visit" onclick="event.stopPropagation()">View Profile</a>
+          </div>
         </div>
       </div>
     </div>`;
@@ -370,7 +373,10 @@ renderArtisans = function(){
               <div class="artisan-rating"><span class="star">★</span>${rating}${nbReviews ? ` (${nbReviews})` : ''}</div>
               <div class="artisan-workshops">${nbActs} experience${nbActs !== 1 ? 's' : ''} available</div>
             </div>
-            <a href="profile.html?id=${a.id_artisan}" class="btn-visit" onclick="event.stopPropagation()">View Profile</a>
+            <div class="artisan-actions">
+              <button class="btn-chat" onclick="openArtisanDirectChat(event, ${parseInt(a.artisan_user_id||0,10)}, '${esc(fullName)}')">Chat</button>
+              <a href="profile.html?id=${a.id_artisan}" class="btn-visit" onclick="event.stopPropagation()">View Profile</a>
+            </div>
           </div>
         </div>
       </div>`;
@@ -393,6 +399,114 @@ loadArtisans = async function(){
 
 document.getElementById('regionFilter')?.addEventListener('change', renderArtisans);
 document.getElementById('sortFilter')?.addEventListener('change', renderArtisans);
+
+let artisanDirectUserId = 0;
+
+function ensureArtisansDirectChatUI() {
+  if (document.getElementById('artisansDirectChatModal')) return;
+  const host = document.createElement('div');
+  host.innerHTML = `
+    <div id="artisansDirectChatModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:360;align-items:center;justify-content:center;">
+      <div style="width:min(760px,96vw);max-height:86vh;background:var(--cream);border:1px solid var(--sand2);border-radius:1rem;overflow:hidden;display:flex;flex-direction:column;">
+        <div style="padding:1rem 1.2rem;border-bottom:1px solid var(--sand2);display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <strong id="artisansDirectTitle">Chat with artisan</strong>
+            <div style="font-size:.75rem;color:var(--text-m);">Direct chat before reservation</div>
+          </div>
+          <button style="background:none;border:none;cursor:pointer;" onclick="closeArtisansDirectChat()">Close</button>
+        </div>
+        <div id="artisansDirectMessages" style="overflow:auto;padding:1rem;display:grid;gap:.6rem;background:#fff9f3;"></div>
+        <div style="padding:.9rem;border-top:1px solid var(--sand2);display:flex;gap:.6rem;">
+          <input id="artisansDirectInput" placeholder="Write a message..." style="flex:1;border:1px solid var(--sand2);border-radius:.7rem;padding:.7rem;background:#fff;"/>
+          <button class="btn-visit" onclick="sendArtisansDirectMessage()">Send</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(host);
+}
+
+function openArtisanDirectChat(event, userId, artisanName) {
+  if (event) event.stopPropagation();
+  const u = JSON.parse(localStorage.getItem('tc_user') || 'null');
+  if (!u || !u.id) {
+    window.location.href = 'tuncover-login.html';
+    return;
+  }
+  if (!userId || parseInt(userId,10) <= 0) {
+    alert('Chat is unavailable for this artisan.');
+    return;
+  }
+  ensureArtisansDirectChatUI();
+  artisanDirectUserId = parseInt(userId, 10);
+  document.getElementById('artisansDirectTitle').textContent = 'Chat with ' + (artisanName || 'artisan');
+  const m = document.getElementById('artisansDirectChatModal');
+  if (m) m.style.display = 'flex';
+  loadArtisansDirectMessages();
+}
+
+function closeArtisansDirectChat() {
+  const m = document.getElementById('artisansDirectChatModal');
+  if (m) m.style.display = 'none';
+  artisanDirectUserId = 0;
+}
+
+async function loadArtisansDirectMessages() {
+  if (!artisanDirectUserId) return;
+  const box = document.getElementById('artisansDirectMessages');
+  if (box) box.innerHTML = '<p style="color:var(--text-m);">Loading chat...</p>';
+  try {
+    const res = await fetch(`php/shared/chat.php?direct_user_id=${artisanDirectUserId}`, { credentials: 'include' });
+    const data = await res.json();
+    if (!data.success) {
+      if (box) box.innerHTML = `<p style="color:#a33;">${esc(data.error || 'Could not load chat')}</p>`;
+      return;
+    }
+    const me = parseInt((JSON.parse(localStorage.getItem('tc_user') || '{}').id || 0), 10);
+    const msgs = data.messages || [];
+    if (!msgs.length) {
+      if (box) box.innerHTML = '<p style="color:var(--text-m);">Start the conversation with this artisan.</p>';
+      return;
+    }
+    box.innerHTML = msgs.map(msg => {
+      const mine = parseInt(msg.id_sender, 10) === me;
+      return `<div style="display:flex;justify-content:${mine ? 'flex-end' : 'flex-start'};">
+        <div style="max-width:74%;padding:.62rem .75rem;border-radius:.75rem;border:1px solid ${mine ? '#d8b59a' : 'var(--sand2)'};background:${mine ? '#f7dfcf' : '#fff'};">
+          <div style="font-size:.78rem;line-height:1.45;">${esc(msg.message || '')}</div>
+          <div style="font-size:.68rem;color:var(--text-m);margin-top:.25rem;">${esc(msg.sender_name || '')} - ${(msg.created_at || '').substring(0,16)}</div>
+        </div>
+      </div>`;
+    }).join('');
+    box.scrollTop = box.scrollHeight;
+  } catch (e) {
+    if (box) box.innerHTML = '<p style="color:#a33;">Network error</p>';
+  }
+}
+
+async function sendArtisansDirectMessage() {
+  if (!artisanDirectUserId) return;
+  const inp = document.getElementById('artisansDirectInput');
+  const message = (inp?.value || '').trim();
+  if (!message) return;
+  try {
+    const res = await fetch('php/shared/chat.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ direct_user_id: artisanDirectUserId, message })
+    });
+    const data = await res.json();
+    if (!data.success) {
+      alert(data.error || 'Could not send message');
+      return;
+    }
+    inp.value = '';
+    loadArtisansDirectMessages();
+  } catch (e) {
+    alert('Network error');
+  }
+}
+
+ensureArtisansDirectChatUI();
 </script>
 
 </body>

@@ -9,6 +9,9 @@
 
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/activity_capacity.php';
+require_once __DIR__ . '/../config/payments.php';
+require_once __DIR__ . '/../config/engagement.php';
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
@@ -20,6 +23,9 @@ if (!isset($_SESSION['user_id'])) {
 $userId = $_SESSION['user_id'];
 $method = $_SERVER['REQUEST_METHOD'];
 $db     = getDB();
+ensureActivityCapacityColumns($db);
+ensurePaymentsTable($db);
+ensureNotificationsTable($db);
 
 // Get artisan id
 $artStmt = $db->prepare("SELECT id_artisan FROM artisans WHERE id_utilisateur = ?");
@@ -40,7 +46,10 @@ if ($method === 'GET') {
             a.*,
             c.nom AS categorie_nom,
             (SELECT COUNT(*) FROM reservations r WHERE r.id_activite = a.id_activite) AS total_bookings,
-            (SELECT AVG(av.note) FROM avis av WHERE av.id_activite = a.id_activite) AS avg_rating
+            (SELECT AVG(av.note) FROM avis av WHERE av.id_activite = a.id_activite) AS avg_rating,
+            COALESCE(a.capacite, a.max_participants, 1) AS capacity_total,
+            COALESCE(a.places_reservees, 0) AS places_reservees_live,
+            GREATEST(COALESCE(a.capacite, a.max_participants, 1) - COALESCE(a.places_reservees, 0), 0) AS places_restantes
         FROM activites a
         LEFT JOIN categories c ON a.id_categorie = c.id_categorie
         WHERE a.id_artisan = ?
@@ -75,11 +84,11 @@ if ($method === 'POST') {
 
     $stmt = $db->prepare("
         INSERT INTO activites
-            (id_artisan, id_categorie, titre, description, prix, ville, duree_heures, max_participants, statut, image_url)
+            (id_artisan, id_categorie, titre, description, prix, ville, duree_heures, max_participants, capacite, places_reservees, availability_status, statut, image_url)
         VALUES
-            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 'disponible', ?, ?)
     ");
-    $stmt->execute([$artisanId, $cat_id, $titre, $description, $prix, $ville, $duree, $max_p, $statut, $image_url ?: null]);
+    $stmt->execute([$artisanId, $cat_id, $titre, $description, $prix, $ville, $duree, $max_p, $max_p, $statut, $image_url ?: null]);
     $newId = $db->lastInsertId();
 
     echo json_encode(['success'=>true, 'id_activite'=>$newId, 'statut'=>$statut]);
@@ -105,11 +114,32 @@ if ($method === 'PUT') {
     $params  = [];
     $allowed = ['titre','description','prix','ville','duree_heures','max_participants','statut','id_categorie','image_url'];
 
+    $capacityUpdated = false;
+    $newCapacity = null;
     foreach ($allowed as $field) {
         if (isset($data[$field])) {
             $fields[]  = "$field = ?";
-            $params[]  = $data[$field];
+            $value = $data[$field];
+            if ($field === 'max_participants') {
+                $capacityUpdated = true;
+                $newCapacity = max(1, (int)$value);
+                $value = $newCapacity;
+            }
+            $params[]  = $value;
         }
+    }
+
+    if ($capacityUpdated) {
+        $confirmedSeats = confirmedParticipantsCount($db, $id);
+        if ($newCapacity < $confirmedSeats) {
+            echo json_encode(['success'=>false,'error'=>'Capacity cannot be lower than already confirmed places (' . $confirmedSeats . ')']); exit;
+        }
+        $fields[] = "capacite = ?";
+        $params[] = $newCapacity;
+        $fields[] = "places_reservees = ?";
+        $params[] = $confirmedSeats;
+        $fields[] = "availability_status = ?";
+        $params[] = ($newCapacity - $confirmedSeats) <= 0 ? 'complet' : 'disponible';
     }
 
     if (empty($fields)) {
@@ -119,6 +149,10 @@ if ($method === 'PUT') {
     $params[] = $id;
     $stmt = $db->prepare("UPDATE activites SET " . implode(', ', $fields) . " WHERE id_activite = ?");
     $stmt->execute($params);
+
+    if ($capacityUpdated) {
+        revalidatePendingReservations($db, $id, 'capacity_updated');
+    }
 
     echo json_encode(['success'=>true]);
     exit;
@@ -138,9 +172,17 @@ if ($method === 'DELETE') {
         echo json_encode(['success'=>false,'error'=>'Access denied']); exit;
     }
 
-    // Soft delete
-    $stmt = $db->prepare("UPDATE activites SET statut = 'supprime' WHERE id_activite = ?");
-    $stmt->execute([$id]);
+    try {
+        $db->beginTransaction();
+        cancelReservationsForActivity($db, $id, 'This activity was removed by the artisan.');
+        $stmt = $db->prepare("UPDATE activites SET statut = 'supprime', availability_status = 'complet' WHERE id_activite = ?");
+        $stmt->execute([$id]);
+        $db->commit();
+    } catch (Throwable $e) {
+        if ($db->inTransaction()) $db->rollBack();
+        http_response_code(500);
+        echo json_encode(['success'=>false,'error'=>'Could not delete activity']); exit;
+    }
 
     echo json_encode(['success'=>true]);
     exit;

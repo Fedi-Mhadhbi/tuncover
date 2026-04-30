@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/engagement.php';
 
 $id = (int)($_GET['id'] ?? 0);
 if ($id <= 0) {
@@ -9,6 +10,7 @@ if ($id <= 0) {
 }
 
 $db = getDB();
+ensureArtisanPortfolioTable($db);
 
 try {
     $artisanStmt = $db->prepare("
@@ -110,11 +112,29 @@ try {
     $reviewsStmt->execute([$id]);
     $reviews = $reviewsStmt->fetchAll();
 
+    $portfolioStmt = $db->prepare("
+        SELECT
+            id_portfolio,
+            title,
+            media_type,
+            media_url,
+            thumbnail_url,
+            display_order,
+            created_at
+        FROM artisan_portfolio
+        WHERE id_artisan = ?
+          AND is_public = 1
+        ORDER BY display_order ASC, id_portfolio DESC
+    ");
+    $portfolioStmt->execute([$id]);
+    $portfolio = $portfolioStmt->fetchAll();
+
     echo json_encode([
         'success' => true,
         'artisan' => $artisan,
         'activities' => $activities,
         'reviews' => $reviews,
+        'portfolio' => $portfolio,
     ]);
 } catch (PDOException $e) {
     http_response_code(500);

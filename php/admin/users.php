@@ -3,12 +3,18 @@
 header('Content-Type: application/json; charset=utf-8');
 session_start();
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/payments.php';
+require_once __DIR__ . '/../config/engagement.php';
+require_once __DIR__ . '/../config/activity_capacity.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     http_response_code(403); echo json_encode(['success'=>false,'error'=>'Admin only']); exit;
 }
 
 $db = getDB();
+ensurePaymentsTable($db);
+ensureNotificationsTable($db);
+ensureActivityCapacityColumns($db);
 $m  = $_SERVER['REQUEST_METHOD'];
 
 // GET — list users with filters
@@ -54,8 +60,36 @@ if ($m === 'DELETE') {
     if ($id === (int)$_SESSION['user_id']) {
         echo json_encode(['success'=>false,'error'=>'Cannot delete yourself']); exit;
     }
-    $db->prepare("DELETE FROM utilisateurs WHERE id_utilisateur=?")->execute([$id]);
-    echo json_encode(['success'=>true]); exit;
+    try {
+        $db->beginTransaction();
+        $userStmt = $db->prepare("SELECT role FROM utilisateurs WHERE id_utilisateur = ? LIMIT 1");
+        $userStmt->execute([$id]);
+        $role = (string)$userStmt->fetchColumn();
+
+        if ($role === 'artisan') {
+            $acts = $db->prepare("
+                SELECT a.id_activite
+                FROM activites a
+                JOIN artisans ar ON ar.id_artisan = a.id_artisan
+                WHERE ar.id_utilisateur = ?
+                  AND a.statut != 'supprime'
+            ");
+            $acts->execute([$id]);
+            foreach ($acts->fetchAll(PDO::FETCH_COLUMN) as $activityId) {
+                cancelReservationsForActivity($db, (int)$activityId, 'This artisan profile was removed.');
+                $db->prepare("UPDATE activites SET statut = 'supprime', availability_status = 'complet' WHERE id_activite = ?")
+                   ->execute([(int)$activityId]);
+            }
+        }
+
+        $db->prepare("DELETE FROM utilisateurs WHERE id_utilisateur=?")->execute([$id]);
+        $db->commit();
+        echo json_encode(['success'=>true]); exit;
+    } catch (Throwable $e) {
+        if ($db->inTransaction()) $db->rollBack();
+        http_response_code(500);
+        echo json_encode(['success'=>false,'error'=>'Could not delete user']); exit;
+    }
 }
 
 echo json_encode(['success'=>false,'error'=>'Method not allowed']);

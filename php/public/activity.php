@@ -2,15 +2,21 @@
 // php/public/activity.php — single activity by id
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../config/activity_capacity.php';
 
 $id = (int)($_GET['id'] ?? 0);
 if (!$id) { echo json_encode(['success'=>false,'error'=>'ID required']); exit; }
 
 $db = getDB();
+ensureActivityCapacityColumns($db);
 try {
     $stmt = $db->prepare("
         SELECT a.id_activite, a.titre, a.description, a.prix,
                a.ville, a.duree_heures, a.max_participants, a.image_url,
+               COALESCE(a.capacite, a.max_participants, 1) AS capacite,
+               COALESCE(a.places_reservees, 0) AS places_reservees,
+               GREATEST(COALESCE(a.capacite, a.max_participants, 1) - COALESCE(a.places_reservees, 0), 0) AS places_restantes,
+               COALESCE(a.availability_status, 'disponible') AS availability_status,
                c.nom AS categorie,
                u.prenom AS artisan_prenom, u.nom AS artisan_nom,
                u.email AS artisan_email, u.id_utilisateur AS artisan_user_id,

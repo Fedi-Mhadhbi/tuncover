@@ -11,7 +11,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>TunCover — Pottery Workshop</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="css/experience.css">
+<link rel="stylesheet" href="css/experience.css?v=20260416a">
 </head>
 <body>
 <nav id="nav">
@@ -186,7 +186,22 @@
         <div class="price-row total"><span>Total</span><span id="total">132 TND</span></div>
       </div>
 
-      <button class="book-btn" onclick="reserveNow()">Reserve Now</button>
+      <div id="availabilityInfo" style="margin:-0.2rem 0 1rem;padding:0.85rem 1rem;border:1px solid var(--sand2);border-radius:0.85rem;background:linear-gradient(180deg,#fffdf9 0%,#f8f0e4 100%);">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-m);">Availability</div>
+            <div id="availabilityText" style="font-size:0.9rem;font-weight:600;color:var(--ink);margin-top:0.18rem;">Checking places...</div>
+          </div>
+          <div id="availabilityBadge" style="font-size:0.72rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:0.4rem 0.75rem;border-radius:999px;background:#eef6ea;color:#4d7a31;">
+            Available
+          </div>
+        </div>
+      </div>
+
+      <div class="booking-actions">
+        <button class="book-btn" onclick="reserveNow()">Reserve Now</button>
+        <button id="chatBookBtn" class="chat-book-btn" type="button" onclick="openExperienceDirectChat()">Chat Artisan</button>
+      </div>
       <p class="book-note">Free cancellation up to 48h before</p>
 
       <div style="display:flex;justify-content:center;gap:1.5rem;margin-top:1.5rem;">
@@ -330,6 +345,10 @@ async function reserveNow(){
     }
 
     // ── Artisan mini ──
+    if(metaRow){
+      metaRow.insertAdjacentHTML('beforeend', '<div class="meta-item">Available <strong>' + (a.places_restantes ?? 0) + '</strong> places</div>');
+    }
+
     const nameEl = document.getElementById('artisanName');
     if(nameEl) nameEl.textContent = (a.artisan_prenom||'')+' '+(a.artisan_nom||'');
 
@@ -341,6 +360,7 @@ async function reserveNow(){
 
     const profLink = document.getElementById('artisanProfileLink');
     if(profLink && a.id_artisan) profLink.href = 'profile.html?id='+a.id_artisan;
+    expDirectUserId = parseInt(a.artisan_user_id || 0, 10) || 0;
 
     // ── Description ──
     const descEl = document.querySelector('#about .desc-text');
@@ -436,9 +456,31 @@ function updatePriceRealFixed(){
   if(totalEl) totalEl.textContent = (sub + fee) + ' TND';
 }
 
+function renderAvailabilityInfo(activity){
+  const textEl = document.getElementById('availabilityText');
+  const badgeEl = document.getElementById('availabilityBadge');
+  const reserveBtn = document.querySelector('.booking-actions .book-btn');
+  if(!textEl || !badgeEl) return;
+  const capacity = parseInt(activity.capacite || activity.max_participants || 0, 10) || 0;
+  const remaining = parseInt(activity.places_restantes || 0, 10) || 0;
+  const isFull = String(activity.availability_status || '').toLowerCase() === 'complet' || remaining <= 0;
+  textEl.textContent = 'Remaining ' + remaining + ' / ' + capacity + ' places';
+  badgeEl.textContent = isFull ? 'Full' : 'Available';
+  badgeEl.style.background = isFull ? '#fbe8e4' : '#eef6ea';
+  badgeEl.style.color = isFull ? '#b5533e' : '#4d7a31';
+  window._remainingPlaces = remaining;
+  if(reserveBtn){
+    reserveBtn.disabled = isFull;
+    reserveBtn.textContent = isFull ? 'Full' : 'Reserve Now';
+    reserveBtn.style.opacity = isFull ? '0.72' : '';
+    reserveBtn.style.cursor = isFull ? 'not-allowed' : '';
+  }
+}
+
 window.changeGuests = function(d){
   let g = parseInt(document.getElementById('guestCount')?.textContent, 10) || 2;
-  g = Math.max(1, Math.min(8, g + d));
+  const maxGuests = Math.max(1, Math.min(8, parseInt(window._remainingPlaces || 8, 10) || 8));
+  g = Math.max(1, Math.min(maxGuests, g + d));
   document.getElementById('guestCount').textContent = g;
   updatePriceRealFixed();
 };
@@ -501,6 +543,7 @@ window.changeGuests = function(d){
 
     const profileLink = document.getElementById('artisanProfileLink');
     if(profileLink && a.id_artisan) profileLink.href = 'profile.html?id=' + a.id_artisan;
+    expDirectUserId = parseInt(a.artisan_user_id || 0, 10) || 0;
 
     const descEl = document.querySelector('#about .desc-text');
     if(descEl && a.description) descEl.textContent = a.description;
@@ -510,6 +553,13 @@ window.changeGuests = function(d){
     const priceEl = document.getElementById('bookingPrice');
     if(priceEl) priceEl.innerHTML = parseFloat(a.prix).toFixed(0) + ' TND <span>/ person</span>';
     window._actPrice = parseFloat(a.prix) || 60;
+    renderAvailabilityInfo(a);
+    const guestCountEl = document.getElementById('guestCount');
+    if(guestCountEl){
+      const initialGuests = parseInt(guestCountEl.textContent, 10) || 2;
+      const allowedGuests = Math.max(1, Math.min(initialGuests, Math.max(1, parseInt(window._remainingPlaces || 8, 10) || 8)));
+      guestCountEl.textContent = allowedGuests;
+    }
     updatePriceRealFixed();
 
     const crumbCity = document.querySelector('.breadcrumb a:last-of-type');
@@ -569,6 +619,114 @@ async function navLogout(e){
   localStorage.removeItem('tc_user');
   window.location.href='tuncover-login.html';
 }
+</script>
+
+<script>
+let expDirectUserId = 0;
+
+function ensureExperienceDirectChatUI(){
+  if(document.getElementById('expDirectChatModal')) return;
+  const host = document.createElement('div');
+  host.innerHTML = `
+    <div id="expDirectChatModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:360;align-items:center;justify-content:center;">
+      <div style="width:min(760px,96vw);max-height:86vh;background:var(--cream);border:1px solid var(--sand2);border-radius:1rem;overflow:hidden;display:flex;flex-direction:column;">
+        <div style="padding:1rem 1.2rem;border-bottom:1px solid var(--sand2);display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <strong id="expDirectTitle">Chat with artisan</strong>
+            <div style="font-size:.75rem;color:var(--text-m);">Ask questions before reservation</div>
+          </div>
+          <button style="background:none;border:none;cursor:pointer;" onclick="closeExperienceDirectChat()">Close</button>
+        </div>
+        <div id="expDirectMessages" style="overflow:auto;padding:1rem;display:grid;gap:.6rem;background:#fff9f3;"></div>
+        <div style="padding:.9rem;border-top:1px solid var(--sand2);display:flex;gap:.6rem;">
+          <input id="expDirectInput" placeholder="Write a message..." style="flex:1;border:1px solid var(--sand2);border-radius:.7rem;padding:.7rem;background:#fff;"/>
+          <button class="book-btn" style="padding:0.65rem 1.1rem;" onclick="sendExperienceDirectMessage()">Send</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(host);
+}
+
+function openExperienceDirectChat(){
+  const u = JSON.parse(localStorage.getItem('tc_user') || 'null');
+  if(!u || !u.id){
+    window.location.href='tuncover-login.html';
+    return;
+  }
+  if(!expDirectUserId){
+    alert('Chat is not available for this artisan yet.');
+    return;
+  }
+  ensureExperienceDirectChatUI();
+  const name = document.getElementById('artisanName')?.textContent || 'artisan';
+  document.getElementById('expDirectTitle').textContent = 'Chat with ' + name;
+  const m = document.getElementById('expDirectChatModal');
+  if(m) m.style.display = 'flex';
+  loadExperienceDirectMessages();
+}
+
+function closeExperienceDirectChat(){
+  const m = document.getElementById('expDirectChatModal');
+  if(m) m.style.display='none';
+}
+
+async function loadExperienceDirectMessages(){
+  if(!expDirectUserId) return;
+  const box = document.getElementById('expDirectMessages');
+  if(box) box.innerHTML = '<p style="color:var(--text-m);">Loading chat...</p>';
+  try{
+    const res = await fetch(`php/shared/chat.php?direct_user_id=${expDirectUserId}`,{credentials:'include'});
+    const data = await res.json();
+    if(!data.success){
+      if(box) box.innerHTML = `<p style="color:#a33;">${escSafe(data.error||'Could not load chat')}</p>`;
+      return;
+    }
+    const me = parseInt((JSON.parse(localStorage.getItem('tc_user')||'{}').id || 0), 10);
+    const msgs = data.messages || [];
+    if(!msgs.length){
+      if(box) box.innerHTML = '<p style="color:var(--text-m);">Start chatting with this artisan.</p>';
+      return;
+    }
+    box.innerHTML = msgs.map(msg=>{
+      const mine = parseInt(msg.id_sender,10)===me;
+      return `<div style="display:flex;justify-content:${mine?'flex-end':'flex-start'};">
+        <div style="max-width:74%;padding:.62rem .75rem;border-radius:.75rem;border:1px solid ${mine?'#d8b59a':'var(--sand2)'};background:${mine?'#f7dfcf':'#fff'};">
+          <div style="font-size:.78rem;line-height:1.45;">${escSafe(msg.message||'')}</div>
+          <div style="font-size:.68rem;color:var(--text-m);margin-top:.25rem;">${escSafe(msg.sender_name||'')} - ${(msg.created_at||'').substring(0,16)}</div>
+        </div>
+      </div>`;
+    }).join('');
+    box.scrollTop = box.scrollHeight;
+  }catch(e){
+    if(box) box.innerHTML = '<p style="color:#a33;">Network error</p>';
+  }
+}
+
+async function sendExperienceDirectMessage(){
+  if(!expDirectUserId) return;
+  const inp = document.getElementById('expDirectInput');
+  const message = (inp?.value || '').trim();
+  if(!message) return;
+  try{
+    const res = await fetch('php/shared/chat.php',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      credentials:'include',
+      body:JSON.stringify({direct_user_id:expDirectUserId,message})
+    });
+    const data = await res.json();
+    if(!data.success){
+      alert(data.error || 'Could not send message');
+      return;
+    }
+    inp.value = '';
+    loadExperienceDirectMessages();
+  }catch(e){
+    alert('Network error');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', ensureExperienceDirectChatUI);
 </script>
 
 </body>

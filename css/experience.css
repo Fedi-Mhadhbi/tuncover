@@ -84,6 +84,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .price-row.total{font-weight:500;color:var(--ink);font-size:0.9rem;margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--sand2);}
 .book-btn{width:100%;background:var(--clay);color:#fff;border:none;padding:1rem;border-radius:3rem;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;transition:background 0.2s,transform 0.2s,box-shadow 0.2s;margin-bottom:0.7rem;box-shadow:0 12px 24px rgba(201,112,58,0.22);}
 .book-btn:hover{background:var(--clay2);transform:translateY(-1px);}
+.booking-actions{display:grid;grid-template-columns:1fr 1fr;gap:0.55rem;}
+.booking-actions .book-btn{margin-bottom:0;}
+.chat-book-btn{border:1px solid rgba(201,112,58,0.45);background:linear-gradient(180deg,#fff 0%,#fff4ea 100%);color:var(--clay2);border-radius:3rem;padding:1rem .85rem;font-family:'DM Sans',sans-serif;font-size:0.86rem;font-weight:700;letter-spacing:0.02em;cursor:pointer;transition:all 0.2s;box-shadow:0 10px 20px rgba(163,82,42,0.14);}
+.chat-book-btn:hover{background:var(--clay);border-color:var(--clay);color:#fff;transform:translateY(-1px);}
+#chatBookBtn{appearance:none;-webkit-appearance:none;display:inline-flex;align-items:center;justify-content:center;min-height:52px;background:linear-gradient(180deg,#fff 0%,#fff4ea 100%);border:1px solid rgba(201,112,58,0.48);border-radius:999px;color:var(--clay2);font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:700;letter-spacing:.02em;padding:0 1rem;cursor:pointer;box-shadow:0 10px 20px rgba(163,82,42,.14);}
+#chatBookBtn:hover{background:var(--clay);border-color:var(--clay);color:#fff;}
 .book-note{text-align:center;font-size:0.72rem;color:var(--text-m);}
 
 .exp-header-row button,
@@ -158,6 +164,7 @@ footer{background:var(--ink);color:rgba(255,255,255,0.45);padding:3rem 3.5rem 1.
   .gallery-thumb { display: none; }
   .detail-layout { grid-template-columns: 1fr; padding: 1.5rem; gap: 2rem; }
   .booking-card { position: static; }
+  .booking-actions { grid-template-columns:1fr; }
   .date-row { grid-template-columns: 1fr; }
   .highlight-list { grid-template-columns: 1fr; }
 

@@ -123,6 +123,8 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--sand);co
 .review-card{border:1px solid var(--sand2);border-radius:0.9rem;padding:1.1rem;margin-bottom:0.9rem;background:#fff;}
 .reviewer{display:flex;align-items:center;gap:0.6rem;}
 .reviewer-avatar{width:34px;height:34px;border-radius:50%;background:var(--clay);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:500;}
+.rv-star{color:#d4a843;line-height:1;transition:transform 0.15s ease,color 0.15s ease;user-select:none;}
+.rv-star:hover{transform:scale(1.06);color:#c18b16;}
 
 /* Refined bookings UI */
 #bkList{display:grid;gap:1rem;}
@@ -309,3 +311,6 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--sand);co
   .mobile-user-chip span{display:none;}
   .section-title-sm{font-size:1.1rem;}
 }
+
+
+

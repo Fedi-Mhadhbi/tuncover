@@ -1,4 +1,4 @@
-:root{
+﻿:root{
   --ink:#1a1410;
   --ink-soft:#2f251d;
   --clay:#c9703a;
@@ -361,3 +361,5 @@ html,body{
     flex-direction:column;
   }
 }
+
+

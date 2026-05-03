@@ -94,6 +94,8 @@ function ensureArtisanPortfolioTable(PDO $db): void {
         CREATE TABLE IF NOT EXISTS artisan_portfolio (
             id_portfolio INT AUTO_INCREMENT PRIMARY KEY,
             id_artisan INT NOT NULL,
+            album_key VARCHAR(120) DEFAULT NULL,
+            album_title VARCHAR(180) DEFAULT NULL,
             title VARCHAR(180) NOT NULL,
             media_type ENUM('image','video') NOT NULL DEFAULT 'image',
             media_url VARCHAR(600) NOT NULL,
@@ -108,6 +110,15 @@ function ensureArtisanPortfolioTable(PDO $db): void {
               ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
+
+    try {
+        $db->exec("ALTER TABLE artisan_portfolio ADD COLUMN album_key VARCHAR(120) DEFAULT NULL AFTER id_artisan");
+    } catch (Throwable $e) {
+    }
+    try {
+        $db->exec("ALTER TABLE artisan_portfolio ADD COLUMN album_title VARCHAR(180) DEFAULT NULL AFTER album_key");
+    } catch (Throwable $e) {
+    }
 
     $ready = true;
 }

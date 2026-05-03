@@ -1,0 +1,29 @@
+﻿.nav-item { color: rgba(255,255,255,0.65); text-decoration: none; }
+.nav-item:hover { background: rgba(255,255,255,0.08) !important; color: #fff; }
+.nav-item.active { background: rgba(201,112,58,0.25) !important; color: var(--clay,#C9703A) !important; font-weight: 500; }
+.sidebar-nav { display: flex; flex-direction: column; }
+.field-error { display:block; font-size:0.72rem; color:#e05252; margin-top:0.25rem; }
+
+@media(max-width:768px){
+  #mobileTabs{display:block!important;}
+  .dash-panel.active{padding-bottom:5.5rem!important;}
+}
+.field-error{display:block;font-size:0.72rem;color:#e05252;margin-top:0.25rem;}
+
+.portfolio-admin-card{background:#fff;border:1px solid var(--sand2);border-radius:0.9rem;overflow:hidden;}
+.portfolio-admin-cover{height:150px;background:#f6efe4;position:relative;overflow:hidden;}
+.portfolio-admin-cover img,.portfolio-admin-cover video{width:100%;height:100%;object-fit:cover;}
+.portfolio-admin-stack{position:absolute;inset:0;padding:12px;}
+.portfolio-admin-stack span{position:absolute;border-radius:.8rem;background-size:cover;background-position:center;border:1px solid rgba(255,255,255,.45);box-shadow:0 10px 22px rgba(26,20,16,.14);}
+.portfolio-admin-stack span:nth-child(1){inset:16px 50px 28px 18px;transform:rotate(-7deg);}
+.portfolio-admin-stack span:nth-child(2){inset:28px 22px 20px 42px;transform:rotate(5deg);}
+.portfolio-admin-stack span:nth-child(3){inset:14px 28px 16px 28px;transform:rotate(-1deg);}
+.portfolio-admin-badge{position:absolute;left:12px;bottom:12px;background:rgba(26,20,16,.76);color:#fff;padding:.34rem .7rem;border-radius:999px;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;}
+.portfolio-admin-body{padding:.8rem .9rem;}
+.portfolio-admin-title{font-size:.85rem;font-weight:600;color:var(--ink);}
+.portfolio-admin-meta{font-size:.7rem;color:var(--clay);letter-spacing:.08em;text-transform:uppercase;margin-top:.22rem;}
+.portfolio-admin-actions{display:flex;justify-content:space-between;align-items:center;gap:.6rem;margin-top:.65rem;}
+.portfolio-admin-count{font-size:.74rem;color:var(--text-m);}
+.portfolio-admin-remove{background:none;border:1px solid #d9c7b3;color:#a44;border-radius:999px;padding:.28rem .68rem;font-size:.7rem;cursor:pointer;}
+
+

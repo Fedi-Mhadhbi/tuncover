@@ -54,7 +54,7 @@ try {
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt = $db->prepare("
-            SELECT id_portfolio, id_artisan, title, media_type, media_url, thumbnail_url, display_order, is_public, created_at
+            SELECT id_portfolio, id_artisan, album_key, album_title, title, media_type, media_url, thumbnail_url, display_order, is_public, created_at
             FROM artisan_portfolio
             WHERE id_artisan = ?
             ORDER BY display_order ASC, id_portfolio DESC
@@ -73,16 +73,38 @@ try {
         $src = $isMultipart ? $_POST : $in;
 
         $title = trim((string)($src['title'] ?? ''));
+        $albumKey = trim((string)($src['album_key'] ?? ''));
+        $albumTitle = trim((string)($src['album_title'] ?? ''));
         $mediaType = strtolower(trim((string)($src['media_type'] ?? 'image')));
         $mediaUrl = trim((string)($src['media_url'] ?? ''));
         $thumb = trim((string)($src['thumbnail_url'] ?? ''));
         $isPublic = isset($src['is_public']) ? ((int)$src['is_public'] === 1 ? 1 : 0) : 1;
 
-        if ($title === '' || mb_strlen($title) > 180) {
-            portfolio_error('Please provide a title up to 180 chars');
+        if ($albumTitle === '' && $title === '') {
+            portfolio_error('Please provide an album name or item title');
+        }
+        if ($title !== '' && mb_strlen($title) > 180) {
+            portfolio_error('Please provide an item title up to 180 chars');
+        }
+        if ($albumTitle !== '' && mb_strlen($albumTitle) > 180) {
+            portfolio_error('Please provide an album title up to 180 chars');
         }
         if (!in_array($mediaType, ['image', 'video'], true)) {
             portfolio_error('media_type must be image or video');
+        }
+        if ($albumKey !== '' && !preg_match('/^[A-Za-z0-9_-]{3,120}$/', $albumKey)) {
+            portfolio_error('album_key contains invalid characters');
+        }
+        if ($albumKey === '') {
+            $seed = $albumTitle !== '' ? $albumTitle : $title;
+            $seed = strtolower(trim(preg_replace('/[^A-Za-z0-9]+/', '-', $seed), '-'));
+            $albumKey = $seed !== '' ? $seed . '-' . substr(bin2hex(random_bytes(3)), 0, 6) : 'album-' . substr(bin2hex(random_bytes(4)), 0, 8);
+        }
+        if ($albumTitle === '') {
+            $albumTitle = $title !== '' ? $title : 'Portfolio Album';
+        }
+        if ($title === '') {
+            $title = $albumTitle;
         }
 
         // Optional desktop upload (preferred when provided)
@@ -155,12 +177,17 @@ try {
         $order = (int)$nextOrderStmt->fetchColumn();
 
         $ins = $db->prepare("
-            INSERT INTO artisan_portfolio (id_artisan, title, media_type, media_url, thumbnail_url, display_order, is_public, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+            INSERT INTO artisan_portfolio (id_artisan, album_key, album_title, title, media_type, media_url, thumbnail_url, display_order, is_public, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
         ");
-        $ins->execute([$artisanId, $title, $mediaType, $mediaUrl, ($thumb !== '' ? $thumb : null), $order, $isPublic]);
+        $ins->execute([$artisanId, $albumKey, $albumTitle, $title, $mediaType, $mediaUrl, ($thumb !== '' ? $thumb : null), $order, $isPublic]);
 
-        echo json_encode(['success' => true, 'id_portfolio' => (int)$db->lastInsertId()]);
+        echo json_encode([
+            'success' => true,
+            'id_portfolio' => (int)$db->lastInsertId(),
+            'album_key' => $albumKey,
+            'album_title' => $albumTitle,
+        ]);
         exit;
     }
 

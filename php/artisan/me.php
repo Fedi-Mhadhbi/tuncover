@@ -18,7 +18,7 @@ try {
     $stmt = $db->prepare("
         SELECT u.id_utilisateur, u.nom, u.prenom, u.email, u.role, u.statut,
                ar.id_artisan, ar.specialite, ar.ville, ar.bio,
-               ar.statut_validation, ar.note_moyenne
+               ar.statut_validation, ar.note_moyenne, ar.avatar_url
         FROM utilisateurs u
         LEFT JOIN artisans ar ON ar.id_utilisateur = u.id_utilisateur
         WHERE u.id_utilisateur = ?
@@ -52,6 +52,7 @@ try {
             'bio'               => $row['bio'] ?? '',
             'statut_validation' => $row['statut_validation'] ?? 'en_attente',
             'note_moyenne'      => (float)($row['note_moyenne'] ?? 0),
+            'avatar_url'        => $row['avatar_url'] ?? '',
         ]
     ]);
 

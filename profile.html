@@ -9,167 +9,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>TunCover — Artisan Profile</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
-<style>
-/* ── Variables ─────────────────────────────────────────────── */
-:root{
-  --ink:#1A1410; --clay:#C9703A; --sand:#F5F0E8; --sand2:#E8DFD0;
-  --cream:#FDFAF5; --text-m:#6B5E52; --gold:#D4A843; --olive:#7A8C4E;
-  --green:#5a8a3a;
-  --r:0.9rem; --transition:0.25s ease;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);}
-a{text-decoration:none;color:inherit;}
-img{max-width:100%;}
 
-/* ── Nav ────────────────────────────────────────────────────── */
-nav{position:sticky;top:0;z-index:100;background:rgba(253,250,245,0.96);
-  backdrop-filter:blur(12px);border-bottom:1px solid var(--sand2);
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 2rem;height:64px;}
-.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--ink);}
-.nav-links{display:flex;align-items:center;gap:2rem;}
-.nav-links a{font-size:0.82rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-m);transition:color var(--transition);}
-.nav-links a:hover{color:var(--clay);}
-.nav-cta{background:var(--clay)!important;color:#fff!important;padding:0.55rem 1.3rem;border-radius:3rem;font-size:0.78rem!important;}
-.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px;}
-.hamburger span{display:block;width:22px;height:2px;background:var(--ink);border-radius:2px;}
-.mobile-menu{display:none;position:fixed;inset:0;background:var(--cream);z-index:200;flex-direction:column;padding:2rem;gap:1.5rem;}
-.mobile-menu.open{display:flex;}
-.mobile-close{align-self:flex-end;background:none;border:none;font-size:1.4rem;cursor:pointer;}
-.mobile-menu a{font-size:1.1rem;font-weight:500;padding:0.5rem 0;border-bottom:1px solid var(--sand2);}
-.menu-cta{background:var(--clay)!important;color:#fff!important;padding:0.7rem 1.5rem!important;border-radius:3rem;text-align:center;border:none!important;}
-@media(max-width:768px){.nav-links{display:none;}.hamburger{display:flex;}}
-
-/* ── Hero / Profile Header ──────────────────────────────────── */
-.profile-hero{
-  background:linear-gradient(135deg,#1A1410 0%,#2d1f14 60%,#3d2a18 100%);
-  color:#fff;padding:3rem 2rem 0;position:relative;overflow:hidden;
-}
-.profile-hero::before{
-  content:'';position:absolute;inset:0;
-  background:url('https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=1200&q=40') center/cover;
-  opacity:0.08;
-}
-.profile-hero-inner{max-width:1100px;margin:0 auto;position:relative;z-index:1;}
-.breadcrumb{display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;color:rgba(255,255,255,0.5);margin-bottom:2rem;}
-.breadcrumb a{color:rgba(255,255,255,0.5);transition:color var(--transition);}
-.breadcrumb a:hover{color:rgba(255,255,255,0.9);}
-.breadcrumb span{opacity:0.4;}
-
-.profile-card-hero{display:flex;align-items:flex-end;gap:2rem;padding-bottom:2rem;}
-.profile-avatar-wrap{position:relative;flex-shrink:0;}
-.profile-avatar{width:110px;height:110px;border-radius:50%;object-fit:cover;border:4px solid rgba(255,255,255,0.25);background:var(--clay);}
-.profile-avatar-initials{width:110px;height:110px;border-radius:50%;background:var(--clay);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:2.5rem;color:#fff;border:4px solid rgba(255,255,255,0.25);}
-.verified-badge{position:absolute;bottom:4px;right:4px;background:#6b9e4a;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:0.75rem;border:2px solid #fff;}
-
-.profile-hero-info{flex:1;}
-.profile-hero-info h1{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300;color:#fff;line-height:1.2;margin-bottom:0.4rem;}
-.profile-craft{font-size:0.82rem;color:var(--clay);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.6rem;}
-.profile-location{font-size:0.85rem;color:rgba(255,255,255,0.6);margin-bottom:1rem;}
-.profile-stats-row{display:flex;gap:2rem;flex-wrap:wrap;}
-.profile-stat{text-align:center;}
-.profile-stat-num{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:#fff;}
-.profile-stat-label{font-size:0.68rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.08em;}
-
-/* ── Tabs ───────────────────────────────────────────────────── */
-.profile-tabs{max-width:1100px;margin:0 auto;display:flex;gap:0;border-bottom:2px solid var(--sand2);background:var(--cream);position:sticky;top:64px;z-index:50;}
-.p-tab{background:none;border:none;padding:1.1rem 1.5rem;font-family:'DM Sans',sans-serif;font-size:0.82rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-m);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all var(--transition);}
-.p-tab:hover{color:var(--clay);}
-.p-tab.active{color:var(--clay);border-bottom-color:var(--clay);font-weight:500;}
-
-/* ── Content ────────────────────────────────────────────────── */
-.profile-content{max-width:1100px;margin:0 auto;padding:2.5rem 2rem;}
-
-.p-panel{display:none;}
-.p-panel.active{display:block;}
-
-/* About */
-.about-grid{display:grid;grid-template-columns:1fr 320px;gap:2.5rem;}
-@media(max-width:900px){.about-grid{grid-template-columns:1fr;}}
-.bio-text{font-size:0.95rem;line-height:1.85;color:var(--text-m);margin-bottom:1.5rem;}
-.section-label{font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--clay);font-weight:500;margin-bottom:1rem;}
-.detail-list{display:flex;flex-direction:column;gap:0.75rem;}
-.detail-row{display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1rem;background:var(--sand);border-radius:var(--r);font-size:0.85rem;}
-.detail-row span:first-child{color:var(--text-m);}
-.detail-row span:last-child{font-weight:500;color:var(--ink);}
-.contact-card{background:var(--sand);border-radius:1rem;padding:1.5rem;}
-.contact-card h4{font-family:'Cormorant Garamond',serif;font-size:1.1rem;margin-bottom:1rem;color:var(--ink);}
-.book-cta-btn{display:block;background:var(--clay);color:#fff;text-align:center;padding:0.9rem;border-radius:3rem;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:500;margin-top:1rem;transition:opacity var(--transition);}
-.book-cta-btn:hover{opacity:0.88;}
-
-/* Activities */
-.activities-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem;}
-.act-card{background:#fff;border-radius:1.1rem;overflow:hidden;border:1px solid var(--sand2);cursor:pointer;transition:transform var(--transition),box-shadow var(--transition);}
-.act-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(26,20,16,0.12);}
-.act-card-img{height:200px;overflow:hidden;position:relative;}
-.act-card-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s ease;}
-.act-card:hover .act-card-img img{transform:scale(1.04);}
-.act-badge{position:absolute;top:0.75rem;left:0.75rem;background:rgba(26,20,16,0.75);color:#fff;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2rem;backdrop-filter:blur(4px);}
-.act-card-body{padding:1.2rem;}
-.act-card-body h3{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:400;margin-bottom:0.4rem;line-height:1.35;}
-.act-card-body p{font-size:0.78rem;color:var(--text-m);line-height:1.6;margin-bottom:0.8rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.act-meta{display:flex;justify-content:space-between;align-items:center;}
-.act-price{font-size:0.9rem;font-weight:500;color:var(--clay);}
-.act-rating{font-size:0.75rem;color:var(--text-m);}
-.act-rating .star{color:var(--gold);}
-.act-details{display:flex;gap:1rem;margin-bottom:0.8rem;flex-wrap:wrap;}
-.act-detail{font-size:0.72rem;color:var(--text-m);}
-
-/* Reviews */
-.reviews-header{display:flex;align-items:center;gap:2rem;background:var(--sand);border-radius:1rem;padding:1.5rem;margin-bottom:2rem;}
-.reviews-score{text-align:center;}
-.reviews-score .big{font-family:'Cormorant Garamond',serif;font-size:3.5rem;font-weight:300;color:var(--ink);line-height:1;}
-.reviews-score .stars{color:var(--gold);font-size:1.2rem;}
-.reviews-score .count{font-size:0.75rem;color:var(--text-m);}
-.reviews-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.2rem;}
-.review-card{background:#fff;border-radius:1rem;padding:1.3rem;border:1px solid var(--sand2);}
-.review-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.8rem;}
-.reviewer{display:flex;align-items:center;gap:0.7rem;}
-.reviewer-av{width:36px;height:36px;border-radius:50%;background:var(--clay);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:600;color:#fff;}
-.reviewer-name{font-size:0.85rem;font-weight:500;}
-.reviewer-date{font-size:0.72rem;color:var(--text-m);}
-.review-activity{font-size:0.72rem;color:var(--clay);margin-bottom:0.5rem;}
-.review-text{font-size:0.82rem;color:var(--text-m);line-height:1.65;}
-.no-reviews{text-align:center;padding:3rem;color:var(--text-m);font-style:italic;}
-
-/* Portfolio */
-.portfolio-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;}
-.portfolio-card{background:#fff;border:1px solid var(--sand2);border-radius:1rem;overflow:hidden;box-shadow:0 4px 14px rgba(26,20,16,0.05);}
-.portfolio-media{height:190px;background:#f2e8d8;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-.portfolio-media img{width:100%;height:100%;object-fit:cover;}
-.portfolio-media video{width:100%;height:100%;object-fit:cover;background:#000;}
-.portfolio-iframe{width:100%;height:100%;border:0;}
-.portfolio-body{padding:.85rem 1rem;}
-.portfolio-title{font-size:.88rem;font-weight:600;color:var(--ink);line-height:1.4;}
-.portfolio-type{font-size:.68rem;color:var(--clay);letter-spacing:.08em;text-transform:uppercase;margin-top:.22rem;}
-.no-portfolio{text-align:center;padding:3rem;color:var(--text-m);font-style:italic;background:#fff;border:1px dashed var(--sand2);border-radius:1rem;}
-
-/* Loading skeleton */
-.skeleton{background:linear-gradient(90deg,var(--sand) 25%,var(--sand2) 50%,var(--sand) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:0.5rem;}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
-/* Footer */
-footer{background:var(--ink);color:rgba(255,255,255,0.7);padding:3rem 2rem 1.5rem;margin-top:4rem;}
-.footer-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2rem;}
-@media(max-width:768px){.footer-grid{grid-template-columns:1fr;}}
-.footer-brand .logo{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:#fff;}
-.footer-brand p{font-size:0.8rem;margin-top:0.5rem;line-height:1.6;}
-.footer-col h4{font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:0.8rem;}
-.footer-col a{display:block;font-size:0.8rem;margin-bottom:0.4rem;transition:color var(--transition);}
-.footer-col a:hover{color:#fff;}
-.footer-bottom{max-width:1100px;margin:0 auto;border-top:1px solid rgba(255,255,255,0.08);padding-top:1rem;display:flex;justify-content:space-between;font-size:0.75rem;flex-wrap:wrap;gap:0.5rem;}
-
-@media(max-width:768px){
-  .profile-card-hero{flex-direction:column;align-items:flex-start;gap:1rem;}
-  .profile-avatar,.profile-avatar-initials{width:80px;height:80px;}
-  .profile-hero-info h1{font-size:1.6rem;}
-  .profile-stats-row{gap:1rem;}
-  .profile-content{padding:1.5rem 1rem;}
-  .about-grid{grid-template-columns:1fr;}
-  .p-tab{padding:0.8rem 1rem;font-size:0.75rem;}
-}
-</style>
+<link rel="stylesheet" href="css/profile.css?v=20260422b">
 </head>
 <body>
 
@@ -269,9 +110,9 @@ footer{background:var(--ink);color:rgba(255,255,255,0.7);padding:3rem 2rem 1.5re
 
   <!-- PORTFOLIO -->
   <div class="p-panel" id="panel-portfolio">
-    <div class="section-label" style="margin-bottom:1.2rem;">Portfolio Gallery</div>
+    <div class="section-label" style="margin-bottom:1.2rem;">Portfolio Albums</div>
     <div class="portfolio-grid" id="portfolioGrid">
-      <div class="no-portfolio">Loading portfolioâ€¦</div>
+          <div class="no-portfolio">Loading portfolio…</div>
     </div>
   </div>
 
@@ -294,6 +135,21 @@ footer{background:var(--ink);color:rgba(255,255,255,0.7);padding:3rem 2rem 1.5re
 
 </div>
 
+<div class="album-modal" id="albumModal">
+  <div class="album-modal-card">
+    <button class="album-close" onclick="closeAlbumModal()">×</button>
+    <div class="album-modal-head">
+      <div>
+        <div class="section-label" id="albumModalLabel">Portfolio Album</div>
+        <h3 id="albumModalTitle">Album</h3>
+      </div>
+      <div class="album-count" id="albumModalCount">0 items</div>
+    </div>
+    <div class="album-viewer" id="albumViewer"></div>
+    <div class="album-strip" id="albumStrip"></div>
+  </div>
+</div>
+
 <footer>
   <div class="footer-grid">
     <div class="footer-brand"><span class="logo">TunCover</span><p>Connecting curious travellers with the authentic cultural soul of Tunisia.</p></div>
@@ -303,246 +159,11 @@ footer{background:var(--ink);color:rgba(255,255,255,0.7);padding:3rem 2rem 1.5re
   <div class="footer-bottom"><span>© 2025 TunCover</span><span>Made in Tunisia 🇹🇳</span></div>
 </footer>
 
-<script>
-/* ── NAV ─────────────────────────────────────────────────────── */
-function toggleMenu(){ const m=document.getElementById('mobileMenu'); m.classList.toggle('open'); document.body.style.overflow=m.classList.contains('open')?'hidden':''; }
-function closeMenu(){ document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow=''; }
 
-/* ── Smart nav ─────────────────────────────────────────────── */
-(function(){
-  try {
-    const u=JSON.parse(localStorage.getItem('tc_user')||'null');
-    if(!u||!u.id) return;
-    const dest=u.role==='artisan'?'tuncover-artisan-dashboard.html':u.role==='admin'?'tuncover-admin.html':'tuncover-tourist.html';
-    document.querySelectorAll('.nav-cta,.menu-cta').forEach(el=>{
-      el.textContent='\u{1F464} '+(u.prenom||'Dashboard'); el.href=dest;
-    });
-  } catch(e){}
-})();
-
-/* ── TABS ───────────────────────────────────────────────────── */
-function showTab(id, btn){
-  document.querySelectorAll('.p-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.p-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('panel-'+id).classList.add('active');
-  if(btn) btn.classList.add('active');
-}
-
-/* ── LOAD ARTISAN ─────────────────────────────────────────── */
-const params    = new URLSearchParams(window.location.search);
-const ARTISAN_ID = parseInt(params.get('id')) || 0;
-
-if (!ARTISAN_ID) {
-  document.getElementById('heroName').textContent = 'Artisan not found';
-  document.getElementById('bioText').textContent  = 'No artisan ID provided.';
-} else {
-  loadProfile();
-}
-
-async function loadProfile(){
-  try {
-    const res  = await fetch(`php/public/artisan.php?id=${ARTISAN_ID}`);
-    const data = await res.json();
-    if(!data.success){ showError(data.error||'Artisan not found'); return; }
-    renderProfile(data.artisan);
-    renderActivities(data.activities);
-    renderPortfolio(data.portfolio || []);
-    renderReviews(data.reviews, data.artisan);
-  } catch(e){
-    showError('Could not load profile. Is XAMPP running?');
-  }
-}
-
-function renderProfile(a){
-  const fullName = (a.prenom||'')+' '+(a.nom||'');
-  const initials = ((a.prenom||'?')[0]+(a.nom||'?')[0]).toUpperCase();
-
-  document.title = `TunCover — ${fullName}`;
-
-  // Breadcrumb
-  document.getElementById('breadcrumbName').textContent = fullName;
-
-  // Avatar — real photo or initials
-  const avEl = document.getElementById('avatarEl');
-  if(a.avatar_url){
-    const img = document.createElement('img');
-    img.src=a.avatar_url; img.alt=fullName; img.className='profile-avatar';
-    img.onerror=()=>{ avEl.textContent=initials; };
-    avEl.replaceWith(img);
-  } else {
-    avEl.textContent=initials;
-  }
-
-  // Verified badge
-  if(a.statut_validation==='valide'){
-    document.getElementById('verifiedBadge').style.display='flex';
-  }
-
-  // Hero text
-  document.getElementById('herocraft').textContent    = a.specialite||'Artisan';
-  document.getElementById('heroName').textContent     = fullName;
-  document.getElementById('heroLocation').textContent = '📍 '+( a.ville||'Tunisia');
-
-  // Stats
-  const rating = parseFloat(a.avg_rating)>0 ? parseFloat(a.avg_rating).toFixed(1) : '—';
-  document.getElementById('statActivities').textContent = a.nb_activites||0;
-  document.getElementById('statBookings').textContent   = a.nb_reservations||0;
-  document.getElementById('statRating').textContent     = rating;
-  document.getElementById('statReviews').textContent    = a.nb_reviews||0;
-
-  // About panel
-  document.getElementById('bioText').textContent          = a.bio||'This artisan has not added a bio yet.';
-  document.getElementById('detailVille').textContent      = a.ville||'—';
-  document.getElementById('detailSpecialite').textContent = a.specialite||'—';
-  document.getElementById('detailRating').textContent     = rating>0 ? `${rating} ★` : 'No ratings yet';
-  document.getElementById('detailActivites').textContent  = `${a.nb_activites||0} published`;
-
-  // Reviews header
-  document.getElementById('reviewBig').textContent   = rating;
-  document.getElementById('reviewCount').textContent = `${a.nb_reviews||0} review${a.nb_reviews!=1?'s':''}`;
-
-  // Update tab label
-  const actTab = document.querySelectorAll('.p-tab')[1];
-  if(actTab) actTab.textContent = `Experiences (${a.nb_activites||0})`;
-  const portTab = document.querySelectorAll('.p-tab')[2];
-  if(portTab) portTab.textContent = `Portfolio`;
-  const revTab = document.querySelectorAll('.p-tab')[3];
-  if(revTab) revTab.textContent = `Reviews (${a.nb_reviews||0})`;
-}
-
-/* ── ACTIVITIES ─────────────────────────────────────────────── */
-const FALLBACK_IMAGES = {
-  'pottery':     'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=600&q=80',
-  'jewellery':   'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&q=80',
-  'leather':     'https://images.unsplash.com/photo-1473496169904-658ba7574b0d?w=600&q=80',
-  'calligraphy': 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&q=80',
-  'weaving':     'https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=600&q=80',
-  'mergoum':     'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
-  'cooking':     'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80',
-  'heritage':    'https://images.unsplash.com/photo-1548013146-72479768bada?w=600&q=80',
-  'ceramic':     'https://images.unsplash.com/photo-1474649107449-ea4f014b7e9f?w=600&q=80',
-  'tour':        'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&q=80',
-  'default':     'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&q=80'
-};
-
-function getActivityImage(a){
-  if(a.image_url) return a.image_url;
-  const t=(a.titre||'').toLowerCase(), c=(a.categorie||'').toLowerCase();
-  for(const [k,v] of Object.entries(FALLBACK_IMAGES)){
-    if(k!=='default'&&(t.includes(k)||c.includes(k))) return v;
-  }
-  return FALLBACK_IMAGES.default;
-}
-
-function renderActivities(activities){
-  const grid = document.getElementById('activitiesGrid');
-  if(!activities||!activities.length){
-    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-m);font-style:italic;">No experiences available yet.</div>';
-    return;
-  }
-  grid.innerHTML = activities.map(a=>{
-    const img    = getActivityImage(a);
-    const badge  = a.categorie||'Experience';
-    const rating = parseFloat(a.avg_rating)>0 ? parseFloat(a.avg_rating).toFixed(1) : 'New';
-    const reviews= parseInt(a.nb_reviews)||0;
-    return `<div class="act-card" onclick="window.location='tuncover-experience.html?id=${a.id_activite}'">
-      <div class="act-card-img">
-        <img src="${esc(img)}" alt="${esc(a.titre)}" loading="lazy" onerror="this.src='${FALLBACK_IMAGES.default}'"/>
-        <span class="act-badge">${esc(badge)}</span>
-      </div>
-      <div class="act-card-body">
-        <h3>${esc(a.titre)}</h3>
-        <p>${esc((a.description||'').substring(0,100))}…</p>
-        <div class="act-details">
-          <span class="act-detail">⏱ ${a.duree_heures}h</span>
-          <span class="act-detail">👥 Max ${a.max_participants}</span>
-          <span class="act-detail">📍 ${esc(a.ville)}</span>
-        </div>
-        <div class="act-meta">
-          <div class="act-price">From ${parseFloat(a.prix).toFixed(0)} TND</div>
-          <div class="act-rating"><span class="star">★</span> ${rating}${reviews>0?' ('+reviews+')':''}</div>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function toVideoEmbed(url){
-  const u = String(url || '').trim();
-  if (!u) return null;
-  const yt = u.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{6,})/i);
-  if (yt && yt[1]) return `https://www.youtube.com/embed/${yt[1]}`;
-  const vm = u.match(/vimeo\.com\/(\d+)/i);
-  if (vm && vm[1]) return `https://player.vimeo.com/video/${vm[1]}`;
-  return null;
-}
-
-function renderPortfolio(items){
-  const grid = document.getElementById('portfolioGrid');
-  if(!grid) return;
-  if(!items || !items.length){
-    grid.innerHTML = '<div class="no-portfolio">No portfolio items yet.</div>';
-    return;
-  }
-  grid.innerHTML = items.map(it => {
-    const type = (it.media_type || 'image').toLowerCase();
-    const title = esc(it.title || 'Portfolio item');
-    let media = '';
-    if(type === 'video'){
-      const embed = toVideoEmbed(it.media_url);
-      if(embed){
-        media = `<iframe class="portfolio-iframe" src="${esc(embed)}" loading="lazy" allowfullscreen></iframe>`;
-      } else {
-        media = `<video controls preload="metadata" src="${esc(it.media_url)}"></video>`;
-      }
-    } else {
-      media = `<img src="${esc(it.media_url)}" alt="${title}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&q=70'"/>`;
-    }
-    return `<div class="portfolio-card">
-      <div class="portfolio-media">${media}</div>
-      <div class="portfolio-body">
-        <div class="portfolio-title">${title}</div>
-        <div class="portfolio-type">${type}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-/* ── REVIEWS ────────────────────────────────────────────────── */
-function renderReviews(reviews, artisan){
-  const grid = document.getElementById('reviewsGrid');
-  if(!reviews||!reviews.length){
-    grid.innerHTML='<div class="no-reviews">No reviews yet — be the first to book and review!</div>';
-    return;
-  }
-  grid.innerHTML = reviews.map(r=>{
-    const initials=((r.tourist_prenom||'?')[0]+(r.tourist_nom||'?')[0]).toUpperCase();
-    const stars='★'.repeat(Math.max(0,Math.round(r.note)))+'☆'.repeat(Math.max(0,5-Math.round(r.note)));
-    const date=r.date_avis?new Date(r.date_avis).toLocaleDateString('en-GB',{month:'long',year:'numeric'}):'';
-    return `<div class="review-card">
-      <div class="review-top">
-        <div class="reviewer">
-          <div class="reviewer-av">${initials}</div>
-          <div>
-            <div class="reviewer-name">${esc(r.tourist_prenom)} ${esc((r.tourist_nom||'').charAt(0))}.</div>
-            <div class="reviewer-date">${date}</div>
-          </div>
-        </div>
-        <span style="color:var(--gold);font-size:0.9rem;">${stars}</span>
-      </div>
-      <div class="review-activity">re: ${esc(r.activite_titre||'')}</div>
-      <p class="review-text">${esc(r.commentaire||'')}</p>
-    </div>`;
-  }).join('');
-}
-
-/* ── UTILS ──────────────────────────────────────────────────── */
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function showError(msg){
-  document.getElementById('heroName').textContent='Error';
-  document.getElementById('bioText').textContent=msg;
-  document.getElementById('activitiesGrid').innerHTML=`<div style="padding:2rem;color:#a33;">${esc(msg)}</div>`;
-}
-</script>
+<script src="js/profile.js?v=20260430a"></script>
 </body>
 </html>
+
+
+
+

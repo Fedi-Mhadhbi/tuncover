@@ -115,6 +115,8 @@ try {
     $portfolioStmt = $db->prepare("
         SELECT
             id_portfolio,
+            album_key,
+            album_title,
             title,
             media_type,
             media_url,

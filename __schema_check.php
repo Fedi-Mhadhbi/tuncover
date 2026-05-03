@@ -1,4 +1,5 @@
 ﻿<?php
+
 require 'php/config/db.php';
 try {
   $db = getDB();
@@ -13,3 +14,5 @@ try {
 } catch (Throwable $e) {
   echo 'ERR:' . $e->getMessage();
 }
+
+

@@ -211,7 +211,7 @@ TunCover follows basic security practices for authentication, database access, a
 
 ## 👨‍💻 Author
 
-**Fedi Mhadhbi**
+**Fedi Mhadhbi** |
 **Tharwa Toumi**
 
 Business Computing Student | Web Developer
